@@ -1,4 +1,17 @@
 {
   "name": "niapp100",
-  "displayName": "niapp100"
+  "displayName": "Ação Entre Amigos",
+  "ios": {
+    "supportsTablet": true,
+    "googleServicesFile": "./GoogleService-Info.plist",
+    "bundleIdentifier": "com.niapp100"
+  },
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
+      "backgroundColor": "#FFFFFF"
+    },
+    "googleServicesFile": "./google-services.json",
+    "package": "com.niapp100"
+  }  
 }
