@@ -24,7 +24,7 @@ export default function Home() {
     const { signOut } = useContext(AuthContext);
     var qtdLimite = 0;
     var token = '';
-
+ 
     async function requestUserPermission() {
         console.log('requestUserPermission')
         setLoading(true)
