@@ -3,7 +3,7 @@ import { StyleSheet, Alert, View, Text, ActivityIndicator, Keyboard, SafeAreaVie
 import Botao from '../../componentes/Botao';
 import { AreaCapa, Texto, Input, TextoMensagemCadastro } from './styles';
 import {
-    gravaRifaALiberarTransacao, obtemGeneros, obtemParametrosApp,
+    gravaRifaALiberarTransacao, obtemGeneros, obtemParametrosApp, obtemQtdNrsRifa,
     gravaRifaDisponibilizadaTransacao
 } from '../../servicos/firestore';
 import estilos from '../../estilos/estilos';
@@ -22,6 +22,8 @@ export default function DisponibilizarRifas() {
     const [descricao, setdescricao] = useState('');
     const [genero, setGenero] = useState(' Escolha a categoria');
     const [descricaoGenero, setDescricaoGenero] = useState([]);
+    const [qtdNrsRifa, setQtdNrsRifa] = useState(' Escolha a qtd de nrs da rifa');
+    const [descricaoQtdNrsRifa, setDescricaoQtdNrsRifa] = useState([]);
     const [imagemCapa, setImagemCapa] = useState('');
     const [load, setLoad] = useState(false);
     const { user: usuario } = useContext(AuthContext);
@@ -29,6 +31,7 @@ export default function DisponibilizarRifas() {
 
     useEffect(() => {
         carregaGenerosList();
+        carregaQtdNrsRifaList();
     }, []);
 
     async function carregaGenerosList() {
@@ -41,6 +44,19 @@ export default function DisponibilizarRifas() {
             descricaoGeneroArray.push(descrGenero);
         }
         setDescricaoGenero(descricaoGeneroArray)
+        setLoad(false)
+    }
+
+    async function carregaQtdNrsRifaList() {
+        console.log('carregaQtdNrsRifaList');
+        setLoad(true)
+        const qtdNrsRifaFirestore = await obtemQtdNrsRifa()
+        var descricaoqtdNrsRifaArray = []
+        for (var g = 0; g < qtdNrsRifaFirestore.length; g++) {
+            const descrQtdNrs = qtdNrsRifaFirestore[g].qtdNrs;
+            descricaoqtdNrsRifaArray.push(descrQtdNrs);
+        }
+        setDescricaoQtdNrsRifa(descricaoqtdNrsRifaArray)
         setLoad(false)
     }
 
@@ -57,6 +73,9 @@ export default function DisponibilizarRifas() {
         } else if (genero === ' Escolha a categoria' || typeof genero === "undefined") {
             console.log('genero: ' + genero);
             setMensagemCadastro('Escolha a categoria')
+        } else if (qtdNrsRifa === ' Escolha a qtd de nrs da rifa' || typeof qtdNrsRifa === "undefined") {
+            console.log('qtdNrsRifa: ' + qtdNrsRifa);
+            setMensagemCadastro('Escolha a qtd nrs da rifa')
         } else {
             gravarRifa();
         }
@@ -92,7 +111,8 @@ export default function DisponibilizarRifas() {
             nome: usuario.nome,
             email: usuario.email,
             nomeCapa: nomeImagem,
-            post: 'imagemRifa'
+            post: 'imagemRifa',
+            qtdNrsRifa: qtdNrsRifa
         }
         const parametrosAppFirestore = await obtemParametrosApp();
         if (parametrosAppFirestore.exigeCuradoria || typeof parametrosAppFirestore.exigeCuradoria === "undefined") {
@@ -239,6 +259,20 @@ export default function DisponibilizarRifas() {
                     dropdownTextStyle={styles.dropdownDropdownText}
                 />
             </View>
+            <Texto>
+                Qtd de nrs da rifa
+            </Texto>
+            <View style={styles.container}>
+                <ModalDropdown
+                    options={descricaoQtdNrsRifa}
+                    defaultValue={qtdNrsRifa}
+                    onSelect={handleOptionSelect}
+                    style={styles.dropdown}
+                    textStyle={styles.dropdownText}
+                    dropdownStyle={styles.dropdownDropdown}
+                    dropdownTextStyle={styles.dropdownDropdownText}
+                />
+            </View>            
             <AreaCapa>
                 <TouchableOpacity style={estilos.imagemCapa}
                     onPress={() => selecionarCapa()}>

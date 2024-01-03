@@ -12,14 +12,14 @@ import { doc, writeBatch, Timestamp } from "firebase/firestore";
 
 export default function Home() {
     console.log('pages/home.index.js');
-    const [RifasDisponiveis, setRifasDisponiveis] = useState([]);
+    const [rifasDisponiveis, setRifasDisponiveis] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [viewable, setViewable] = useState([]);
     const [temRifaDisponivel, setTemRifaDisponivel] = useState(false);
     const { user } = useContext(AuthContext);
     const [qtdRifas, setQtdRifas] = useState(0);
-    const [RifasDisponiveisPaginacao, setRifasDisponiveisPaginacao] = useState([]);
+    const [rifasDisponiveisPaginacao, setRifasDisponiveisPaginacao] = useState([]);
     const [ultimoRifa, setUltimoRifa] = useState(false);
     const { signOut } = useContext(AuthContext);
     var qtdLimite = 0;
@@ -107,28 +107,29 @@ async function carregarRifasDisponiveis() {
     setTemRifaDisponivel(false)
     setLoading(true)
     console.log('qtdLimite: ' + qtdLimite)
-    const RifasDisponiveisFirestore = await obtemRifasDisponiveisPaginacao(qtdLimite, user.cidade, user.uf)
+    const rifasDisponiveisFirestore = await obtemRifasDisponiveisPaginacao(qtdLimite, user.cidade, user.uf)
     setLoading(false)
-    console.log('qtdRifas home carregarRifasDisponiveis :' + RifasDisponiveisFirestore.qtdRifas)
-    if (RifasDisponiveisFirestore.qtdRifas > 0) {
-        setQtdRifas(RifasDisponiveisFirestore.qtdRifas)
-        setRifasDisponiveisPaginacao(RifasDisponiveisFirestore.RifasDisponiveisFirestore)
+    console.log('qtdRifas home carregarRifasDisponiveis :' + rifasDisponiveisFirestore.qtdRifas)
+    if (rifasDisponiveisFirestore.qtdRifas > 0) {
+        console.log('rifasDisponiveisFirestore.qtdRifas > 0')
+        setQtdRifas(rifasDisponiveisFirestore.qtdRifas)
+        setRifasDisponiveisPaginacao(rifasDisponiveisFirestore.rifasDisponiveisFirestore)
         setTemRifaDisponivel(true)
     } else {
         setTemRifaDisponivel(false)
         return
     }
-    if (RifasDisponiveisFirestore.qtdRifas > 10) {
-        console.log('qtd Rifas > 10: ' + RifasDisponiveisFirestore.qtdRifas)
-        var RifasDisponiveisArray = []
+    if (rifasDisponiveisFirestore.qtdRifas > 10) {
+        console.log('qtd Rifas > 10: ' + rifasDisponiveisFirestore.qtdRifas)
+        var rifasDisponiveisArray = []
         for (var i = 0; i < 10; i++) {
-            const RifaDisponivel = RifasDisponiveisFirestore.RifasDisponiveisFirestore[i];
-            RifasDisponiveisArray.push(RifaDisponivel)
+            const rifaDisponivel = rifasDisponiveisFirestore.rifasDisponiveisFirestore[i];
+            rifasDisponiveisArray.push(rifaDisponivel)
             console.log('i: ' + i)
         }
-        setRifasDisponiveis(RifasDisponiveisArray)
+        setRifasDisponiveis(rifasDisponiveisArray)
     } else {
-        setRifasDisponiveis(RifasDisponiveisFirestore.RifasDisponiveisFirestore)
+        setRifasDisponiveis(rifasDisponiveisFirestore.rifasDisponiveisFirestore)
     }
 }
 
@@ -146,37 +147,37 @@ async function obterMaisRifas() {
         return
     }
     console.log('não é último Rifa')
-    var qtdPag = RifasDisponiveis.length + 10;
+    var qtdPag = rifasDisponiveis.length + 10;
     console.log('qtdPag: ' + qtdPag)
-    var RifasDisponiveisArray = []
+    var rifasDisponiveisArray = []
     if (qtdRifas > qtdPag) {
         console.log('maior')
         var qtdini = qtdPag - 10
         while (qtdini < qtdPag) {
             console.log('qtdini antes: ' + qtdini)
-            const RifaDisponivel = RifasDisponiveisPaginacao[qtdini];
-            RifasDisponiveisArray.push(RifaDisponivel)
-            console.log('RifaDisponivel: ')
-            console.log(RifaDisponivel)
+            const rifaDisponivel = rifasDisponiveisPaginacao[qtdini];
+            rifasDisponiveisArray.push(rifaDisponivel)
+            console.log('rifaDisponivel: ')
+            console.log(rifaDisponivel)
             qtdini = qtdini + 1
             console.log('qtdini depois: ' + qtdini)
         }
-        setRifasDisponiveis([...RifasDisponiveis, ...RifasDisponiveisArray])
-        console.log('RifasDisponiveis.length: ' + RifasDisponiveis.length)
+        setRifasDisponiveis([...rifasDisponiveis, ...rifasDisponiveisArray])
+        console.log('rifasDisponiveis.length: ' + rifasDisponiveis.length)
         return
     } else {
         console.log('menor ou igual: ' + qtdRifas)
         var qtdini = qtdPag - 10
         console.log('qtdini fora while: ' + qtdini)
-        var RifasDisponiveisArray = []
+        var rifasDisponiveisArray = []
         while (qtdini < qtdRifas) {
             console.log('qtdini dentro while antes somar: ' + qtdini)
-            const RifaDisponivel = RifasDisponiveisPaginacao[qtdini];
-            RifasDisponiveisArray.push(RifaDisponivel)
+            const rifaDisponivel = rifasDisponiveisPaginacao[qtdini];
+            rifasDisponiveisArray.push(rifaDisponivel)
             qtdini = qtdini + 1
             console.log('qtdini dentro while depois somar: ' + qtdini)
         }
-        setRifasDisponiveis([...RifasDisponiveis, ...RifasDisponiveisArray])
+        setRifasDisponiveis([...rifasDisponiveis, ...rifasDisponiveisArray])
         setUltimoRifa(true)
         return
     }
@@ -197,7 +198,7 @@ if (loading) {
             <EntregarReceberBadge />
             {temRifaDisponivel ?
                 <FlatList style={styles.lista}
-                    data={RifasDisponiveis}
+                    data={rifasDisponiveis}
                     keyExtractor={post => String(post.id)}
                     onViewableItemsChanged={handleViewableChanged}
                     viewabilityConfig={{

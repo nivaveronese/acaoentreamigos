@@ -42,7 +42,7 @@ export default function RifasDisponiveisList({ data, shouldLoad = false }) {
 
     function sairNet() {
         console.log('saidaNet')
-        //navigation.navigate('SaidaNet', data);
+        navigation.navigate('SaidaNet', data);
     }
 
     function controlarVolume() {
@@ -68,11 +68,10 @@ export default function RifasDisponiveisList({ data, shouldLoad = false }) {
                     />
                     <ListaRifas>
                         <RifaTextTitulo> {data.titulo} </RifaTextTitulo>
-                        <RifaText> {data.autor} </RifaText>
-                        <RifaText> {data.genero} </RifaText>
                         <ContentText numberOfLines={8}>
-                            {data.sinopse}
+                            {data.descricao}
                         </ContentText>
+                        <RifaText> Responsável: {data.responsavel} </RifaText>
                         <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
                     </ListaRifas>
                     <AreaBotaoReservar onPress={navegaReserva}>

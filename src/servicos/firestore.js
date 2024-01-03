@@ -9,7 +9,7 @@ export async function alteraCepRifasDisponiveis(data) {
   console.log('firestore-alteraCepRifasDisponiveis ' + data.uid)
   const batch = writeBatch(db);
   try {
-    const q = query(collection(db, "RifasDisponiveis"),
+    const q = query(collection(db, "rifasDisponiveis"),
       where("uid", "==", data.uid));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -34,9 +34,9 @@ export async function alteraCepRifasDisponiveis(data) {
 export async function excluiRifaNaoLiberadaTransacao(idRifa) {
   console.log('firestore-excluiRifaNaoLiberadaTransacao: ' + idRifa)
   const batch = writeBatch(db);
-  const RifaRef = doc(db, "RifasNaoLiberadas", idRifa);
+  const rifaRef = doc(db, "rifasNaoLiberadas", idRifa);
   try {
-    batch.delete(RifaRef);
+    batch.delete(rifaRef);
     await batch.commit();
     return 'sucesso';
   } catch (error) {
@@ -48,9 +48,9 @@ export async function excluiRifaNaoLiberadaTransacao(idRifa) {
 export async function excluiRifaDisponibilizadaTransacao(idRifa) {
   console.log('firestore-excluiRifaDisponibilizadaTransacao: ' + idRifa)
   const batch = writeBatch(db);
-  const RifaRef = doc(db, "RifasDisponiveis", idRifa);
+  const rifaRef = doc(db, "rifasDisponiveis", idRifa);
   try {
-    batch.delete(RifaRef);
+    batch.delete(rifaRef);
     await batch.commit();
   } catch (error) {
     console.log('Ops, Algo deu errado em excluiRifaDisponibilizadaTransacao ' + error.code);
@@ -61,12 +61,12 @@ export async function excluiRifaDisponibilizadaTransacao(idRifa) {
 export async function gravaRifaDisponibilizadaTransacao(data) {
   console.log('firestore-gravaRifaDisponibilizadaTransacao ' + data.id)
   const batch = writeBatch(db);
-  const RifaRef = doc(collection(db, "RifasDisponiveis"));
+  const rifaRef = doc(collection(db, "rifasDisponiveis"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
   const resultDate = subHours(new Date(), 3);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   try {
-    batch.set(RifaRef, {
+    batch.set(rifaRef, {
       titulo: data.titulo,
       descricao: data.descricao,
       imagemCapa: data.imagemCapa,
@@ -82,7 +82,8 @@ export async function gravaRifaDisponibilizadaTransacao(data) {
       dataCadastroSeq: dataCadastroSeq,
       nomeCapa: data.nomeCapa,
       post: data.post,
-      cidadeUf: data.cidade + data.uf
+      cidadeUf: data.cidade + data.uf,
+      qtdNrs: data.qtdNrs
     });
     await batch.commit();
     return 'sucesso';
@@ -95,12 +96,12 @@ export async function gravaRifaDisponibilizadaTransacao(data) {
 export async function gravaRifaLiberadaTransacao(data) {
   console.log('firestore-gravaRifaLiberadaTransacao ' + data.id)
   const batch = writeBatch(db);
-  const RifaRef = doc(collection(db, "RifasDisponiveis"));
+  const rifaRef = doc(collection(db, "rifasDisponiveis"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
   const resultDate = subHours(new Date(), 3);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   try {
-    batch.set(RifaRef, {
+    batch.set(rifaRef, {
       titulo: data.titulo,
       descricao: data.descricao,
       imagemCapa: data.imagemCapa,
@@ -116,15 +117,16 @@ export async function gravaRifaLiberadaTransacao(data) {
       dataCadastroSeq: dataCadastroSeq,
       nomeCapa: data.nomeCapa,
       post: data.post,
-      cidadeUf: data.cidade + data.uf
+      cidadeUf: data.cidade + data.uf,
+      qtdNrs: data.qtdNrs
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasDisponiveis ' + error.code);
     return 'Falha em liberar Rifa. Tente novamente'
   }
   try {
-    const RifaDRef = doc(db, "RifasALiberar", data.id);
-    batch.delete(RifaDRef);
+    const rifaDRef = doc(db, "rifasALiberar", data.id);
+    batch.delete(rifaDRef);
     await batch.commit();
     return 'sucesso'
   } catch (error) {
@@ -136,12 +138,12 @@ export async function gravaRifaLiberadaTransacao(data) {
 export async function gravaRifaALiberarTransacao(data) {
   console.log('firestore-gravaRifaALiberarTransacao')
   const batch = writeBatch(db);
-  const RifaRef = doc(collection(db, "RifasALiberar"));
+  const rifaRef = doc(collection(db, "rifasALiberar"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
   const resultDate = subHours(new Date(), 3);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   try {
-    batch.set(RifaRef, {
+    batch.set(rifaRef, {
       titulo: data.titulo,
       descricao: data.descricao,
       imagemCapa: data.imagemCapa,
@@ -157,7 +159,8 @@ export async function gravaRifaALiberarTransacao(data) {
       dataCadastroSeq: dataCadastroSeq,
       nomeCapa: data.nomeCapa,
       post: 'imagemRifa',
-      cidadeUf: data.cidade + data.uf
+      cidadeUf: data.cidade + data.uf,
+      qtdNrs: data.qtdNrs
     });
     await batch.commit();
     return 'sucesso'
@@ -170,12 +173,12 @@ export async function gravaRifaALiberarTransacao(data) {
 export async function gravaRifaNaoLiberadaTransacao(data) {
   console.log('firestore-gravaRifaNaoLiberadaTransacao ' + data.id)
   const batch = writeBatch(db);
-  const RifaRef = doc(collection(db, "RifasNaoLiberadas"));
+  const rifaRef = doc(collection(db, "rifasNaoLiberadas"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
   const resultDate = subHours(new Date(), 3);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   try {
-    batch.set(RifaRef, {
+    batch.set(rifaRef, {
       titulo: data.titulo,
       descricao: data.descricao,
       imagemCapa: data.imagemCapa,
@@ -190,15 +193,16 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
       dataCadastro: dataCadastro,
       dataCadastroSeq: dataCadastroSeq,
       nomeCapa: data.nomeCapa,
-      post: data.post
+      post: data.post,
+      qtdNrs: data.qtdNrs
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaNaoLiberadaTransacao-RifasNaoLiberadas ' + error.code);
     return 'Falha em não liberar Rifa. Tente novamente'
   }
   try {
-    const RifaDRef = doc(db, "RifasALiberar", data.id);
-    batch.delete(RifaDRef);
+    const rifaDRef = doc(db, "rifasALiberar", data.id);
+    batch.delete(rifaDRef);
     await batch.commit();
     return 'sucesso'
   } catch (error) {
@@ -253,6 +257,23 @@ export async function obtemGeneros() {
   }
 }
 
+export async function obtemQtdNrsRifa() {
+  console.log('firestore-obtemQtdNrsRifa: ');
+  try {
+    const q = query(collection(db, "qtdNrsRifa"), orderBy("qtdNrs"));
+    let qtdNrsRifaFirestore = []
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let qtdNrsRifa = { id: doc.id, ...doc.data() }
+      qtdNrsRifaFirestore.push(qtdNrsRifa)
+    });
+    return qtdNrsRifaFirestore
+  } catch (error) {
+    console.log('erro obtemQtdNrsRifa: ' + error.code)
+    return []
+  }
+}
+
 export async function obtemMotivosExcluirConta() {
   console.log('firestore-obtemMotivosExcluirConta: ');
   try {
@@ -293,20 +314,20 @@ export async function obtemUsuario(uidusuario) {
 export async function obtemRifasALiberar() {
   console.log('firestore-obtemRifasALiberar');
   try {
-    let RifasALiberarFirestore = [];
-    const q = query(collection(db, "RifasALiberar"),
+    let rifasALiberarFirestore = [];
+    const q = query(collection(db, "rifasALiberar"),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      let RifaALiberar = { id: doc.id, ...doc.data() }
-      RifasALiberarFirestore.push(RifaALiberar)
+      let rifaALiberar = { id: doc.id, ...doc.data() }
+      rifasALiberarFirestore.push(rifaALiberar)
     });
-    let qtdRifas = RifasALiberarFirestore.length
+    let qtdRifas = rifasALiberarFirestore.length
     console.log('qtdRifas: ' + qtdRifas)
-    return { RifasALiberarFirestore, qtdRifas }
+    return { rifasALiberarFirestore, qtdRifas }
   } catch (error) {
     console.log('erro obtemRifasALiberar: ' + error.code)
-    return { RifasALiberarFirestore, qtdRifas }
+    return { rifasALiberarFirestore, qtdRifas }
   }
 }
 
@@ -314,123 +335,123 @@ export async function obtemRifasDisponiveisCepPaginacao(localidade, uf, qtdLimit
   console.log('firestore-obtemRifasDisponiveisCepPaginacao: ' + localidade + '-' + uf + '-' + qtdLimite);
   const cidadeUf = localidade + uf;
   console.log('cidadeUf: ' + cidadeUf)
-  var RifasDisponiveisFirestore = [];
+  var rifasDisponiveisFirestore = [];
   try {
-    const q = query(collection(db, "RifasDisponiveis"),
+    const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      let RifaDisponivel = { id: doc.id, ...doc.data() }
-      RifasDisponiveisFirestore.push(RifaDisponivel)
+      let rifaDisponivel = { id: doc.id, ...doc.data() }
+      rifasDisponiveisFirestore.push(rifaDisponivel)
     });
-    var qtdRifas = RifasDisponiveisFirestore.length
+    var qtdRifas = rifasDisponiveisFirestore.length
     console.log('firestore-obtemRifasDisponiveisCepPaginacao qtdRifas: ' + qtdRifas)
-    return { RifasDisponiveisFirestore, qtdRifas }
+    return { rifasDisponiveisFirestore, qtdRifas }
   } catch (error) {
     console.log('firestore-erro obtemRifasDisponiveisCepPaginacao: ' + error.code)
-    return { RifasDisponiveisFirestore, qtdRifas }
+    return { rifasDisponiveisFirestore, qtdRifas }
   }
 }
 
 export async function obtemRifasDisponiveisGeneroPaginacao(qtdLimite, cidade, uf, genero) {
   console.log('firestore-obtemRifasDisponiveisGeneroPaginacao: ' + qtdLimite + '-' + cidade + '-' + uf + '-' + genero);
   const cidadeUf = cidade + uf;
-  var RifasDisponiveisFirestore = [];
+  var rifasDisponiveisFirestore = [];
   try {
-    const q = query(collection(db, "RifasDisponiveis"),
+    const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
       where("genero", "==", genero),
       limit(`${qtdLimite}`));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      let RifaDisponivel = { id: doc.id, ...doc.data() }
-      RifasDisponiveisFirestore.push(RifaDisponivel)
+      let rifaDisponivel = { id: doc.id, ...doc.data() }
+      rifasDisponiveisFirestore.push(rifaDisponivel)
     });
-    var qtdRifas = RifasDisponiveisFirestore.length
+    var qtdRifas = rifasDisponiveisFirestore.length
     console.log('firestore-obtemRifasDisponiveisGeneroPaginacao qtdRifas : ' + qtdRifas)
     if (qtdRifas < qtdLimite) {
       console.log('Uf')
       // uf    
       let qtdLimiteFalta = qtdLimite - qtdRifas
-      const qUf = query(collection(db, "RifasDisponiveis"),
+      const qUf = query(collection(db, "rifasDisponiveis"),
         where("genero", "==", genero),
         where("uf", "==", uf),
         where("cidadeUf", "!=", cidadeUf),
         limit(`${qtdLimiteFalta}`));
       const querySnapshotUf = await getDocs(qUf);
       querySnapshotUf.forEach((doc) => {
-        let RifaDisponivelUf = { id: doc.id, ...doc.data() }
-        RifasDisponiveisFirestore.push(RifaDisponivelUf)
+        let rifaDisponivelUf = { id: doc.id, ...doc.data() }
+        rifasDisponiveisFirestore.push(rifaDisponivelUf)
       });
-      var qtdRifas = RifasDisponiveisFirestore.length
+      var qtdRifas = rifasDisponiveisFirestore.length
       console.log('firestore-obtemRifasDisponiveisGeneroPaginacao uf qtdRifas : ' + qtdRifas)
       if (qtdRifas < qtdLimite) {
         console.log('Final')
         // final
         let qtdLimiteFaltaFinal = qtdLimite - qtdRifas
-        const qFi = query(collection(db, "RifasDisponiveis"),
+        const qFi = query(collection(db, "rifasDisponiveis"),
           where("genero", "==", genero),
           where("uf", "!=", uf),
           limit(`${qtdLimiteFaltaFinal}`));
         const querySnapshotFi = await getDocs(qFi);
         querySnapshotFi.forEach((doc) => {
-          let RifaDisponivelFi = { id: doc.id, ...doc.data() }
-          RifasDisponiveisFirestore.push(RifaDisponivelFi)
+          let rifaDisponivelFi = { id: doc.id, ...doc.data() }
+          rifasDisponiveisFirestore.push(rifaDisponivelFi)
         });
-        var qtdRifas = RifasDisponiveisFirestore.length
+        var qtdRifas = rifasDisponiveisFirestore.length
         console.log('firestore-obtemRifasDisponiveisGeneroPaginacao final: ' + qtdRifas)
       }
     }
   } catch (error) {
     console.log('firestore erro obtemRifasDisponiveisGeneroPaginacao ' + error.code)
-    return { RifasDisponiveisFirestore, qtdRifas }
+    return { rifasDisponiveisFirestore, qtdRifas }
   }
   console.log('firestore-obtemRifasDisponiveisGeneroPaginacao return: ' + qtdRifas)
-  return { RifasDisponiveisFirestore, qtdRifas }
+  return { rifasDisponiveisFirestore, qtdRifas }
 }
 
 export async function obtemRifasDisponibilizadasAExcluir(uid) {
   console.log('firestore-obtemRifasDisponibilizadasAExcluir: ' + uid);
   try {
-    const q = query(collection(db, "RifasDisponiveis"), where("uid", "==", uid));
-    const RifasAExcluirFirestore = []
+    const q = query(collection(db, "rifasDisponiveis"), where("uid", "==", uid));
+    const rifasAExcluirFirestore = []
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      let RifaAExcluir = { id: doc.id, ...doc.data() }
-      RifasAExcluirFirestore.push(RifaAExcluir)
+      let rifaAExcluir = { id: doc.id, ...doc.data() }
+      rifasAExcluirFirestore.push(rifaAExcluir)
     });
-    const qtdRifas = RifasAExcluirFirestore.length
-    return { RifasAExcluirFirestore, qtdRifas }
+    const qtdRifas = rifasAExcluirFirestore.length
+    return { rifasAExcluirFirestore, qtdRifas }
   } catch (error) {
     console.log('erro obtemRifasDisponibilizadasAExcluir: ' + error.code)
-    return { RifasAExcluirFirestore, qtdRifas }
+    return { rifasAExcluirFirestore, qtdRifas }
   }
 }
 
 export async function obtemRifasNaoLiberadas(uid) {
   console.log('firestore-obtemRifasNaoLiberadas: ' + uid);
   try {
-    const q = query(collection(db, "RifasNaoLiberadas"), where("uid", "==", uid));
-    const RifasNaoLiberadasFirestore = []
+    const q = query(collection(db, "rifasNaoLiberadas"), where("uid", "==", uid));
+    const rifasNaoLiberadasFirestore = []
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      let RifaNaoLiberada = { id: doc.id, ...doc.data() }
-      RifasNaoLiberadasFirestore.push(RifaNaoLiberada)
+      let rifaNaoLiberada = { id: doc.id, ...doc.data() }
+      rifasNaoLiberadasFirestore.push(rifaNaoLiberada)
     });
-    const qtdRifas = RifasNaoLiberadasFirestore.length
-    return { RifasNaoLiberadasFirestore, qtdRifas }
+    const qtdRifas = rifasNaoLiberadasFirestore.length
+    return { rifasNaoLiberadasFirestore, qtdRifas }
   } catch (error) {
     console.log('erro obtemRifasNaoLiberadas: ' + error.code)
-    return { RifasNaoLiberadasFirestore, qtdRifas }
+    return { rifasNaoLiberadasFirestore, qtdRifas }
   }
 }
 
 export async function obtemQtdRifasNaoLiberadas(uid) {
   console.log('firestore-obtemQtdRifasNaoLiberadas: ' + uid);
   try {
-    const coll = collection(db, "RifasNaoLiberadas");
+    const coll = collection(db, "rifasNaoLiberadas");
     const q = query(coll, where("uid", "==", uid));
     const snapshot = await getCountFromServer(q);
     return snapshot.data().count;
@@ -443,23 +464,23 @@ export async function obtemQtdRifasNaoLiberadas(uid) {
 export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf, argPesquisa) {
   console.log('firestore-obtemRifasDisponiveisTituloPaginacao: ' + qtdLimite + '-' + cidade + '-' + uf + '-' + argPesquisa);
   const cidadeUf = cidade + uf;
-  var RifasDisponiveisFirestore = [];
-  var RifasDisponiveisAntesFiltro = [];
-  var RifasDisponiveisAposFiltro = [];
+  var rifasDisponiveisFirestore = [];
+  var rifasDisponiveisAntesFiltro = [];
+  var rifasDisponiveisAposFiltro = [];
   try {
-    const q = query(collection(db, "RifasDisponiveis"),
+    const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      let RifaDisponivel = { id: doc.id, ...doc.data() }
-      RifasDisponiveisAntesFiltro.push(RifaDisponivel)
+      let rifaDisponivel = { id: doc.id, ...doc.data() }
+      rifasDisponiveisAntesFiltro.push(rifaDisponivel)
     });
-    var qtdRifasAntes = RifasDisponiveisAntesFiltro.length
+    var qtdRifasAntes = rifasDisponiveisAntesFiltro.length
     console.log('firestore-obtemRifasDisponiveisTituloPaginacao qtdRifas antes filtro: ' + qtdRifasAntes)
-    RifasDisponiveisAposFiltro = (
-      RifasDisponiveisAntesFiltro.filter(item => {
+    rifasDisponiveisAposFiltro = (
+      rifasDisponiveisAntesFiltro.filter(item => {
         if (item.titulo.toLowerCase().indexOf(argPesquisa.toLowerCase()) > -1) {
           return true;
         } else {
@@ -467,32 +488,32 @@ export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf
         }
       })
     );
-    if (RifasDisponiveisAposFiltro.length > 0) {
-      RifasDisponiveisFirestore = [...RifasDisponiveisFirestore, ...RifasDisponiveisAposFiltro]
+    if (rifasDisponiveisAposFiltro.length > 0) {
+      rifasDisponiveisFirestore = [...rifasDisponiveisFirestore, ...rifasDisponiveisAposFiltro]
     }
-    var qtdRifas = RifasDisponiveisFirestore.length
+    var qtdRifas = rifasDisponiveisFirestore.length
     console.log('firestore-obtemRifasDisponiveisTituloPaginacao qtdRifas após filtro: ' + qtdRifas)
     if (qtdRifas == qtdLimite) {
       console.log('firestore-obtemRifasDisponiveisTituloPaginacao return: ' + qtdRifas)
-      return { RifasDisponiveisFirestore, qtdRifas }
+      return { rifasDisponiveisFirestore, qtdRifas }
     }
     // uf    
     let qtdLimiteFalta = qtdLimite - qtdRifas
-    var RifasDisponiveisAntesFiltroUf = [];
-    var RifasDisponiveisAposFiltroUf = [];
-    const qUf = query(collection(db, "RifasDisponiveis"),
+    var rifasDisponiveisAntesFiltroUf = [];
+    var rifasDisponiveisAposFiltroUf = [];
+    const qUf = query(collection(db, "rifasDisponiveis"),
       where("uf", "==", uf),
       where("cidadeUf", "!=", cidadeUf),
       limit(`${qtdLimiteFalta}`));
     const querySnapshotUf = await getDocs(qUf);
     querySnapshotUf.forEach((doc) => {
-      let RifaDisponivelUf = { id: doc.id, ...doc.data() }
-      RifasDisponiveisAntesFiltroUf.push(RifaDisponivelUf)
+      let rifaDisponivelUf = { id: doc.id, ...doc.data() }
+      rifasDisponiveisAntesFiltroUf.push(rifaDisponivelUf)
     });
-    var qtdRifasAntesUf = RifasDisponiveisAntesFiltroUf.length
+    var qtdRifasAntesUf = rifasDisponiveisAntesFiltroUf.length
     console.log('firestore-obtemRifasDisponiveisTituloPaginacao Uf qtdRifas antes filtro: ' + qtdRifasAntesUf)
-    RifasDisponiveisAposFiltroUf = (
-      RifasDisponiveisAntesFiltroUf.filter(item => {
+    rifasDisponiveisAposFiltroUf = (
+      rifasDisponiveisAntesFiltroUf.filter(item => {
         if (item.titulo.toLowerCase().indexOf(argPesquisa.toLowerCase()) > -1) {
           return true;
         } else {
@@ -500,31 +521,31 @@ export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf
         }
       })
     );
-    if (RifasDisponiveisAposFiltroUf.length > 0) {
-      RifasDisponiveisFirestore = [...RifasDisponiveisFirestore, ...RifasDisponiveisAposFiltroUf]
+    if (rifasDisponiveisAposFiltroUf.length > 0) {
+      rifasDisponiveisFirestore = [...rifasDisponiveisFirestore, ...rifasDisponiveisAposFiltroUf]
     }
-    var qtdRifas = RifasDisponiveisFirestore.length
+    var qtdRifas = rifasDisponiveisFirestore.length
     console.log('firestore-obtemRifasDisponiveisTituloPaginacao Uf qtdRifas após filtro: ' + qtdRifas)
     if (qtdRifas == qtdLimite) {
       console.log('firestore-obtemRifasDisponiveisTituloPaginacao return uf: ' + qtdRifas)
-      return { RifasDisponiveisFirestore, qtdRifas }
+      return { rifasDisponiveisFirestore, qtdRifas }
     }
     // final
     let qtdLimiteFaltaFinal = qtdLimite - qtdRifas
-    var RifasDisponiveisAntesFiltroFi = [];
-    var RifasDisponiveisAposFiltroFi = [];
-    const qFi = query(collection(db, "RifasDisponiveis"),
+    var rifasDisponiveisAntesFiltroFi = [];
+    var rifasDisponiveisAposFiltroFi = [];
+    const qFi = query(collection(db, "rifasDisponiveis"),
       where("uf", "!=", uf),
       limit(`${qtdLimiteFaltaFinal}`));
     const querySnapshotFi = await getDocs(qFi);
     querySnapshotFi.forEach((doc) => {
-      let RifaDisponivelFi = { id: doc.id, ...doc.data() }
-      RifasDisponiveisAntesFiltroFi.push(RifaDisponivelFi)
+      let rifaDisponivelFi = { id: doc.id, ...doc.data() }
+      rifasDisponiveisAntesFiltroFi.push(rifaDisponivelFi)
     });
-    var qtdRifasAntesFi = RifasDisponiveisAntesFiltroFi.length
+    var qtdRifasAntesFi = rifasDisponiveisAntesFiltroFi.length
     console.log('firestore-obtemRifasDisponiveisTituloPaginacao qtdRifas Final: ' + qtdRifasAntesFi)
-    RifasDisponiveisAposFiltroFi = (
-      RifasDisponiveisAntesFiltroFi.filter(item => {
+    rifasDisponiveisAposFiltroFi = (
+      rifasDisponiveisAntesFiltroFi.filter(item => {
         if (item.titulo.toLowerCase().indexOf(argPesquisa.toLowerCase()) > -1) {
           return true;
         } else {
@@ -532,70 +553,70 @@ export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf
         }
       })
     );
-    if (RifasDisponiveisAposFiltroFi.length > 0) {
-      RifasDisponiveisFirestore = [...RifasDisponiveisFirestore, ...RifasDisponiveisAposFiltroFi]
+    if (rifasDisponiveisAposFiltroFi.length > 0) {
+      rifasDisponiveisFirestore = [...rifasDisponiveisFirestore, ...rifasDisponiveisAposFiltroFi]
     }
-    var qtdRifas = RifasDisponiveisFirestore.length
+    var qtdRifas = rifasDisponiveisFirestore.length
     console.log('firestore-obtemRifasDisponiveisTituloPaginacao qtdRifas Final após filtro: ' + qtdRifas)
-    console.log('firestore-obtemRifasDisponiveisTituloPaginacao return final : ' + qtdRifas)
-    return { RifasDisponiveisFirestore, qtdRifas }
+    return { rifasDisponiveisFirestore, qtdRifas }
   } catch (error) {
     console.log('firestore-obtemRifasDisponiveisTituloPaginacao erro' + error.code)
-    return { RifasDisponiveisFirestore, qtdRifas }
+    return { rifasDisponiveisFirestore, qtdRifas }
   }
 }
 
 export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
   console.log('firestore-obtemRifasDisponiveisPaginacao: ' + qtdLimite + '-' + cidade + '-' + uf);
   const cidadeUf = cidade + uf;
-  var RifasDisponiveisFirestore = [];
+  var rifasDisponiveisFirestore = [];
   try {
-    const q = query(collection(db, "RifasDisponiveis"),
+    const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      let RifaDisponivel = { id: doc.id, ...doc.data() }
-      RifasDisponiveisFirestore.push(RifaDisponivel)
+      let rifaDisponivel = { id: doc.id, ...doc.data() }
+      console.log('each: ' + doc.data().titulo)
+      rifasDisponiveisFirestore.push(rifaDisponivel)
     });
-    var qtdRifas = RifasDisponiveisFirestore.length
+    var qtdRifas = rifasDisponiveisFirestore.length
     console.log('firestore-obtemRifasDisponiveisPaginacao qtdRifas : ' + qtdRifas)
     if (qtdRifas < qtdLimite) {
       console.log('Uf')
       // uf    
       let qtdLimiteFalta = qtdLimite - qtdRifas
-      const qUf = query(collection(db, "RifasDisponiveis"),
+      const qUf = query(collection(db, "rifasDisponiveis"),
         where("uf", "==", uf),
         where("cidadeUf", "!=", cidadeUf),
         limit(`${qtdLimiteFalta}`));
       const querySnapshotUf = await getDocs(qUf);
       querySnapshotUf.forEach((doc) => {
-        let RifaDisponivelUf = { id: doc.id, ...doc.data() }
-        RifasDisponiveisFirestore.push(RifaDisponivelUf)
+        let rifaDisponivelUf = { id: doc.id, ...doc.data() }
+        rifasDisponiveisFirestore.push(rifaDisponivelUf)
       });
-      var qtdRifas = RifasDisponiveisFirestore.length
+      var qtdRifas = rifasDisponiveisFirestore.length
       console.log('firestore-obtemRifasDisponiveisPaginacao uf qtdRifas : ' + qtdRifas)
       if (qtdRifas < qtdLimite) {
         console.log('Final')
         // final
         let qtdLimiteFaltaFinal = qtdLimite - qtdRifas
-        const qFi = query(collection(db, "RifasDisponiveis"),
+        const qFi = query(collection(db, "rifasDisponiveis"),
           where("uf", "!=", uf),
           limit(`${qtdLimiteFaltaFinal}`));
         const querySnapshotFi = await getDocs(qFi);
         querySnapshotFi.forEach((doc) => {
-          let RifaDisponivelFi = { id: doc.id, ...doc.data() }
-          RifasDisponiveisFirestore.push(RifaDisponivelFi)
+          let rifaDisponivelFi = { id: doc.id, ...doc.data() }
+          rifasDisponiveisFirestore.push(rifaDisponivelFi)
         });
-        var qtdRifas = RifasDisponiveisFirestore.length
+        var qtdRifas = rifasDisponiveisFirestore.length
         console.log('firestore-obtemRifasDisponiveisPaginacao final: ' + qtdRifas)
       }
     }
   } catch (error) {
     console.log('firestore erro obtemRifasDisponiveisPaginacao ' + error.code)
-    var qtdRifas = RifasDisponiveisFirestore.length
-    return { RifasDisponiveisFirestore, qtdRifas }
+    var qtdRifas = rifasDisponiveisFirestore.length
+    return { rifasDisponiveisFirestore, qtdRifas }
   }
   var qtdliv = 9;
   if (qtdRifas > qtdliv) {
@@ -610,13 +631,13 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
       });
     } catch (error) {
       console.log('erro obtemRifasDisponiveisPaginacao - advertising: ' + error.code)
-      return { RifasDisponiveisFirestore }
+      return { rifasDisponiveisFirestore }
     }
     var index = 5;
     var iitem = 0;
     const batch = writeBatch(db);
     while (qtdRifas > qtdliv) {
-      RifasDisponiveisFirestore.splice(index, 0, advertisingFirestore[iitem])
+      rifasDisponiveisFirestore.splice(index, 0, advertisingFirestore[iitem])
       try {
         const advertisingRef = doc(db, "advertising", advertisingFirestore[iitem].id);
         batch.update(advertisingRef, {
@@ -625,8 +646,8 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
         batch.commit();
       } catch (error) {
         console.log('Ops, Algo deu errado em obtemRifasDisponiveisPaginacao-atualiza qtd views advertising 1: ' + error.code);
-        var qtdRifas = RifasDisponiveisFirestore.length
-        return { RifasDisponiveisFirestore, qtdRifas }
+        var qtdRifas = rifasDisponiveisFirestore.length
+        return { rifasDisponiveisFirestore, qtdRifas }
       }
       qtdliv = qtdliv + 10;
       index = index + 10;
@@ -636,12 +657,116 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
       }
     }
     console.log('return obtemRifasDisponiveisPaginacao com advertising')
-    var qtdRifas = RifasDisponiveisFirestore.length
-    return { RifasDisponiveisFirestore, qtdRifas }
+    var qtdRifas = rifasDisponiveisFirestore.length
+    return { rifasDisponiveisFirestore, qtdRifas }
   }
   console.log('return obtemRifasDisponiveisPaginacao sem advertising')
-  var qtdRifas = RifasDisponiveisFirestore.length
-  return { RifasDisponiveisFirestore, qtdRifas }
+  var qtdRifas = rifasDisponiveisFirestore.length
+  return { rifasDisponiveisFirestore, qtdRifas }
+}
+
+export async function obtemRifasDisponiveisResponsavelPaginacao(qtdLimite, cidade, uf, argPesquisa) {
+  console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao: ' + qtdLimite + '-' + cidade + '-' + uf + '-' + argPesquisa);
+  const cidadeUf = cidade + uf;
+  var rifasDisponiveisFirestore = [];
+  var rifasDisponiveisAntesFiltro = [];
+  var rifasDisponiveisAposFiltro = [];
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("cidadeUf", "==", cidadeUf),
+      limit(`${qtdLimite}`),
+      orderBy("dataCadastroSeq", "desc"));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let rifaDisponivel = { id: doc.id, ...doc.data() }
+      rifasDisponiveisAntesFiltro.push(rifaDisponivel)
+    });
+    var qtdRifasAntes = rifasDisponiveisAntesFiltro.length
+    console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao qtdRifas antes filtro: ' + qtdRifasAntes)
+    rifasDisponiveisAposFiltro = (
+      rifasDisponiveisAntesFiltro.filter(item => {
+        if (item.nome.toLowerCase().indexOf(argPesquisa.toLowerCase()) > -1) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+    );
+    if (rifasDisponiveisAposFiltro.length > 0) {
+      rifasDisponiveisFirestore = [...rifasDisponiveisFirestore, ...rifasDisponiveisAposFiltro]
+    }
+    var qtdRifas = rifasDisponiveisFirestore.length
+    console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao qtdRifas após filtro: ' + qtdRifas)
+    if (qtdRifas == qtdLimite) {
+      console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao return: ' + qtdRifas)
+      return { rifasDisponiveisFirestore, qtdRifas }
+    }
+    // uf    
+    let qtdLimiteFalta = qtdLimite - qtdRifas
+    var rifasDisponiveisAntesFiltroUf = [];
+    var rifasDisponiveisAposFiltroUf = [];
+    const qUf = query(collection(db, "rifasDisponiveis"),
+      where("uf", "==", uf),
+      where("cidadeUf", "!=", cidadeUf),
+      limit(`${qtdLimiteFalta}`));
+    const querySnapshotUf = await getDocs(qUf);
+    querySnapshotUf.forEach((doc) => {
+      let rifaDisponivelUf = { id: doc.id, ...doc.data() }
+      rifasDisponiveisAntesFiltroUf.push(rifaDisponivelUf)
+    });
+    var qtdRifasAntesUf = rifasDisponiveisAntesFiltroUf.length
+    console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao Uf qtdRifas antes filtro: ' + qtdRifasAntesUf)
+    rifasDisponiveisAposFiltroUf = (
+      rifasDisponiveisAntesFiltroUf.filter(item => {
+        if (item.nome.toLowerCase().indexOf(argPesquisa.toLowerCase()) > -1) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+    );
+    if (rifasDisponiveisAposFiltroUf.length > 0) {
+      rifasDisponiveisFirestore = [...rifasDisponiveisFirestore, ...rifasDisponiveisAposFiltroUf]
+    }
+    var qtdRifas = rifasDisponiveisFirestore.length
+    console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao Uf qtdRifas após filtro: ' + qtdRifas)
+    if (qtdRifas == qtdLimite) {
+      console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao return uf: ' + qtdRifas)
+      return { rifasDisponiveisFirestore, qtdRifas }
+    }
+    // final
+    let qtdLimiteFaltaFinal = qtdLimite - qtdRifas
+    var rifasDisponiveisAntesFiltroFi = [];
+    var rifasDisponiveisAposFiltroFi = [];
+    const qFi = query(collection(db, "rifasDisponiveis"),
+      where("uf", "!=", uf),
+      limit(`${qtdLimiteFaltaFinal}`));
+    const querySnapshotFi = await getDocs(qFi);
+    querySnapshotFi.forEach((doc) => {
+      let rifaDisponivelFi = { id: doc.id, ...doc.data() }
+      rifasDisponiveisAntesFiltroFi.push(rifaDisponivelFi)
+    });
+    var qtdRifasAntesFi = rifasDisponiveisAntesFiltroFi.length
+    console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao qtdRifas Final: ' + qtdRifasAntesFi)
+    rifasDisponiveisAposFiltroFi = (
+      rifasDisponiveisAntesFiltroFi.filter(item => {
+        if (item.nome.toLowerCase().indexOf(argPesquisa.toLowerCase()) > -1) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+    );
+    if (rifasDisponiveisAposFiltroFi.length > 0) {
+      rifasDisponiveisFirestore = [...rifasDisponiveisFirestore, ...rifasDisponiveisAposFiltroFi]
+    }
+    var qtdRifas = rifasDisponiveisFirestore.length
+    console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao qtdRifas Final após filtro: ' + qtdRifas)
+    return { rifasDisponiveisFirestore, qtdRifas }
+  } catch (error) {
+    console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao erro' + error.code)
+    return { rifasDisponiveisFirestore, qtdRifas }
+  }
 }
 
 export async function obtemParametrosApp() {
@@ -664,4 +789,3 @@ export async function obtemParametrosApp() {
     return parametrosAppFirestore
   }
 }
-

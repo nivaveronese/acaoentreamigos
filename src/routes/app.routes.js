@@ -3,9 +3,9 @@ import React from 'react';
 import StackRoutes from '../routes/stack.routes';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Perfil from '../pages/Perfil';
-import Pesquisar from '../pages/Pesquisar';
 import DisponibilizarRifas from '../pages/DisponibilizarRifas';
+import Pesquisar from '../pages/Pesquisar';
+import Perfil from '../pages/Perfil';
 
 const Tab = createBottomTabNavigator();
 
@@ -35,13 +35,13 @@ function AppRoutes() {
         }}
       />
       <Tab.Screen
-        name='Perfil' component={Perfil}
+        name='DisponibilizarRifas' component={DisponibilizarRifas}
         options={{
           headerShown: false,
-          tabBarLabel: 'Perfil',
+          tabBarLabel: 'DisponibilizarRifas',
           tabBarIcon: ({ color, size }) => {
-            return <Feather
-              name='user' color={color} size={size}
+            return <MaterialCommunityIcons
+              name='book-plus-outline' color={color} size={size}
             />
           }
         }}
@@ -59,13 +59,13 @@ function AppRoutes() {
         }}
       />
       <Tab.Screen
-        name='DisponibilizarRifas' component={DisponibilizarRifas}
+        name='Perfil' component={Perfil}
         options={{
           headerShown: false,
-          tabBarLabel: 'DisponibilizarRifas',
+          tabBarLabel: 'Perfil',
           tabBarIcon: ({ color, size }) => {
-            return <MaterialCommunityIcons
-              name='book-plus-outline' color={color} size={size}
+            return <Feather
+              name='user' color={color} size={size}
             />
           }
         }}
