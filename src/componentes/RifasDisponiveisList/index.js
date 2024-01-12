@@ -35,9 +35,9 @@ export default function RifasDisponiveisList({ data, shouldLoad = false }) {
         }).start();
     }
 
-    function navegaReserva() {
-        console.log('navegaReserva')
-        //navigation.navigate('ValidarReserva', data);
+    function navegaAquisicao() {
+        console.log('navegaAquisicao')
+        navigation.navigate('ValidarAquisicao', data);
     }
 
     function sairNet() {
@@ -71,10 +71,10 @@ export default function RifasDisponiveisList({ data, shouldLoad = false }) {
                         <ContentText numberOfLines={8}>
                             {data.descricao}
                         </ContentText>
-                        <RifaText> Responsável: {data.responsavel} </RifaText>
+                        <RifaText> Responsável: {data.nome} </RifaText>
                         <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
                     </ListaRifas>
-                    <AreaBotaoReservar onPress={navegaReserva}>
+                    <AreaBotaoReservar onPress={navegaAquisicao}>
                         <SubmitText>
                             Eu quero adquirir bilhetes desta rifa
                     </SubmitText>

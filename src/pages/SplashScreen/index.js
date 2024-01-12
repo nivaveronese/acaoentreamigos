@@ -1,6 +1,6 @@
 import { Container } from './styles';
 import LottieView from 'lottie-react-native';
-import splash from '../../assets/animation_lohmig5g.json';
+import splash from '../../assets/animation_lohmtdhf.json';
 import { useNavigation } from '@react-navigation/native';
 
 export default function SplashScreen() {

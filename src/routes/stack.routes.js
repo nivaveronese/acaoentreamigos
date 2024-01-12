@@ -11,6 +11,7 @@ import ExcluirConta from '../pages/ExcluirConta';
 import ExcluirRifaDisponibilizada from '../pages/ExcluirRifaDisponibilizada';
 import SignIn from '../pages/SignIn';
 import SaidaNet from '../pages/SaidaNet';
+import ValidarAquisicao from '../pages/ValidarAquisicao';
 
 const Stack = createNativeStackNavigator();
 
@@ -121,6 +122,13 @@ export default function StackRoutes() {
                     headerTitle: 'Voltar'
                 }}
             />
+            <Stack.Screen
+                name= 'ValidarAquisicao'
+                component= {ValidarAquisicao}
+                options= {{
+                    headerShown: false
+                }}
+            />               
         </Stack.Navigator>
     )
 }

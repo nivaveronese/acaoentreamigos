@@ -10,11 +10,11 @@ export default function RifasPesquisarList({ data }) {
     console.log('RifasPesquisarList');
     const navigation = useNavigation();
 
-    function navegaReserva() {
-        console.log('navegaReserva');
-        //navigation.navigate('Reserva', data);
+    function navegaAquisicao() {
+        console.log('navegaAquisicao')
+        navigation.navigate('ValidarAquisicao', data);
     }
-
+ 
     return (
         <SafeAreaView>
             <View style={styles.card}>
@@ -30,7 +30,7 @@ export default function RifasPesquisarList({ data }) {
                     <RifaText> Responsável: {data.nome} </RifaText>
                     <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
                 </ListaRifas>
-                <AreaBotaoReservar onPress={navegaReserva}>
+                <AreaBotaoReservar onPress={navegaAquisicao}>
                     <SubmitText>
                     Eu quero adquirir bilhetes desta rifa
                     </SubmitText>

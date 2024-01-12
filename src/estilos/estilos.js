@@ -41,7 +41,7 @@ export default StyleSheet.create({
   }, 
   logo:{
     marginBottom: 15,
-    marginLeft: '15%'
+    marginLeft: '10%'
   },
   safeArea:{
     flex: 1,

@@ -66,7 +66,7 @@ export default function SignIn() {
   return (
       <SafeAreaView style={estilos.safeArea}>
         <View style={estilos.areaLogo}>
-          <Image style={estilos.logo} source={require('../../assets/acaoentreamigos.jpg')} />
+          <Image style={estilos.logo} source={require('../../assets/acaoentreamigos3.jpeg')} />
         </View>
         <Texto>
           Email

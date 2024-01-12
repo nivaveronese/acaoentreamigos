@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet, Alert, View, Text, ActivityIndicator, Keyboard, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import Botao from '../../componentes/Botao';
-import { AreaCapa, Texto, Input, TextoMensagemCadastro } from './styles';
+import { AreaCapa, Texto, Input, TextoMensagemCadastro, InputQtd } from './styles';
 import {
     gravaRifaALiberarTransacao, obtemGeneros, obtemParametrosApp, obtemQtdNrsRifa,
     gravaRifaDisponibilizadaTransacao
@@ -19,19 +19,19 @@ export default function DisponibilizarRifas() {
     console.log('DisponibilizarRifas');
     const [mensagemCadastro, setMensagemCadastro] = useState('');
     const [titulo, setTitulo] = useState('');
+    const [nroAutorizacao, setNroAutorizacao] = useState('');
     const [descricao, setdescricao] = useState('');
     const [genero, setGenero] = useState(' Escolha a categoria');
     const [descricaoGenero, setDescricaoGenero] = useState([]);
-    const [qtdNrsRifa, setQtdNrsRifa] = useState(' Escolha a qtd de nrs da rifa');
-    const [descricaoQtdNrsRifa, setDescricaoQtdNrsRifa] = useState([]);
+    const [qtdNrsRifa, setQtdNrsRifa] = useState(0);
     const [imagemCapa, setImagemCapa] = useState('');
     const [load, setLoad] = useState(false);
     const { user: usuario } = useContext(AuthContext);
     const navigation = useNavigation();
+    var qtdNrsRifaValidos = [10,100,1000,10000,100000];
 
     useEffect(() => {
         carregaGenerosList();
-        carregaQtdNrsRifaList();
     }, []);
 
     async function carregaGenerosList() {
@@ -47,21 +47,8 @@ export default function DisponibilizarRifas() {
         setLoad(false)
     }
 
-    async function carregaQtdNrsRifaList() {
-        console.log('carregaQtdNrsRifaList');
-        setLoad(true)
-        const qtdNrsRifaFirestore = await obtemQtdNrsRifa()
-        var descricaoqtdNrsRifaArray = []
-        for (var g = 0; g < qtdNrsRifaFirestore.length; g++) {
-            const descrQtdNrs = qtdNrsRifaFirestore[g].qtdNrs;
-            descricaoqtdNrsRifaArray.push(descrQtdNrs);
-        }
-        setDescricaoQtdNrsRifa(descricaoqtdNrsRifaArray)
-        setLoad(false)
-    }
-
     async function disponibilizarRifa() {
-        console.log('disponibilizarRifa: ' + genero);
+        console.log('disponibilizarRifa: ' + genero + '-' + qtdNrsRifa);
         Keyboard.dismiss();
         setMensagemCadastro('')
         if (titulo == '' || titulo.length === 0) {
@@ -73,9 +60,8 @@ export default function DisponibilizarRifas() {
         } else if (genero === ' Escolha a categoria' || typeof genero === "undefined") {
             console.log('genero: ' + genero);
             setMensagemCadastro('Escolha a categoria')
-        } else if (qtdNrsRifa === ' Escolha a qtd de nrs da rifa' || typeof qtdNrsRifa === "undefined") {
-            console.log('qtdNrsRifa: ' + qtdNrsRifa);
-            setMensagemCadastro('Escolha a qtd nrs da rifa')
+        } else if (typeof qtdNrsRifa === "undefined" || !qtdNrsRifaValidos.includes(parseInt(qtdNrsRifa))) {
+            setMensagemCadastro('Informe uma quantidade valida de nrs da rifa (10,100,1000,10000 ou 100000')
         } else {
             gravarRifa();
         }
@@ -112,7 +98,8 @@ export default function DisponibilizarRifas() {
             email: usuario.email,
             nomeCapa: nomeImagem,
             post: 'imagemRifa',
-            qtdNrsRifa: qtdNrsRifa
+            qtdNrsRifa: qtdNrsRifa,
+            nroAutorizacao: nroAutorizacao
         }
         const parametrosAppFirestore = await obtemParametrosApp();
         if (parametrosAppFirestore.exigeCuradoria || typeof parametrosAppFirestore.exigeCuradoria === "undefined") {
@@ -123,7 +110,9 @@ export default function DisponibilizarRifas() {
                 setTitulo('')
                 setImagemCapa('')
                 setdescricao('')
+                setNroAutorizacao('')
                 setGenero(' Escolha a categoria')
+                setQtdNrsRifa(' Escolha a qtd de nrs da rifa')
                 navigation.navigate('Ok')
             }
             else {
@@ -139,7 +128,9 @@ export default function DisponibilizarRifas() {
                 setTitulo('')
                 setImagemCapa('')
                 setdescricao('')
+                setNroAutorizacao('')
                 setGenero(' Escolha a categoria')
+                setQtdNrsRifa(' Escolha a qtd de nrs da rifa')
                 navigation.navigate('Ok')
             }
             else {
@@ -234,7 +225,7 @@ export default function DisponibilizarRifas() {
                 onChangeText={(text) => setTitulo(text)}
             />
             <Texto>
-                descricao
+                Descricao
             </Texto>
             <Input
                 autoCorrect={false}
@@ -260,19 +251,23 @@ export default function DisponibilizarRifas() {
                 />
             </View>
             <Texto>
-                Qtd de nrs da rifa
+                Qtd de nrs da rifa (10, 100, 1000, 10000 ou 100000)
             </Texto>
-            <View style={styles.container}>
-                <ModalDropdown
-                    options={descricaoQtdNrsRifa}
-                    defaultValue={qtdNrsRifa}
-                    onSelect={handleOptionSelect}
-                    style={styles.dropdown}
-                    textStyle={styles.dropdownText}
-                    dropdownStyle={styles.dropdownDropdown}
-                    dropdownTextStyle={styles.dropdownDropdownText}
-                />
-            </View>            
+                    <InputQtd
+                        autoCorrect={false}
+                        keyboardType="numeric"
+                        value={qtdNrsRifa}
+                        onChangeText={(text) => setQtdNrsRifa(text)}
+                    />    
+            <Texto>
+                Numero da autorizacao
+            </Texto>
+            <Input
+                autoCorrect={false}
+                autoCaptalize='none'
+                value={nroAutorizacao}
+                onChangeText={(text) => setNroAutorizacao(text)}
+            />                  
             <AreaCapa>
                 <TouchableOpacity style={estilos.imagemCapa}
                     onPress={() => selecionarCapa()}>

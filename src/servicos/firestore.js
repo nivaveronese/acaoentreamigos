@@ -59,7 +59,7 @@ export async function excluiRifaDisponibilizadaTransacao(idRifa) {
 }
 
 export async function gravaRifaDisponibilizadaTransacao(data) {
-  console.log('firestore-gravaRifaDisponibilizadaTransacao ' + data.id)
+  console.log('firestore-gravaRifaDisponibilizadaTransacao ' + data.titulo)
   const batch = writeBatch(db);
   const rifaRef = doc(collection(db, "rifasDisponiveis"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
@@ -83,7 +83,8 @@ export async function gravaRifaDisponibilizadaTransacao(data) {
       nomeCapa: data.nomeCapa,
       post: data.post,
       cidadeUf: data.cidade + data.uf,
-      qtdNrs: data.qtdNrs
+      qtdNrs: data.qtdNrsRifa,
+      nroAutorizacao: data.nroAutorizacao
     });
     await batch.commit();
     return 'sucesso';
@@ -328,6 +329,46 @@ export async function obtemRifasALiberar() {
   } catch (error) {
     console.log('erro obtemRifasALiberar: ' + error.code)
     return { rifasALiberarFirestore, qtdRifas }
+  }
+}
+
+export async function obtemBilhetesEmAquisicao(idUsuario, idRifa) {
+  console.log('firestore-obtemBilhetesEmAquisicao: ' + idUsuario + '-' + idRifa);
+  var bilhetesEmAquisicaoFirestore = [];
+  try {
+    const q = query(collection(db, "bilhetesEmAquisicao"),
+      where("idRifa", "==", idRifa),
+      where("idUsuario", "==", idUsuario)
+      );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let bilheteEmAquisicao = { id: doc.id, ...doc.data() }
+      bilhetesEmAquisicaoFirestore.push(bilheteEmAquisicao)
+    });
+    return bilhetesEmAquisicaoFirestore
+  } catch (error) {
+    console.log('firestore-erro obtemBilhetesEmAquisicao: ' + error.code)
+    return bilhetesEmAquisicaoFirestore
+  }
+}
+
+export async function obtemBilhetesJaAdquiridos(idUsuario, idRifa) {
+  console.log('firestore-obtemBilhetesJaAdquiridos: ' + idUsuario + '-' + idRifa);
+  var bilhetesJaAdquiridosFirestore = [];
+  try {
+    const q = query(collection(db, "bilhetesJaAdquiridos"),
+      where("idRifa", "==", idRifa),
+      where("idUsuario", "==", idUsuario)
+      );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let bilheteJaAdquirido = { id: doc.id, ...doc.data() }
+      bilhetesJaAdquiridosFirestore.push(bilheteJaAdquirido)
+    });
+    return bilhetesJaAdquiridosFirestore
+  } catch (error) {
+    console.log('firestore-erro obtemBilhetesJaAdquiridos: ' + error.code)
+    return bilhetesJaAdquiridosFirestore
   }
 }
 
