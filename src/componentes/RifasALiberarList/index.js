@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {ActivityIndicator, Image, View, Alert, SafeAreaView, StyleSheet } from 'react-native';
+import { ActivityIndicator, Image, View, Alert, SafeAreaView, StyleSheet } from 'react-native';
 import {
     RifaText, ListaRifas, Container, RifaTextTitulo, ContentText, TextRecebe,
     AreaBotaoConfirmarRecebimento
@@ -12,7 +12,7 @@ export default function RifasALiberarList({ data }) {
     console.log('RifasALiberarList');
     const navigation = useNavigation();
     const [mensagemCadastro, setMensagemCadastro] = useState('');
-    const [loading,setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const confirmarLiberacaoRifa = () => {
         console.log('confirmarLiberacaoRifa');
@@ -36,12 +36,12 @@ export default function RifasALiberarList({ data }) {
 
     const confirmarNaoLiberacaoRifa = () => {
         console.log('confirmarNaoLiberacaoRifa');
-       Alert.alert(
+        Alert.alert(
             "Olá,",
-            "Você não vai mesmo liberar este Rifa?",
+            "Você não vai mesmo liberar esta Rifa?",
             [
                 {
-                    text: "Não vou liberar este Rifa",
+                    text: "Não vou liberar esta Rifa",
                     onPress: () => confirmaNaoLiberacao(),
                     style: "cancel"
                 },
@@ -108,42 +108,44 @@ export default function RifasALiberarList({ data }) {
             </View>
         )
     } else {
-    return (
-        <SafeAreaView>
-            <View style={styles.card}>
-                <Image source={{ uri: data.imagemCapa }}
-                    resizeMode={"cover"}
-                    style={styles.capa}
-                />
-                <ListaRifas>
-                    <RifaTextTitulo> {data.titulo} </RifaTextTitulo>
-                    <RifaText> {data.genero} </RifaText>
-                    <ContentText numberOfLines={8}>
+        return (
+            <SafeAreaView>
+                <View style={styles.card}>
+                    <Image source={{ uri: data.imagemCapa }}
+                        resizeMode={"cover"}
+                        style={styles.capa}
+                    />
+                    <ListaRifas>
+                        <RifaTextTitulo> {data.titulo} </RifaTextTitulo>
+                        <ContentText numberOfLines={8}>
                             {data.descricao}
                         </ContentText>
-                    <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
-                </ListaRifas>
-                <Container>
-                    <TextRecebe>Liberar este Rifa </TextRecebe>
-                    <AreaBotaoConfirmarRecebimento onPress={confirmarLiberacaoRifa}>
-                        <Icon
-                            name='check-circle-outline' size={30} color='#008080'
-                        />
-                    </AreaBotaoConfirmarRecebimento>
-                </Container>
-                <Container>
-                    <TextRecebe>Não liberar este Rifa </TextRecebe>
-                    <AreaBotaoConfirmarRecebimento onPress={confirmarNaoLiberacaoRifa}>
-                        <Icon
-                            name='alpha-x-circle-outline' size={30} color='#FF0000'
-                        />
-                    </AreaBotaoConfirmarRecebimento>
-                </Container>
-                <RifaTextTitulo> {mensagemCadastro} </RifaTextTitulo>
-            </View>
-        </SafeAreaView>
-    )
-}
+                        <RifaText> Responsável: {data.nome} </RifaText>
+                        <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
+                        <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
+                        <RifaText> Autorizacao: {data.autorizacao} </RifaText>
+                    </ListaRifas>
+                    <Container>
+                        <TextRecebe>Liberar esta Rifa </TextRecebe>
+                        <AreaBotaoConfirmarRecebimento onPress={confirmarLiberacaoRifa}>
+                            <Icon
+                                name='check-circle-outline' size={30} color='#008080'
+                            />
+                        </AreaBotaoConfirmarRecebimento>
+                    </Container>
+                    <Container>
+                        <TextRecebe>Não liberar esta Rifa </TextRecebe>
+                        <AreaBotaoConfirmarRecebimento onPress={confirmarNaoLiberacaoRifa}>
+                            <Icon
+                                name='alpha-x-circle-outline' size={30} color='#FF0000'
+                            />
+                        </AreaBotaoConfirmarRecebimento>
+                    </Container>
+                    <RifaTextTitulo> {mensagemCadastro} </RifaTextTitulo>
+                </View>
+            </SafeAreaView>
+        )
+    }
 }
 
 const styles = StyleSheet.create({

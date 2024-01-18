@@ -14,7 +14,7 @@ export default function RifasPesquisarList({ data }) {
         console.log('navegaAquisicao')
         navigation.navigate('ValidarAquisicao', data);
     }
- 
+
     return (
         <SafeAreaView>
             <View style={styles.card}>
@@ -29,10 +29,12 @@ export default function RifasPesquisarList({ data }) {
                     </ContentText>
                     <RifaText> Responsável: {data.nome} </RifaText>
                     <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
+                    <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
+                    <RifaText> Autorizacao: {data.autorizacao} </RifaText>
                 </ListaRifas>
                 <AreaBotaoReservar onPress={navegaAquisicao}>
                     <SubmitText>
-                    Eu quero adquirir bilhetes desta rifa
+                        Eu quero adquirir bilhetes desta rifa
                     </SubmitText>
                 </AreaBotaoReservar>
             </View>

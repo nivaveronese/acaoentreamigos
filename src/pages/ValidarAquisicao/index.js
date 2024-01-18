@@ -1,16 +1,17 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Image, SafeAreaView, Alert, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, Image, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import {
-    ViewTitulo, RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
-    AreaBotao, ContentText, InputQtd, TextoQtd, AreaInput
+    RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
+    ContentText, InputQtd, TextoQtd, AreaInput
 } from './styles';
 import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
 import { obtemBilhetesJaAdquiridos, obtemBilhetesEmAquisicao, obtemParametrosApp }
     from '../../servicos/firestore';
-import { Timestamp } from "firebase/firestore";
+import { ScrollView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function ValidarAquisicao() {
     console.log('ValidarAquisicao: ')
@@ -20,7 +21,7 @@ export default function ValidarAquisicao() {
     const [loading, setLoading] = useState(false);
     const [mensagemCadastro, setMensagemCadastro] = useState('');
     const [qtdBilhetes, setQtdBilhetes] = useState(0);
-    const [qtdMaximaBilhetesPorCpf, setQtdMaximaBilhetesPorCpf] = useState(0);
+    const [qtdMaximaBilhetesPorUsuario, setQtdMaximaBilhetesPorUsuario] = useState(0);
 
     useEffect(() => {
         console.log('ValidarAquisicao-useEffect')
@@ -34,11 +35,11 @@ export default function ValidarAquisicao() {
         setLoading(false)
         if (!parametrosAppFirestore) {
             console.log('nao encontrou parametros')
-            setQtdMaximaBilhetesPorCpf(5);
+            setQtdMaximaBilhetesPorUsuario(5);
         } else {
-            setQtdMaximaBilhetesPorCpf( parametrosAppFirestore.qtdMaximaBilhetesParaCompraPorCpfPorRifa );
+            setQtdMaximaBilhetesPorUsuario(parametrosAppFirestore.qtdMaximaBilhetesParaCompraPorUsuarioPorRifa);
         }
-        console.log('carregarParametrosApp - qtdMaximaBilhetesPorCpf: ' + qtdMaximaBilhetesPorCpf);
+        console.log('carregarParametrosApp - qtdMaximaBilhetesPorUsuario: ' + qtdMaximaBilhetesPorUsuario);
     }
 
     async function verSePodeAdquirir() {
@@ -66,18 +67,40 @@ export default function ValidarAquisicao() {
             return
         }
         let qtdTotalBilhetesJaEmAquisicao = (parseFloat(bilhetesJaAdquiridosFirestore.length) + parseFloat(bilhetesEmAquisicaoFirestore.length));
-        let qtdBilhetesPodeAdquirir = qtdMaximaBilhetesPorCpf - qtdTotalBilhetesJaEmAquisicao;
+        let qtdBilhetesPodeAdquirir = qtdMaximaBilhetesPorUsuario - qtdTotalBilhetesJaEmAquisicao;
         if (qtdBilhetesPodeAdquirir == 0) {
             setLoading(false);
-            setMensagemCadastro('Voce ja adquiriu, ou tem em processo de aquisicao, a quantidade maxima de bilhetes: ' + qtdMaximaBilhetesPorCpf)
+            setMensagemCadastro('Voce ja adquiriu, ou tem em processo de aquisicao, a quantidade maxima de bilhetes: ' + qtdMaximaBilhetesPorUsuario)
             return;
         }
         if (qtdBilhetes > qtdBilhetesPodeAdquirir) {
             setLoading(false);
             setMensagemCadastro('Voce pode adquirir no maximo:  ' + qtdBilhetesPodeAdquirir + ' bilhetes')
             return;
+        } 
+        var dadosRifa = {
+            id: route.params?.id,
+            cep: route.params?.cep,
+            cidade: route.params?.cidade,
+            uf: route.params?.uf,
+            bairro: route.params?.bairro,
+            nome: route.params?.nome,
+            email: route.params?.email,
+            titulo: route.params?.titulo,
+            descricao: route.params?.descricao,
+            genero: route.params?.genero,
+            imagemCapa: route.params?.imagemCapa,
+            nomeCapa: route.params?.nomeCapa,
+            post: route.params?.post,
+            vlrBilhete: route.params?.vlrBilhete,
+            vlrTotalBilhetes: (parseInt(qtdBilhetes) * parseInt(route.params?.vlrBilhete)),
+            usuarioUid: usuario.uid,
+            usuarioQtdBilhetes: qtdBilhetes,
+            usuarioNome: usuario.nome,
+            usuarioEmail: usuario.email
         }
-        console.log('ir para solicitar dados pagamento')
+        console.log('ir para informar dados pagamento')
+        navigation.navigate('InformarDadosPagamento', dadosRifa);
     }
 
     function voltar() {
@@ -98,51 +121,52 @@ export default function ValidarAquisicao() {
         )
     } else {
         return (
-            <SafeAreaView style={{ backgroundColor: '#FFFFFF' }}>
-
-                <View style={styles.card}>
-                    <Image source={{ uri: route.params?.imagemCapa }}
-                        style={styles.capa}
-                    />
-                    <AreaRifa>
-                        <ViewTitulo>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <ScrollView>
+                    <View style={styles.card}>
+                        <Image source={{ uri: route.params?.imagemCapa }}
+                            style={styles.capa}
+                        />
+                        <AreaRifa>
                             <RifaTextTitulo> {route.params?.titulo} </RifaTextTitulo>
-                        </ViewTitulo>
-                        <ContentText numberOfLines={8}>
-                            {route.params?.descricao}
-                        </ContentText>
-                        <RifaText> Responsável: {route.params?.nome} </RifaText>
-                        <RifaText> {route.params?.cepusuario} {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
-                        <RifaText> Permitida a aquisicao maxima de {qtdMaximaBilhetesPorCpf} bilhetes por cpf </RifaText>                    
-                    </AreaRifa>
-                </View>
-                <View style={estilos.areaMensagemCadastro}>
-                    <TextoQtd>
-                        Informe a quantidade de bilhetes que deseja adquirir
-                    </TextoQtd>
-                </View>
-                <AreaInput>
-                    <InputQtd
-                        autoCorrect={false}
-                        keyboardType="numeric"
-                        value={qtdBilhetes}
-                        onChangeText={(text) => setQtdBilhetes(text)}
-                    />
-                    <SubmitButton onPress={verSePodeAdquirir}>
-                        <SubmitText>
-                            Adquirir
-                        </SubmitText>
-                    </SubmitButton>
-                    <TouchableOpacity style={styles.botao} onPress={() => voltar()}>
-                        <Text style={estilos.linkText}>Voltar</Text>
-                    </TouchableOpacity>
-                </AreaInput>
-                <View style={estilos.areaMensagemCadastro}>
-                    <Text style={estilos.textoMensagemCadastro}>
-                        {mensagemCadastro}
-                    </Text>
-                </View>
-            </SafeAreaView>
+                            <ContentText numberOfLines={8}>
+                                {route.params?.descricao}
+                            </ContentText>
+                            <RifaText> Responsável: {route.params?.nome} </RifaText>
+                            <RifaText> {route.params?.cepusuario} {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
+                            <RifaText> Qtd nrs: {route.params?.qtdNrs} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
+                            <RifaText> Autorizacao: {route.params?.autorizacao} </RifaText>
+                            <RifaText> Permitida a aquisicao maxima de {qtdMaximaBilhetesPorUsuario} bilhetes por usuario </RifaText>
+                        </AreaRifa>
+                    </View>
+                    <View style={estilos.areaMensagemCadastro}>
+                        <TextoQtd>
+                            Informe a quantidade de bilhetes que deseja adquirir
+                        </TextoQtd>
+                    </View>
+                    <AreaInput>
+                        <InputQtd
+                            autoCorrect={false}
+                            keyboardType="numeric"
+                            value={qtdBilhetes}
+                            onChangeText={(text) => setQtdBilhetes(text)}
+                        />
+                        <SubmitButton onPress={verSePodeAdquirir}>
+                            <SubmitText>
+                                Adquirir
+                            </SubmitText>
+                        </SubmitButton>
+                        <TouchableOpacity style={styles.botao} onPress={() => voltar()}>
+                            <Text style={estilos.linkText}>Voltar</Text>
+                        </TouchableOpacity>
+                    </AreaInput>
+                    <View style={estilos.areaMensagemCadastro}>
+                        <Text style={estilos.textoMensagemCadastro}>
+                            {mensagemCadastro}
+                        </Text>
+                    </View>
+                </ScrollView>
+            </GestureHandlerRootView>
         )
     }
 }

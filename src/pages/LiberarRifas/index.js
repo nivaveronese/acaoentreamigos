@@ -9,10 +9,10 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function LiberarRifas() {
     console.log('pages/LiberarRifas');
-    const [RifasALiberar, setRifasALiberar] = useState([]);
+    const [rifasALiberar, setRifasALiberar] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [temLivroALiberar, setTemLivroALiberar] = useState(false);
+    const [temRifaALiberar, setTemRifaALiberar] = useState(false);
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -23,14 +23,14 @@ export default function LiberarRifas() {
     async function carregarRifasALiberar(shouldRefresh = false) {
         console.log('carregarRifasALiberar');
         if(loading) return;
-        setTemLivroALiberar(false)
+        setTemRifaALiberar(false)
         setLoading(true)
-        const RifasALiberarFirestore = await obtemRifasALiberar()
-        setRifasALiberar(shouldRefresh ? RifasALiberarFirestore.RifasALiberarFirestore
-            : [...RifasALiberar, ...RifasALiberarFirestore.RifasALiberarFirestore])
-        console.log('RifasALiberarFirestore.qtdRifas: ' + RifasALiberarFirestore.qtdRifas)
-        if (RifasALiberarFirestore.qtdRifas > 0){
-            setTemLivroALiberar(true)
+        const rifasALiberarFirestore = await obtemRifasALiberar()
+        setRifasALiberar(shouldRefresh ? rifasALiberarFirestore.rifasALiberarFirestore
+            : [...rifasALiberar, ...rifasALiberarFirestore.rifasALiberarFirestore])
+        console.log('RifasALiberarFirestore.qtdRifas: ' + rifasALiberarFirestore.qtdRifas)
+        if (rifasALiberarFirestore.qtdRifas > 0){
+            setTemRifaALiberar(true)
         } else {
             navigation.navigate('Ok')
         }
@@ -50,17 +50,17 @@ export default function LiberarRifas() {
     } else {
         return (
             <Background>
-                { temLivroALiberar ?
+                { temRifaALiberar ?
                     <FlatList style={styles.lista}
                         showsVerticalScrollIndicator={false}
                         onRefresh={refreshList}
                         refreshing={refreshing}
-                        data={RifasALiberar}
+                        data={rifasALiberar}
                         keyExtractor={item => item.key}
                         renderItem={({ item }) => (<RifasALiberarList data={item} />)}
                     />
                 :
-                <Texto> Nenhum livro a liberar</Texto>
+                <Texto> Nenhuma rifa a liberar</Texto>
                 }    
             </Background>
         )

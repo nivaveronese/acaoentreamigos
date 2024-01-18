@@ -22,7 +22,7 @@ export default function EntregarReceberBadge() {
   
     function RifasNaoLiberadas() {
         console.log('navega NaoLiberada')
-        //navigation.navigate('NaoLiberada');
+        navigation.navigate('NaoLiberada');
     }    
  
     return (

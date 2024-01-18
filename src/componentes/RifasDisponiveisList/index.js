@@ -19,7 +19,7 @@ export default function RifasDisponiveisList({ data, shouldLoad = false }) {
     const [videoVolume, setVideoVolume] = useState(1.0);
     const opacity = new Animated.Value(0);
     const AnimatedOriginal = Animated.createAnimatedComponent(Original);
- 
+
     useEffect(() => {
         if (shouldLoad) {
             setLoaded(true);
@@ -46,7 +46,7 @@ export default function RifasDisponiveisList({ data, shouldLoad = false }) {
     }
 
     function controlarVolume() {
-                console.log('controlarVolume')
+        console.log('controlarVolume')
         if (mute) {
             setMute(false);
             setVideoVolume(1.0);
@@ -73,11 +73,13 @@ export default function RifasDisponiveisList({ data, shouldLoad = false }) {
                         </ContentText>
                         <RifaText> Responsável: {data.nome} </RifaText>
                         <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
+                        <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
+                        <RifaText> Autorizacao: {data.autorizacao} </RifaText>
                     </ListaRifas>
                     <AreaBotaoReservar onPress={navegaAquisicao}>
                         <SubmitText>
                             Eu quero adquirir bilhetes desta rifa
-                    </SubmitText>
+                        </SubmitText>
                     </AreaBotaoReservar>
                 </View>
                 )

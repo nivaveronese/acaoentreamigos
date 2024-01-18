@@ -14,7 +14,7 @@ export const Input = styled.TextInput`
 `;
 export const Texto= styled.Text`
         font-size: 12px; 
-        margin-top: 8px;
+        margin-top: 5px;
         margin-left: 8px;
         color: #333;
         font-family: Roboto;
@@ -34,7 +34,7 @@ export const TextoMensagemCadastro= styled.Text`
         margin-left: 8px;
 `;
 export const InputQtd = styled.TextInput`
-    width: 95%;
+    width: 40%;
     height: 40px;
     border-width: 1px;
     border-color: #D3D3D3;    

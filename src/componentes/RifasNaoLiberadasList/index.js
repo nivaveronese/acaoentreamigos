@@ -1,65 +1,37 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, Image, View, Alert, SafeAreaView, StyleSheet } from 'react-native';
-import {
-    RifaText, ListaRifas, RifaTextTitulo, SubmitText, ContentText,
-    AreaBotaoExcluir
-} from './styles';
+import React, { useState, useEffect } from 'react';
+import { ContentText, ListaRifas, RifaTextTitulo, RifaText } from './styles';
+import { SafeAreaView, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { excluiRifaDisponibilizadaTransacao } from '../../servicos/firestore';
+import { View, Image } from 'react-native';
+import { excluiRifaNaoLiberadaTransacao } from '../../servicos/firestore';
 import { excluiImagem } from '../../servicos/storage';
 
-export default function RifasDisponibilizadasAExcluirList({ data }) {
-    console.log('RifasDisponibilizadasAExcluirList');
-    const navigation = useNavigation();
-    const [mensagemCadastro, setMensagemCadastro] = useState('');
+export default function RifasNaoLiberadasList({ data }) {
+    console.log('RifasNaoLiberadasList')
     const [loading, setLoading] = useState(false);
- 
-    const confirmarExclusaoRifa = () => {
-        console.log('confirmarExclusaoRifa');
-        Alert.alert(
-            "Olá,",
-            "Você confirma a exclusão desta Rifa?",
-            [
-                {
-                    text: "Hum, ainda não. Vou pensar melhor",
-                    onPress: () => naoConfirmaExclusaoRifa(),
-                    style: "cancel"
-                },
-                {
-                    text: "Sim. Vou excluir.",
-                    onPress: () => confirmaExclusaoRifa(),
-                    style: 'default'
-                }
-            ]
-        );
-    }
+    const navigation = useNavigation();
 
-    function naoConfirmaExclusaoRifa() {
-        console.log('naoConfirmaExclusaoRifa');
-        return;
-    }
+    useEffect(() => {
+        return () => {
+            doSomethingOnUnmount();
+        }
+    }, [])
 
-    async function confirmaExclusaoRifa() {
-        console.log('confirmaExclusaoRifa');
-        setMensagemCadastro('')
+    async function doSomethingOnUnmount() {
+        console.log('doSomethingOnUnmount')
         setLoading(true);
-        console.log('data.id: ' + data.id )
-        const resultado = await excluiRifaDisponibilizadaTransacao(data.id);
-        console.log('resultado confirmaExclusaoRifa: ' + resultado);
+        const resultado = await excluiRifaNaoLiberadaTransacao(data.id);
+        console.log('resultado excluiRifaNaoLiberadaTransacao: ' + resultado);
         if (resultado == 'sucesso') {
             excluirImagem();
-        } else {
-            setMensagemCadastro(resultado)
-            setLoading(false);
-            return;
         }
+        setLoading(false);
     }
 
     async function excluirImagem() {
         console.log('excluirImagem')
         const resultadoE = await excluiImagem(data.nomeCapa);
         console.log('resultado excluirImagem: ' + resultadoE);
-        setMensagemCadastro('')
         setLoading(false);
         navigation.navigate('Ok')
     }
@@ -90,18 +62,14 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
                         <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
                         <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
                         <RifaText> Autorizacao: {data.autorizacao} </RifaText>
+                        <RifaText> Obs: Rifa nao foi liberada, pois nao atendeu as regras </RifaText>
                     </ListaRifas>
-                    <AreaBotaoExcluir onPress={confirmarExclusaoRifa}>
-                        <SubmitText>
-                            Excluir esta Rifa
-                        </SubmitText>
-                    </AreaBotaoExcluir>
-                    <RifaTextTitulo> {mensagemCadastro} </RifaTextTitulo>
                 </View>
             </SafeAreaView>
         )
     }
 }
+
 const styles = StyleSheet.create({
     card: {
         shadowColor: '#000',
@@ -116,6 +84,6 @@ const styles = StyleSheet.create({
     capa: {
         width: '100%',
         height: 400,
-        borderRadius: 5,
+        borderRadius: 5
     }
 })

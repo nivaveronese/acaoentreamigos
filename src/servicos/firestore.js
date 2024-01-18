@@ -1,6 +1,6 @@
 import { db } from '../config/firebase';
 import {
-  collection, getDocs, getDoc, doc, query,
+  collection, getDocs, getDoc, doc, query, updateDoc,
   where, orderBy, limit, increment, writeBatch, Timestamp, getCountFromServer
 } from "firebase/firestore"
 import { subHours, format } from 'date-fns';
@@ -41,7 +41,7 @@ export async function excluiRifaNaoLiberadaTransacao(idRifa) {
     return 'sucesso';
   } catch (error) {
     console.log('Ops, Algo deu errado em excluiRifaNaoLiberadaTransacao ' + error.code);
-    return 'Falha em excluir Rifa Não Liberada. Tente novamente'
+    return 'Falha em excluiRifaNaoLiberadaTransacao. Tente novamente'
   }
 }
 
@@ -52,26 +52,55 @@ export async function excluiRifaDisponibilizadaTransacao(idRifa) {
   try {
     batch.delete(rifaRef);
     await batch.commit();
+    return 'sucesso';
   } catch (error) {
     console.log('Ops, Algo deu errado em excluiRifaDisponibilizadaTransacao ' + error.code);
-    return 'Falha em excluir Rifa Disponibilizada. Tente novamente'
+    return 'Falha em excluiRifaDisponibilizadaTransacao. Tente novamente'
   }
 }
 
-export async function gravaRifaDisponibilizadaTransacao(data) {
-  console.log('firestore-gravaRifaDisponibilizadaTransacao ' + data.titulo)
+export async function gravaPreReservaTransacao(data) {
+  console.log('firestore-gravaPreReservaTransacao ' )
+  console.log(data)
   const batch = writeBatch(db);
+  var qtdBilhetesReservados = 0;
+  const refNomeColecaoNrsBilhetesRifaDisponivel =  'nrsBilhetesRifaDisponivel-' + `${data.id}`;
+  try {
+    const q = query(collection(db, refNomeColecaoNrsBilhetesRifaDisponivel),
+      where("situacao", "==", "livre")
+      );
+    const querySnapshot = await getDocs(q);
+    while (qtdBilhetesReservados < data.usuarioQtdBilhetes) {    
+    querySnapshot.forEach((doc) => {
+      let bilheteLivre = { id: doc.id, ...doc.data() }
+      
+    });
+    if (bilhetesLivresFirestore.length == 0) {
+      return 'No momento, todos os bilhetes ja foram adquiridos. Tente novamente mais tarde, pois pode ser que alguem desista.'
+    }
+  } catch (error) {
+    console.log('firestore-erro gravaPreReservaTransacao-nrsBilhetesRifaDisponivel: ' + error.code)
+    return 'Falha em gravaPreReservaTransacao-nrsBilhetesRifaDisponivel. Por favor, tente novamente mais tarde.'
+  }
+
+
+
+
+
   const rifaRef = doc(collection(db, "rifasDisponiveis"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
   const resultDate = subHours(new Date(), 3);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
+  const idRifa = rifaRef.id;
+  console.log('rifaRef.id: ' + rifaRef.id)
+  console.log('data.id: ' + data.id)
   try {
     batch.set(rifaRef, {
       titulo: data.titulo,
       descricao: data.descricao,
       imagemCapa: data.imagemCapa,
       genero: data.genero,
-      uid: data.uidusuario,
+      uid: data.uid,
       cep: data.cep,
       cidade: data.cidade,
       uf: data.uf,
@@ -83,21 +112,121 @@ export async function gravaRifaDisponibilizadaTransacao(data) {
       nomeCapa: data.nomeCapa,
       post: data.post,
       cidadeUf: data.cidade + data.uf,
-      qtdNrs: data.qtdNrsRifa,
-      nroAutorizacao: data.nroAutorizacao
+      qtdNrs: data.qtdNrs,
+      autorizacao: data.autorizacao,
+      vlrBilhete: data.vlrBilhete,
+      id: idRifa
     });
-    await batch.commit();
-    return 'sucesso';
   } catch (error) {
-    console.log('Ops, Algo deu errado em gravaRifaDisponibilizadaTransacao-RifasDisponiveis ' + error.code);
-    return 'Falha em disponibilizar Rifa. Tente novamente'
+    console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasDisponiveis ' + error.code);
+    return 'Falha em gravaRifaLiberadaTransacao-RifasDisponiveis. Tente novamente'
+  }
+  try {
+    const refNomeColecao =  'nrsBilhetesRifaDisponivel-' + `${idRifa}`;
+    let nroBilhete = 0;
+    while (nroBilhete < data.qtdNrs) {
+      const nrsBilhetesRef = doc(collection(db, refNomeColecao));
+      batch.set(nrsBilhetesRef, {
+        id: idRifa,
+        nroBilhete: nroBilhete,
+        situacao: 'livre',
+        emailAdquiriu: '',
+        cpfAdquiriu: '',
+        uidAdquiriu: '',
+        dataAdquiriu: ''
+      });      
+      nroBilhete = nroBilhete + 1;
+  }
+  }
+  catch (error) {
+    console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-nrsBilhetesRifaDisponivel ' + error.code);
+    return 'Falha em gravaRifaLiberadaTransacao-nrsBilhetesRifaDisponivel. Tente novamente'
+  }
+  try {
+    const rifaDRef = doc(db, "rifasALiberar", data.id);
+    batch.delete(rifaDRef);
+    await batch.commit();
+    return 'sucesso'
+  } catch (error) {
+    console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasALiberar ' + error.code);
+    return 'Falha em lgravaRifaLiberadaTransacao-RifasALiberar. Tente novamente'
   }
 }
 
 export async function gravaRifaLiberadaTransacao(data) {
-  console.log('firestore-gravaRifaLiberadaTransacao ' + data.id)
+  console.log('firestore-gravaRifaLiberadaTransacao ' )
+  console.log(data)
   const batch = writeBatch(db);
   const rifaRef = doc(collection(db, "rifasDisponiveis"));
+  const dataCadastroSeq = Timestamp.fromDate(new Date());
+  const resultDate = subHours(new Date(), 3);
+  const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
+  const idRifa = rifaRef.id;
+  console.log('rifaRef.id: ' + rifaRef.id)
+  console.log('data.id: ' + data.id)
+  try {
+    batch.set(rifaRef, {
+      titulo: data.titulo,
+      descricao: data.descricao,
+      imagemCapa: data.imagemCapa,
+      genero: data.genero,
+      uid: data.uid,
+      cep: data.cep,
+      cidade: data.cidade,
+      uf: data.uf,
+      bairro: data.bairro,
+      nome: data.nome,
+      email: data.email,
+      dataCadastro: dataCadastro,
+      dataCadastroSeq: dataCadastroSeq,
+      nomeCapa: data.nomeCapa,
+      post: data.post,
+      cidadeUf: data.cidade + data.uf,
+      qtdNrs: data.qtdNrs,
+      autorizacao: data.autorizacao,
+      vlrBilhete: data.vlrBilhete,
+      id: idRifa
+    });
+  } catch (error) {
+    console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasDisponiveis ' + error.code);
+    return 'Falha em gravaRifaLiberadaTransacao-RifasDisponiveis. Tente novamente'
+  }
+  try {
+    const refNomeColecao =  'nrsBilhetesRifaDisponivel-' + `${idRifa}`;
+    let nroBilhete = 0;
+    while (nroBilhete < data.qtdNrs) {
+      const nrsBilhetesRef = doc(collection(db, refNomeColecao));
+      batch.set(nrsBilhetesRef, {
+        id: idRifa,
+        nroBilhete: nroBilhete,
+        situacao: 'livre',
+        emailAdquiriu: '',
+        cpfAdquiriu: '',
+        uidAdquiriu: '',
+        dataAdquiriu: ''
+      });      
+      nroBilhete = nroBilhete + 1;
+  }
+  }
+  catch (error) {
+    console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-nrsBilhetesRifaDisponivel ' + error.code);
+    return 'Falha em gravaRifaLiberadaTransacao-nrsBilhetesRifaDisponivel. Tente novamente'
+  }
+  try {
+    const rifaDRef = doc(db, "rifasALiberar", data.id);
+    batch.delete(rifaDRef);
+    await batch.commit();
+    return 'sucesso'
+  } catch (error) {
+    console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasALiberar ' + error.code);
+    return 'Falha em lgravaRifaLiberadaTransacao-RifasALiberar. Tente novamente'
+  }
+}
+
+export async function gravaRifaALiberarTransacao(data) {
+  console.log('firestore-gravaRifaALiberarTransacao: ' + data.titulo)
+  const batch = writeBatch(db);
+  const rifaRef = doc(collection(db, "rifasALiberar"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
   const resultDate = subHours(new Date(), 3);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
@@ -119,60 +248,20 @@ export async function gravaRifaLiberadaTransacao(data) {
       nomeCapa: data.nomeCapa,
       post: data.post,
       cidadeUf: data.cidade + data.uf,
-      qtdNrs: data.qtdNrs
-    });
-  } catch (error) {
-    console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasDisponiveis ' + error.code);
-    return 'Falha em liberar Rifa. Tente novamente'
-  }
-  try {
-    const rifaDRef = doc(db, "rifasALiberar", data.id);
-    batch.delete(rifaDRef);
-    await batch.commit();
-    return 'sucesso'
-  } catch (error) {
-    console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasALiberar ' + error.code);
-    return 'Falha em liberar Rifa. Tente novamente'
-  }
-}
-
-export async function gravaRifaALiberarTransacao(data) {
-  console.log('firestore-gravaRifaALiberarTransacao')
-  const batch = writeBatch(db);
-  const rifaRef = doc(collection(db, "rifasALiberar"));
-  const dataCadastroSeq = Timestamp.fromDate(new Date());
-  const resultDate = subHours(new Date(), 3);
-  const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
-  try {
-    batch.set(rifaRef, {
-      titulo: data.titulo,
-      descricao: data.descricao,
-      imagemCapa: data.imagemCapa,
-      genero: data.genero,
-      uid: data.uidusuario,
-      cep: data.cep,
-      cidade: data.cidade,
-      uf: data.uf,
-      bairro: data.bairro,
-      nome: data.nome,
-      email: data.email,
-      dataCadastro: dataCadastro,
-      dataCadastroSeq: dataCadastroSeq,
-      nomeCapa: data.nomeCapa,
-      post: 'imagemRifa',
-      cidadeUf: data.cidade + data.uf,
-      qtdNrs: data.qtdNrs
+      qtdNrs: data.qtdNrs,
+      autorizacao: data.autorizacao,
+      vlrBilhete: data.vlrBilhete
     });
     await batch.commit();
     return 'sucesso'
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaALiberarTransacao ' + error.code);
-    return 'Falha em disponibilizar Rifa a liberar. Tente novamente'
+    return 'Falha em gravaRifaALiberarTransacao. Tente novamente'
   }
 }
 
 export async function gravaRifaNaoLiberadaTransacao(data) {
-  console.log('firestore-gravaRifaNaoLiberadaTransacao ' + data.id)
+  console.log('firestore-gravaRifaNaoLiberadaTransacao ' + data.titulo)
   const batch = writeBatch(db);
   const rifaRef = doc(collection(db, "rifasNaoLiberadas"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
@@ -195,11 +284,14 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
       dataCadastroSeq: dataCadastroSeq,
       nomeCapa: data.nomeCapa,
       post: data.post,
-      qtdNrs: data.qtdNrs
+      cidadeUf: data.cidade + data.uf,
+      qtdNrs: data.qtdNrs,
+      autorizacao: data.autorizacao,
+      vlrBilhete: data.vlrBilhete
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaNaoLiberadaTransacao-RifasNaoLiberadas ' + error.code);
-    return 'Falha em não liberar Rifa. Tente novamente'
+    return 'Falha em gravaRifaNaoLiberadaTransacao-RifasNaoLiberadas. Tente novamente'
   }
   try {
     const rifaDRef = doc(db, "rifasALiberar", data.id);
@@ -208,7 +300,7 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
     return 'sucesso'
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaNaoLiberadaTransacao-RifasALiberar ' + error.code);
-    return 'Falha em não liberar Rifa. Tente novamente'
+    return 'Falha em gravaRifaNaoLiberadaTransacao-RifasALiberar. Tente novamente'
   }
 }
 
@@ -254,23 +346,6 @@ export async function obtemGeneros() {
     return generosRifasFirestore
   } catch (error) {
     console.log('erro obtemGeneros: ' + error.code)
-    return []
-  }
-}
-
-export async function obtemQtdNrsRifa() {
-  console.log('firestore-obtemQtdNrsRifa: ');
-  try {
-    const q = query(collection(db, "qtdNrsRifa"), orderBy("qtdNrs"));
-    let qtdNrsRifaFirestore = []
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      let qtdNrsRifa = { id: doc.id, ...doc.data() }
-      qtdNrsRifaFirestore.push(qtdNrsRifa)
-    });
-    return qtdNrsRifaFirestore
-  } catch (error) {
-    console.log('erro obtemQtdNrsRifa: ' + error.code)
     return []
   }
 }

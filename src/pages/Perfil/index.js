@@ -32,7 +32,7 @@ export default function Perfil() {
 
     function liberarRifas() {
         console.log('liberarRifas')
-        //navigation.navigate('LiberarRifas')
+        navigation.navigate('LiberarRifas')
     }
 
     function alterarDadosConta() {
@@ -42,12 +42,12 @@ export default function Perfil() {
 
     function excluirConta() {
         console.log('excluirConta')
-        //navigation.navigate('ExcluirConta')
+        navigation.navigate('ExcluirConta')
     }
 
     function excluirRifaDisponibilizada() {
         console.log('excluirRifaDisponibilizada')
-        //navigation.navigate('ExcluirRifaDisponibilizada')
+        navigation.navigate('ExcluirRifaDisponibilizada')
     }
 
     return (
