@@ -8,8 +8,12 @@ import {
 import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
-import { obtemBilhetesJaAdquiridos, obtemBilhetesEmAquisicao, obtemParametrosApp }
+import {
+    obtemBilhetesJaAdquiridos, obtemBilhetesEmAquisicao, obtemParametrosApp,
+    obtemBilhetesDisponiveisParaReserva, gravaPreReservaTransacao
+}
     from '../../servicos/firestore';
+import { Timestamp } from "firebase/firestore";
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -20,8 +24,8 @@ export default function ValidarAquisicao() {
     const { user: usuario } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [mensagemCadastro, setMensagemCadastro] = useState('');
-    const [qtdBilhetes, setQtdBilhetes] = useState(0);
-    const [qtdMaximaBilhetesPorUsuario, setQtdMaximaBilhetesPorUsuario] = useState(0);
+    const [qtdBilhetes, setQtdBilhetes] = useState('');
+    const [qtdMaximaBilhetesPorUsuario, setQtdMaximaBilhetesPorUsuario] = useState('');
 
     useEffect(() => {
         console.log('ValidarAquisicao-useEffect')
@@ -77,7 +81,64 @@ export default function ValidarAquisicao() {
             setLoading(false);
             setMensagemCadastro('Voce pode adquirir no maximo:  ' + qtdBilhetesPodeAdquirir + ' bilhetes')
             return;
-        } 
+        }
+
+        let dadosObtemBilhetes = {
+            id: route.params?.id,
+            usuarioQtdBilhetes: qtdBilhetes,
+        }
+
+        const bilhetesDisponiveisParaReservaFirestore = await obtemBilhetesDisponiveisParaReserva(dadosObtemBilhetes);
+        if (bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis == 0) {
+            setLoading(false);
+            setMensagemCadastro('No momento, todos os bilhetes ja foram adquiridos ou estao em processo de aquisicao. Tente novamente mais tarde, pois pode ser que alguem desista.')
+            return;
+        }
+        if (bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis < qtdBilhetes) {
+            setLoading(false);
+            setMensagemCadastro('No momento, temos apenas ' + bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis + 'bilhetes disponiveis. Altere a quantidade que deseja adquirir, e tente novamente.')
+            return;
+        }
+
+        let dadosPreReserva = {
+            id: route.params?.id,
+            usuarioUid: usuario.uid,
+            usuarioNome: usuario.nome,
+            usuarioEmail: usuario.email,
+            usuarioQtdBilhetes: qtdBilhetes,
+            vlrBilhete: route.params?.vlrBilhete,
+            vlrvlrTotalBilhetes: (parseInt(qtdBilhetes) * parseInt(route.params?.vlrBilhete)),
+            dataPreReserva: Timestamp.fromDate(new Date())
+        }
+
+        var qtdBilhetesProcessados = 0;
+        var bilhetesPreReservados = [];
+        while (qtdBilhetes > qtdBilhetesProcessados) {
+            let dadosBilhetePreReserva = {
+                idBilhete: bilhetesDisponiveisParaReservaFirestore.bilhetesDisponiveisParaReservaFirestore[qtdBilhetesProcessados].idBilhete,
+                nroBilhete: bilhetesDisponiveisParaReservaFirestore.bilhetesDisponiveisParaReservaFirestore[qtdBilhetesProcessados].nroBilhete
+            }
+            const resultado = await gravaPreReservaTransacao(dadosPreReserva, dadosBilhetePreReserva);
+            if (resultado == 'sucesso') {
+                console.log('bilhete reservado com sucesso: ' + dadosBilhetePreReserva.idBilhete + ' - ' + dadosBilhetePreReserva.nroBilhete)
+                bilhetesPreReservados.push(dadosBilhetePreReserva.idBilhete);
+            }
+            else {
+                console.log('bilhete nao reservado: ' + dadosBilhetePreReserva.idBilhete + ' - ' + dadosBilhetePreReserva.nroBilhete)
+            }
+            qtdBilhetesProcessados = qtdBilhetesProcessados + 1;
+        }
+        setLoading(false)
+        if (bilhetesPreReservados.length == 0) {
+            console.log('nenhum reservado')
+        }
+        if (bilhetesPreReservados.length < qtdBilhetes) {
+            console.log('reservado menos')
+        }
+        if (bilhetesPreReservados.length == qtdBilhetes) {
+            console.log('reservado ok')
+        }
+
         var dadosRifa = {
             id: route.params?.id,
             cep: route.params?.cep,

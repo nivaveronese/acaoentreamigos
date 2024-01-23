@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity, ActivityIndicator }
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Image }
     from 'react-native';
 import estilos from '../../estilos/estilos';
-import { InputAno, Input, Texto, AreaBotao, AreaBotao1, SubmitButton, SubmitText, SubmitButton1 } from './styles';
+import { AreaBotao, InputAno, Input, Texto, 
+    RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
+    ContentText } from './styles';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import { gravaPreReservaTransacao } from '../../servicos/firestore';
+//import { gravaPreReservaTransacao } from '../../servicos/firestore';
 import { Timestamp } from "firebase/firestore";
-
+import { ScrollView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+ 
 export default function InformarDadosPagamento() {
     console.log('InformarDadosPagamento')
     const [numeroCartaoCredito, setNumeroCartaoCredito] = useState('');
@@ -20,35 +24,6 @@ export default function InformarDadosPagamento() {
     const [loading, setLoading] = useState(false);
     const route = useRoute();
     const navigation = useNavigation();
-
-    useEffect(() => {
-        console.log('InformarDadosPagamento-useEffect')
-        preReservarNrsRifa()
-    }, [])
-
-    async function preReservarNrsRifa() {
-        console.log('preReservarNrsRifa')
-        let dadosPreReserva = {
-            id: route.params?.id,
-            usuarioUid: route.params?.usuarioUid,
-            usuarioNome: usuario.nome,
-            usuarioEmail: usuario.email,
-            usuarioQtdBilhetes: qtdBilhetes,
-            vlrBilhete: route.params?.vlrBilhete,
-            vlrvlrTotalBilhetes: route.params?.vlrTotalBilhetes,
-            dataPreReserva: Timestamp.fromDate(new Date())
-        }
-        setLoading(true)
-        const resultado = await gravaPreReservaTransacao(dadosPreReserva);
-        setLoading(false)
-        if (resultado == 'sucesso') {
-            console.log('pre reserva realizada com sucesso')
-        }
-        else {
-            setMensagemCadastro(resultado)
-            setLoading(false)
-            return
-        }   }
 
     async function validarDadosCartao() {
         console.log('validarDadosCartao');
@@ -82,12 +57,6 @@ export default function InformarDadosPagamento() {
             setMensagemCadastro('Digite o nome impresso no cartão de crédito');
             return;
         }
-        console.log('vai gravarPagamento')
-        gravarPagamento();
-    }
-
-    async function validarPix() {
-        console.log('validarPix');
         console.log('vai gravarPagamento')
         gravarPagamento();
     }
@@ -127,39 +96,9 @@ export default function InformarDadosPagamento() {
     }
 
     async function gravarPagamento() {
-        console.log('gravarPagamento: ' )
-        setLoading(true)
-        let dadosPagamento = {
-            id: route.params?.id,
-            usuarioUid: route.params?.usuarioUid,
-            usuarioNome: usuario.nome,
-            usuarioEmail: usuario.email,
-            usuarioQtdBilhetes: qtdBilhetes,
-            vlrBilhete: route.params?.vlrBilhete,
-            vlrvlrTotalBilhetes: route.params?.vlrTotalBilhetes,
-            dataPagamento: Timestamp.fromDate(new Date()),
-            numeroCartaoCredito: numeroCartaoCredito,
-            mesValidadeCartaoCredito: mesValidadeCartaoCredito,
-            anoValidadeCartaoCredito: anoValidadeCartaoCredito,
-            cvvCartaoCredito: cvvCartaoCredito,
-            cpfCartaoCredito: cpfCartaoCredito,
-            nomeCartaoCredito: nomeCartaoCredito,
-            idTransacaoPix: idTransacaoPix            
-        }
-        const resultado = await gravaRecorrenciaTransacao(dadosPagamento);
-        console.log('resultado gravaRecorrencia: ' + resultado);
-        if (resultado == 'sucesso') {
-            setMensagemCadastro('Recorrência autorizada')
-            setLoading(false);
-            setRecorrenciaAutorizada(true)
-            console.log('gravou recorrência')
-            return;
-        } else {
-            setMensagemCadastro(resultado)
-            setLoading(false);
-            return;
-        }
+        console.log('gravarPagamento: ')
     }
+
 
     async function voltar() {
         console.log('voltar')
@@ -167,29 +106,6 @@ export default function InformarDadosPagamento() {
             index: 0,
             routes: [{ name: "Home" }]
         })
-    }
-
-    async function reservarRifa() {
-        console.log('reservarRifa')
-        let data = {
-            uid: route.params?.uidDisponibilizou,
-            cep: route.params?.cepDisponibilizou,
-            cidade: route.params?.cidadeDisponibilizou,
-            uf: route.params?.ufDisponibilizou,
-            bairro: route.params?.bairroDisponibilizou,
-            nome: route.params?.nomeDisponibilizou,
-            email: route.params?.emailDisponibilizou,
-            titulo: route.params?.titulo,
-            autor: route.params?.autor,
-            sinopse: route.params?.sinopse,
-            genero: route.params?.genero,
-            imagemCapa: route.params?.imagemCapa,
-            id: route.params?.keyRifaDisponibilizado,
-            nomeCapa: route.params?.nomeCapa,
-            post: route.params?.post
-        }
-        console.log('data: ' + data.uid + '-' + data.cep)
-        navigation.navigate('Reserva', data)
     }
 
     if (loading) {
@@ -221,19 +137,13 @@ export default function InformarDadosPagamento() {
                         </AreaRifa>
                     </View>
                     <Texto>
-                        Olá {route.params?.nomeUsuario},
+                        Olá {route.params?.usuarioNome},
                     </Texto>
                     <Texto>
-                        Voce esta adquirindo {route.params?.qtdBilhetes} a R$ {route.params?.vlrBilhete} cada um, totalizando R$ {route.params?.vlrTotalBilhetes }
+                        Voce esta adquirindo {route.params?.usuarioQtdBilhetes} bilhetes, a R$ {route.params?.vlrBilhete} cada um, totalizando R$ {route.params?.vlrTotalBilhetes}
                     </Texto>
                     <Texto>
-                        Preencha os dados abaixo, autorizando que seja debitado R$ {route.params?.vlrTotalBilhetes}
-                    </Texto>
-                    <Texto>
-                        no seu cartão de crédito
-                    </Texto>
-                    <Texto>
-                        Ou clique em PIX.
+                        Preencha os dados abaixo, para debitar R$ {route.params?.vlrTotalBilhetes} no seu cartão de crédito.
                     </Texto>
                     <Texto>
                         Número cartão de crédito
@@ -275,7 +185,6 @@ export default function InformarDadosPagamento() {
                         autoCorrect={false}
                         autoCaptalize='none'
                         keyboardType="numeric"
-                        placeholder='123'
                         value={cvvCartaoCredito}
                         onChangeText={(text) => setCvvCartaoCredito(text)}
                     />
@@ -304,21 +213,16 @@ export default function InformarDadosPagamento() {
                             {mensagemCadastro}
                         </Text>
                     </View>
-                            <AreaBotao>
-                                <SubmitButton onPress={validarDadosCartao}>
-                                    <SubmitText>
-                                        Cartao Credito
-                                    </SubmitText>
-                                </SubmitButton>
-                                <SubmitButton onPress={validaPix}>
-                                    <SubmitText>
-                                        PIX
-                                    </SubmitText>
-                                </SubmitButton>
-                                <TouchableOpacity style={styles.botao} onPress={() => voltar()}>
-                                    <Text style={estilos.linkText}>Voltar</Text>
-                                </TouchableOpacity>
-                            </AreaBotao>
+                    <AreaBotao>
+                        <SubmitButton onPress={validarDadosCartao}>
+                            <SubmitText>
+                                Pagar
+                            </SubmitText>
+                        </SubmitButton>
+                        <TouchableOpacity style={styles.botao} onPress={() => voltar()}>
+                            <Text style={estilos.linkText}>Voltar</Text>
+                        </TouchableOpacity>
+                    </AreaBotao>
                 </ScrollView>
             </GestureHandlerRootView>
         );
