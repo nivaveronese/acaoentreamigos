@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
 import {
     obtemBilhetesJaAdquiridos, obtemBilhetesEmAquisicao, obtemParametrosApp,
-    obtemBilhetesDisponiveisParaReserva, gravaPreReservaTransacao
+    obtemBilhetesDisponiveisParaReserva, gravaPreReservaTransacao, desgravaPreReservaTransacao
 }
     from '../../servicos/firestore';
 import { Timestamp } from "firebase/firestore";
@@ -91,59 +91,74 @@ export default function ValidarAquisicao() {
         const bilhetesDisponiveisParaReservaFirestore = await obtemBilhetesDisponiveisParaReserva(dadosObtemBilhetes);
         if (bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis == 0) {
             setLoading(false);
-            setMensagemCadastro('No momento, todos os bilhetes ja foram adquiridos ou estao em processo de aquisicao. Tente novamente mais tarde, pois pode ser que alguem desista.')
+            setMensagemCadastro('No momento, todos os bilhetes ja foram adquiridos ou estao em processo de aquisicao. Tente novamente mais tarde, pois pode ser que alguem desista.(A)')
             return;
         }
         if (bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis < qtdBilhetes) {
             setLoading(false);
-            setMensagemCadastro('No momento, temos apenas ' + bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis + 'bilhetes disponiveis. Altere a quantidade que deseja adquirir, e tente novamente.')
+            setMensagemCadastro('No momento, temos apenas ' + bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis + 'bilhetes disponiveis. Altere a quantidade que deseja adquirir, e tente novamente.(A)')
             return;
         }
 
         let dadosPreReserva = {
             id: route.params?.id,
             usuarioUid: usuario.uid,
-            usuarioNome: usuario.nome,
             usuarioEmail: usuario.email,
-            usuarioQtdBilhetes: qtdBilhetes,
-            vlrBilhete: route.params?.vlrBilhete,
-            vlrvlrTotalBilhetes: (parseInt(qtdBilhetes) * parseInt(route.params?.vlrBilhete)),
             dataPreReserva: Timestamp.fromDate(new Date())
-        }
-
+        } 
+   
         var qtdBilhetesProcessados = 0;
         var bilhetesPreReservados = [];
         while (qtdBilhetes > qtdBilhetesProcessados) {
             let dadosBilhetePreReserva = {
                 idBilhete: bilhetesDisponiveisParaReservaFirestore.bilhetesDisponiveisParaReservaFirestore[qtdBilhetesProcessados].idBilhete,
                 nroBilhete: bilhetesDisponiveisParaReservaFirestore.bilhetesDisponiveisParaReservaFirestore[qtdBilhetesProcessados].nroBilhete
-            }
+            } 
             const resultado = await gravaPreReservaTransacao(dadosPreReserva, dadosBilhetePreReserva);
+            console.log('resultado: ' + resultado)
             if (resultado == 'sucesso') {
                 console.log('bilhete reservado com sucesso: ' + dadosBilhetePreReserva.idBilhete + ' - ' + dadosBilhetePreReserva.nroBilhete)
                 bilhetesPreReservados.push(dadosBilhetePreReserva.idBilhete);
             }
             else {
                 console.log('bilhete nao reservado: ' + dadosBilhetePreReserva.idBilhete + ' - ' + dadosBilhetePreReserva.nroBilhete)
-            }
+            }  
             qtdBilhetesProcessados = qtdBilhetesProcessados + 1;
         }
-        setLoading(false)
+        console.log('bilhetesPreReservados.length: ' + bilhetesPreReservados.length)
         if (bilhetesPreReservados.length == 0) {
             console.log('nenhum reservado')
+            setMensagemCadastro('No momento, todos os bilhetes ja foram adquiridos ou estao em processo de aquisicao. Tente novamente mais tarde, pois pode ser que alguem desista.(B)')            
+            setLoading(false)
+            return;
         }
         if (bilhetesPreReservados.length < qtdBilhetes) {
             console.log('reservado menos')
-        }
+            var qtdBilhetesDesgravados = 0;
+            while (qtdBilhetesDesgravados < bilhetesPreReservados.length) {
+                const resultado = await desgravaPreReservaTransacao(route.params?.id,bilhetesPreReservados[qtdBilhetesDesgravados].idBilhete);
+                console.log('resultado: ' + resultado)
+                if (resultado == 'sucesso') {
+                    console.log('bilhete pre-reservado desgravado com sucesso: ' + bilhetesPreReservados[qtdBilhetesDesgravados].idBilhete)
+                }
+                else {
+                    console.log('bilhete pre-reservado nao desgravado: ' + bilhetesPreReservados[qtdBilhetesDesgravados].idBilhete)
+                }
+                qtdBilhetesDesgravados = qtdBilhetesDesgravados + 1;
+            }
+            setMensagemCadastro('No momento, temos apenas ' + bilhetesPreReservados.length + 'bilhetes disponiveis. Altere a quantidade que deseja adquirir, e tente novamente.(B)')
+            setLoading(false)
+            return;
+        } 
         if (bilhetesPreReservados.length == qtdBilhetes) {
-            console.log('reservado ok')
+            console.log('pre-reserva ok')
         }
-
+ 
         var dadosRifa = {
             id: route.params?.id,
             cep: route.params?.cep,
             cidade: route.params?.cidade,
-            uf: route.params?.uf,
+            uf: route.params?.uf, 
             bairro: route.params?.bairro,
             nome: route.params?.nome,
             email: route.params?.email,
@@ -153,16 +168,20 @@ export default function ValidarAquisicao() {
             imagemCapa: route.params?.imagemCapa,
             nomeCapa: route.params?.nomeCapa,
             post: route.params?.post,
+            autorizacao: route.params?.autorizacao,
+            qtdNrs: route.params?.qtdNrs,
             vlrBilhete: route.params?.vlrBilhete,
             vlrTotalBilhetes: (parseInt(qtdBilhetes) * parseInt(route.params?.vlrBilhete)),
             usuarioUid: usuario.uid,
             usuarioQtdBilhetes: qtdBilhetes,
-            usuarioNome: usuario.nome,
-            usuarioEmail: usuario.email
-        }
+            usuarioNome: usuario.nome,  
+            usuarioEmail: usuario.email,
+            bilhetesPreReservados: bilhetesPreReservados 
+        }       
         console.log('ir para informar dados pagamento')
+        setLoading(false)
         navigation.navigate('InformarDadosPagamento', dadosRifa);
-    }
+    } 
 
     function voltar() {
         navigation.reset({

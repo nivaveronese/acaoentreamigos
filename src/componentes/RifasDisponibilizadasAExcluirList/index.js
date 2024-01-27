@@ -5,7 +5,7 @@ import {
     AreaBotaoExcluir
 } from './styles';
 import { useNavigation } from '@react-navigation/native';
-import { excluiRifaDisponibilizadaTransacao } from '../../servicos/firestore';
+import { obtemQtdNrsBilhetesRifaDisponivel,excluiRifaDisponibilizadaTransacao } from '../../servicos/firestore';
 import { excluiImagem } from '../../servicos/storage';
 
 export default function RifasDisponibilizadasAExcluirList({ data }) {
@@ -27,7 +27,7 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
                 },
                 {
                     text: "Sim. Vou excluir.",
-                    onPress: () => confirmaExclusaoRifa(),
+                    onPress: () => verificarSePodeExcluirRifa(),
                     style: 'default'
                 }
             ]
@@ -37,6 +37,21 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
     function naoConfirmaExclusaoRifa() {
         console.log('naoConfirmaExclusaoRifa');
         return;
+    }
+
+    async function verificarSePodeExcluirRifa() {
+        console.log('verificarSePodeExcluirRifa');
+        setLoading(true)
+        const qtdNrsBilhetesDisponiveis = await obtemQtdNrsBilhetesRifaDisponivel(data.id);
+        console.log('qtdNrsBilhetesDisponiveis: ' + qtdNrsBilhetesDisponiveis)
+        console.log('data.qtdNrs: ' + data.qtdNrs)
+        if (qtdNrsBilhetesDisponiveis == data.qtdNrs){
+            confirmaExclusaoRifa();
+        } else {
+            setMensagemCadastro('Rifa nao pode ser excluida, pois tem bilhetes ja adquiridos ou em aquisicao.')
+            setLoading(false);
+            return;
+        }
     }
 
     async function confirmaExclusaoRifa() {
@@ -53,7 +68,7 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
             setLoading(false);
             return;
         }
-    }
+    } 
 
     async function excluirImagem() {
         console.log('excluirImagem')
@@ -62,7 +77,7 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
         setMensagemCadastro('')
         setLoading(false);
         navigation.navigate('Ok')
-    }
+    } 
 
     if (loading) {
         return (

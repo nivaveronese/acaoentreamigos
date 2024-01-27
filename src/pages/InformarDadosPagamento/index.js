@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Image }
     from 'react-native';
 import estilos from '../../estilos/estilos';
-import { AreaBotao, InputAno, Input, Texto, 
+import {
+    AreaBotao, InputAno, Input, Texto,
     RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
-    ContentText } from './styles';
+    ContentText
+} from './styles';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-//import { gravaPreReservaTransacao } from '../../servicos/firestore';
-import { Timestamp } from "firebase/firestore";
+import { desgravaPreReservaTransacao, gravaPagamentoPreReservaTransacao } from '../../servicos/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
- 
+
 export default function InformarDadosPagamento() {
     console.log('InformarDadosPagamento')
     const [numeroCartaoCredito, setNumeroCartaoCredito] = useState('');
@@ -22,6 +23,7 @@ export default function InformarDadosPagamento() {
     const [cpfCartaoCredito, setCpfCartaoCredito] = useState('');
     const [mensagemCadastro, setMensagemCadastro] = useState('');
     const [loading, setLoading] = useState(false);
+    const [pgtoRealizado, setPgtoRealizado] = useState(false);
     const route = useRoute();
     const navigation = useNavigation();
 
@@ -97,11 +99,65 @@ export default function InformarDadosPagamento() {
 
     async function gravarPagamento() {
         console.log('gravarPagamento: ')
+        var dadosGravarPagamentoPreReserva = {
+            id: route.params?.id,
+            vlrBilhete: route.params?.vlrBilhete,
+            vlrTotalBilhetes: route.params?.vlrTotalBilhetes,
+            usuarioUid: route.params?.usuarioUid,
+            usuarioQtdBilhetes: route.params?.usuarioQtdBilhetes,
+            usuarioEmail: route.params?.usuarioEmail,
+            bilhetesPreReservados: route.params?.bilhetesPreReservados,
+            numeroCartaoCredito: numeroCartaoCredito,
+            nomeCartaoCredito: nomeCartaoCredito,
+            mesValidadeCartaoCredito: mesValidadeCartaoCredito,
+            anoValidadeCartaoCredito: anoValidadeCartaoCredito,
+            cvvCartaoCredito: cvvCartaoCredito,
+            cpfCartaoCredito: cpfCartaoCredito
+        }
+        setLoading(true)
+        const resultado = await gravaPagamentoPreReservaTransacao(dadosGravarPagamentoPreReserva);
+        setLoading(false)
+        console.log('resultado: ' + resultado)
+        if (resultado == 'sucesso') {
+            setPgtoRealizado(true)
+            console.log('pagamento pre reserva realizado com sucesso ')
+            setMensagemCadastro('Pagamento realizado com sucesso.');
+            return;
+        }
+        else {
+            setPgtoRealizado(false)
+            setMensagemCadastro('Falha gravacao pagamento pre reserva. Tente novamente.');
+            return;
+        }
     }
-
 
     async function voltar() {
         console.log('voltar')
+        console.log('route.params?.bilhetesPreReservados.length: ' + route.params?.bilhetesPreReservados.length)
+        console.log(route.params?.bilhetesPreReservados)
+        var qtdBilhetesDesgravados = 0;
+        setLoading(true)
+        while (qtdBilhetesDesgravados < route.params?.bilhetesPreReservados.length) {
+            console.log('route.params?.bilhetesPreReservados[qtdBilhetesDesgravados]: ' + route.params?.bilhetesPreReservados[qtdBilhetesDesgravados])
+            const resultado = await desgravaPreReservaTransacao(route.params?.id, route.params?.bilhetesPreReservados[qtdBilhetesDesgravados]);
+            console.log('resultado: ' + resultado)
+            if (resultado == 'sucesso') {
+                console.log('bilhete pre-reservado desgravado com sucesso: ' + route.params?.bilhetesPreReservados[qtdBilhetesDesgravados])
+            }
+            else {
+                console.log('bilhete pre-reservado nao desgravado: ' + route.params?.bilhetesPreReservados[qtdBilhetesDesgravados])
+            }
+            qtdBilhetesDesgravados = qtdBilhetesDesgravados + 1;
+        }
+        setLoading(false)
+        navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }]
+        })
+    }
+
+    async function sair() {
+        console.log('sair')
         navigation.reset({
             index: 0,
             routes: [{ name: "Home" }]
@@ -144,6 +200,9 @@ export default function InformarDadosPagamento() {
                     </Texto>
                     <Texto>
                         Preencha os dados abaixo, para debitar R$ {route.params?.vlrTotalBilhetes} no seu cartão de crédito.
+                    </Texto>
+                    <Texto>
+
                     </Texto>
                     <Texto>
                         Número cartão de crédito
@@ -213,16 +272,27 @@ export default function InformarDadosPagamento() {
                             {mensagemCadastro}
                         </Text>
                     </View>
-                    <AreaBotao>
-                        <SubmitButton onPress={validarDadosCartao}>
-                            <SubmitText>
-                                Pagar
-                            </SubmitText>
-                        </SubmitButton>
-                        <TouchableOpacity style={styles.botao} onPress={() => voltar()}>
-                            <Text style={estilos.linkText}>Voltar</Text>
-                        </TouchableOpacity>
-                    </AreaBotao>
+                    {
+                        pgtoRealizado ?
+                            <AreaBotao>
+                                <SubmitButton onPress={sair}>
+                                    <SubmitText>
+                                        Ok
+                                    </SubmitText>
+                                </SubmitButton>
+                            </AreaBotao>
+                            :
+                            <AreaBotao>
+                                <SubmitButton onPress={validarDadosCartao}>
+                                    <SubmitText>
+                                        Pagar
+                                    </SubmitText>
+                                </SubmitButton>
+                                <TouchableOpacity style={styles.botao} onPress={() => voltar()}>
+                                    <Text style={estilos.linkText}>Voltar</Text>
+                                </TouchableOpacity>
+                            </AreaBotao>
+                    }
                 </ScrollView>
             </GestureHandlerRootView>
         );
