@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { desgravaPreReservaTransacao, gravaPagamentoPreReservaTransacao } from '../../servicos/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { criticallyDampedSpringCalculations } from 'react-native-reanimated/lib/typescript/reanimated2/animation/springUtils';
 
 export default function InformarDadosPagamento() {
     console.log('InformarDadosPagamento')
@@ -26,19 +27,20 @@ export default function InformarDadosPagamento() {
     const [pgtoRealizado, setPgtoRealizado] = useState(false);
     const route = useRoute();
     const navigation = useNavigation();
-
+ 
     async function validarDadosCartao() {
         console.log('validarDadosCartao');
+        console.log('ano atual: ' + anoAtual)
 
-        if (numeroCartaoCredito == '' || numeroCartaoCredito.length === 0) {
-            setMensagemCadastro('Digite o número do cartão de crédito');
+        if (numeroCartaoCredito == '' || isNaN(numeroCartaoCredito) || numeroCartaoCredito.length === 0 || numeroCartaoCredito.length < 13 || numeroCartaoCredito.length > 16) {
+            setMensagemCadastro('Digite corretamente o número do cartão de crédito');
             return;
         }
         if (mesValidadeCartaoCredito == '' || isNaN(mesValidadeCartaoCredito) || parseInt(mesValidadeCartaoCredito) < 1 || parseInt(mesValidadeCartaoCredito) > 12) {
             setMensagemCadastro('Digite corretamente o mês de validade do cartão de crédito');
             return;
         }
-        if (anoValidadeCartaoCredito == '' || isNaN(anoValidadeCartaoCredito) || anoValidadeCartaoCredito.length < 2 || anoValidadeCartaoCredito.length === 3 || anoValidadeCartaoCredito.length > 4) {
+        if (anoValidadeCartaoCredito == '' || isNaN(anoValidadeCartaoCredito) || !anoValidadeCartaoCredito.length == 4) {
             setMensagemCadastro('Digite corretamente o ano de validade do cartão de crédito');
             return;
         }
@@ -54,15 +56,16 @@ export default function InformarDadosPagamento() {
                 setMensagemCadastro('Digite cpf válido');
                 return;
             }
-        }
-        if (nomeCartaoCredito == '' || nomeCartaoCredito.length === 0) {
+        } 
+
+        if (nomeCartaoCredito == '' || nomeCartaoCredito.length === 0 || !isNaN(nomeCartaoCredito)) {
             setMensagemCadastro('Digite o nome impresso no cartão de crédito');
             return;
         }
         console.log('vai gravarPagamento')
         gravarPagamento();
     }
-
+ 
     function validarCPF(cpf) {
         cpf = cpf.replace(/[^\d]+/g, '');
         if (cpf == '') return false;
@@ -216,7 +219,7 @@ export default function InformarDadosPagamento() {
                         onChangeText={(text) => setNumeroCartaoCredito(text)}
                     />
                     <Texto>
-                        Mês validade cartão de crédito
+                        Mês validade cartão de crédito (MM)
                     </Texto>
                     <InputAno
                         autoCorrect={false}
@@ -227,13 +230,13 @@ export default function InformarDadosPagamento() {
                         onChangeText={(text) => setMesValidadeCartaoCredito(text)}
                     />
                     <Texto>
-                        Ano validade cartão de crédito
+                        Ano validade cartão de crédito (AAAA)
                     </Texto>
                     <InputAno
                         autoCorrect={false}
                         autoCaptalize='none'
                         keyboardType="numeric"
-                        placeholder='99'
+                        placeholder='2024'
                         value={anoValidadeCartaoCredito}
                         onChangeText={(text) => setAnoValidadeCartaoCredito(text)}
                     />

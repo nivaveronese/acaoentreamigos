@@ -9,7 +9,7 @@ import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
 import {
-    obtemBilhetesJaAdquiridos, obtemBilhetesEmAquisicao, obtemParametrosApp,
+    obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao, obtemParametrosApp,
     obtemBilhetesDisponiveisParaReserva, gravaPreReservaTransacao, desgravaPreReservaTransacao
 }
     from '../../servicos/firestore';
@@ -58,20 +58,13 @@ export default function ValidarAquisicao() {
             return
         }
         setLoading(true);
-        const bilhetesJaAdquiridosFirestore = await obtemBilhetesJaAdquiridos(usuario.uid, route.params?.id)
-        if (!bilhetesJaAdquiridosFirestore) {
+        const qtdBilhetesAdquiridoOuEmAquisicaoFirestore = await obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao(route.params?.id, usuario.uid)
+        if (qtdBilhetesAdquiridoOuEmAquisicaoFirestore == 999999) {
             setLoading(false);
-            setMensagemCadastro('Ops, não consegui verificar se pode adquirir bilhetes (ja adquiridos). Tente novamente')
+            setMensagemCadastro('Ops, não consegui verificar se pode adquirir bilhetes (adquiridos ou em aquisicao). Tente novamente')
             return
         }
-        const bilhetesEmAquisicaoFirestore = await obtemBilhetesEmAquisicao(usuario.uid, route.params?.id)
-        if (!bilhetesEmAquisicaoFirestore) {
-            setLoading(false);
-            setMensagemCadastro('Ops, não consegui verificar se pode adquirir bilhetes (em aquisicao). Tente novamente')
-            return
-        }
-        let qtdTotalBilhetesJaEmAquisicao = (parseFloat(bilhetesJaAdquiridosFirestore.length) + parseFloat(bilhetesEmAquisicaoFirestore.length));
-        let qtdBilhetesPodeAdquirir = qtdMaximaBilhetesPorUsuario - qtdTotalBilhetesJaEmAquisicao;
+        let qtdBilhetesPodeAdquirir = qtdMaximaBilhetesPorUsuario - qtdBilhetesAdquiridoOuEmAquisicaoFirestore;
         if (qtdBilhetesPodeAdquirir == 0) {
             setLoading(false);
             setMensagemCadastro('Voce ja adquiriu, ou tem em processo de aquisicao, a quantidade maxima de bilhetes: ' + qtdMaximaBilhetesPorUsuario)
@@ -96,7 +89,7 @@ export default function ValidarAquisicao() {
         }
         if (bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis < qtdBilhetes) {
             setLoading(false);
-            setMensagemCadastro('No momento, temos apenas ' + bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis + 'bilhetes disponiveis. Altere a quantidade que deseja adquirir, e tente novamente.(A)')
+            setMensagemCadastro('No momento, temos apenas ' + bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis + ' bilhetes disponiveis. Altere a quantidade que deseja adquirir, e tente novamente.(A)')
             return;
         }
 

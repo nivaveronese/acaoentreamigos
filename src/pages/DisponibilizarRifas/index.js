@@ -28,6 +28,7 @@ export default function DisponibilizarRifas() {
     const [load, setLoad] = useState(false);
     const { user: usuario } = useContext(AuthContext);
     const navigation = useNavigation();
+    const [gravouRifa, setGravouRifa] = useState(false)
     var qtdNrsValidos = [10, 100, 1000, 10000, 100000];
     var regra = /^[0-9]+$/;
 
@@ -103,7 +104,8 @@ export default function DisponibilizarRifas() {
             post: 'imagemRifa',
             qtdNrs: parseInt(qtdNrs),
             autorizacao: autorizacao,
-            vlrBilhete: parseInt(vlrBilhete)
+            vlrBilhete: parseInt(vlrBilhete),
+            dataSolicitacaoExcluir: ''
         }
 
         const resultado = await gravaRifaALiberarTransacao(dadosRifa);
@@ -116,179 +118,192 @@ export default function DisponibilizarRifas() {
             setVlrBilhete('')
             setGenero(' Escolha a categoria')
             setQtdNrs('')
-            setMensagemCadastro('Os dados da Rifa serao analisados em breve. Estando de acordo com a politica da plataforma, a Rifa sera disponibilizada. Caso contrario, sera rejeitada.')
-            setTimeout(() => {
-                navigation.navigate('Ok')
-            }, 6000);
+            setMensagemCadastro('Os dados da Rifa serao analisados. Estando de acordo com a politica da plataforma, a Rifa sera disponibilizada.')
+            setGravouRifa(true);
+            //            setTimeout(() => {
+            //                navigation.navigate('Ok')
+            //            }, 6000);
         }
         else {
             setMensagemCadastro(resultado)
             setLoad(false)
             return
         }
-}
+    }
 
-function selecionarCapa() {
-    console.log('selecionarCapa')
-    Alert.alert(
-        "Selecione",
-        "Informe de onde você vai obter a foto",
-        [
-            {
-                text: "Cancelar",
-                onPress: () => cancelarSelecionarCapa(),
-                style: "cancel"
-            },
-            {
-                text: "Galeria",
-                onPress: () => obterImagemGaleria(),
-                style: 'default'
-            },
-            {
-                text: "Câmera",
-                onPress: () => obterImagemCamera(),
-                style: 'default'
+    function selecionarCapa() {
+        console.log('selecionarCapa')
+        Alert.alert(
+            "Selecione",
+            "Informe de onde você vai obter a foto",
+            [
+                {
+                    text: "Cancelar",
+                    onPress: () => cancelarSelecionarCapa(),
+                    style: "cancel"
+                },
+                {
+                    text: "Galeria",
+                    onPress: () => obterImagemGaleria(),
+                    style: 'default'
+                },
+                {
+                    text: "Câmera",
+                    onPress: () => obterImagemCamera(),
+                    style: 'default'
+                }
+            ]
+        );
+    }
+
+    async function cancelarSelecionarCapa() {
+        return
+    }
+
+    async function obterImagemGaleria() {
+        console.log('obterImagemGaleria')
+        setMensagemCadastro('')
+        ImagePicker.openPicker({
+            width: 400,
+            height: 400,
+            cropping: true,
+            compressImageQuality: 0.9
+        }).then(image => {
+            console.log(image);
+            if (image.size > 614488) {
+                setMensagemCadastro('Tamanho da foto maior que o permitido')
+                return
             }
-        ]
-    );
-}
+            setImagemCapa(image.path);
+        })
+            .catch(error => {
+                console.log(error)
+                setMensagemCadastro('Ops, erro ao selecionar foto da Rifa')
+            });
+    }
 
-async function cancelarSelecionarCapa() {
-    return
-}
+    async function obterImagemCamera() {
+        console.log('obterImagemCamera')
+        setMensagemCadastro('')
+        ImagePicker.openCamera({
+            compressImageMaxWidth: 400,
+            compressImageMaxHeight: 400,
+            cropping: true,
+            compressImageQuality: 0.9
+        }).then(image => {
+            console.log(image.path);
+            setImagemCapa(image.path);
+        })
+            .catch(error => {
+                console.log(error)
+                setMensagemCadastro('Ops, erro ao selecionar foto da Rifa')
+            });
+    }
 
-async function obterImagemGaleria() {
-    console.log('obterImagemGaleria')
-    setMensagemCadastro('')
-    ImagePicker.openPicker({
-        width: 400,
-        height: 400,
-        cropping: true,
-        compressImageQuality: 0.9
-    }).then(image => {
-        console.log(image);
-        if (image.size > 614488) {
-            setMensagemCadastro('Tamanho da foto maior que o permitido')
-            return
-        }
-        setImagemCapa(image.path);
-    })
-        .catch(error => {
-            console.log(error)
-            setMensagemCadastro('Ops, erro ao selecionar foto da Rifa')
-        });
-}
+    async function sair() {
+        console.log('sair')
+        navigation.navigate('Ok');
+    }
 
-async function obterImagemCamera() {
-    console.log('obterImagemCamera')
-    setMensagemCadastro('')
-    ImagePicker.openCamera({
-        compressImageMaxWidth: 400,
-        compressImageMaxHeight: 400,
-        cropping: true,
-        compressImageQuality: 0.9
-    }).then(image => {
-        console.log(image.path);
-        setImagemCapa(image.path);
-    })
-        .catch(error => {
-            console.log(error)
-            setMensagemCadastro('Ops, erro ao selecionar foto da Rifa')
-        });
-}
+    const handleOptionSelect = (index, value) => {
+        setGenero(value);
+    };
 
-const handleOptionSelect = (index, value) => {
-    setGenero(value);
-};
-
-return (
-    <SafeAreaView style={estilos.safeArea}>
-        <Texto>
-            Título
-        </Texto>
-        <Input
-            autoCorrect={false}
-            autoCaptalize='none'
-            value={titulo}
-            onChangeText={(text) => setTitulo(text)}
-        />
-        <Texto>
-            Descricao
-        </Texto>
-        <Input
-            autoCorrect={false}
-            autoCaptalize='none'
-            multiline={true}
-            numberOfLines={8}
-            maxLength={400}
-            value={descricao}
-            onChangeText={(text) => setdescricao(text)}
-        />
-        <Texto>
-            Categoria
-        </Texto>
-        <View style={styles.container}>
-            <ModalDropdown
-                options={descricaoGenero}
-                defaultValue={genero}
-                onSelect={handleOptionSelect}
-                style={styles.dropdown}
-                textStyle={styles.dropdownText}
-                dropdownStyle={styles.dropdownDropdown}
-                dropdownTextStyle={styles.dropdownDropdownText}
-            />
-        </View>
-        <Texto>
-            Qtd de nrs da rifa (10, 100, 1000, 10000 ou 100000)
-        </Texto>
-        <InputQtd
-            autoCorrect={false}
-            keyboardType="numeric"
-            value={qtdNrs}
-            onChangeText={(text) => setQtdNrs(text)}
-        />
-        <Texto>
-            Valor do bilhete R$
-        </Texto>
-        <InputQtd
-            autoCorrect={false}
-            keyboardType="numeric"
-            value={vlrBilhete}
-            onChangeText={(text) => setVlrBilhete(text)}
-        />
-        <Texto>
-            Autorizacao
-        </Texto>
-        <InputQtd
-            autoCorrect={false}
-            autoCaptalize='none'
-            value={autorizacao}
-            onChangeText={(text) => setAutorizacao(text)}
-        />
-        <AreaCapa>
-            <TouchableOpacity style={estilos.imagemCapa}
-                onPress={() => selecionarCapa()}>
-                <Image source={imagemCapa ? { uri: imagemCapa } : capabranca}
-                    resizeMode={"cover"}
-                    style={estilos.imagemCapa} />
-            </TouchableOpacity>
+    return (
+        <SafeAreaView style={estilos.safeArea}>
             <Texto>
-                Foto da rifa
+                Título
             </Texto>
-        </AreaCapa>
-        <TextoMensagemCadastro>
-            {mensagemCadastro}
-        </TextoMensagemCadastro>
-        <Botao onPress={disponibilizarRifa}>
-            {load ? (
-                <ActivityIndicator size={20} color='#FFF' />
-            ) : (
-                <Text>Disponibilizar Rifa</Text>
-            )
+            <Input
+                autoCorrect={false}
+                autoCaptalize='none'
+                value={titulo}
+                onChangeText={(text) => setTitulo(text)}
+            />
+            <Texto>
+                Descricao
+            </Texto>
+            <Input
+                autoCorrect={false}
+                autoCaptalize='none'
+                multiline={true}
+                numberOfLines={8}
+                maxLength={400}
+                value={descricao}
+                onChangeText={(text) => setdescricao(text)}
+            />
+            <Texto>
+                Categoria
+            </Texto>
+            <View style={styles.container}>
+                <ModalDropdown
+                    options={descricaoGenero}
+                    defaultValue={genero}
+                    onSelect={handleOptionSelect}
+                    style={styles.dropdown}
+                    textStyle={styles.dropdownText}
+                    dropdownStyle={styles.dropdownDropdown}
+                    dropdownTextStyle={styles.dropdownDropdownText}
+                />
+            </View>
+            <Texto>
+                Qtd de nrs da rifa (10, 100, 1000, 10000 ou 100000)
+            </Texto>
+            <InputQtd
+                autoCorrect={false}
+                keyboardType="numeric"
+                value={qtdNrs}
+                onChangeText={(text) => setQtdNrs(text)}
+            />
+            <Texto>
+                Valor do bilhete R$
+            </Texto>
+            <InputQtd
+                autoCorrect={false}
+                keyboardType="numeric"
+                value={vlrBilhete}
+                onChangeText={(text) => setVlrBilhete(text)}
+            />
+            <Texto>
+                Autorizacao
+            </Texto>
+            <InputQtd
+                autoCorrect={false}
+                autoCaptalize='none'
+                value={autorizacao}
+                onChangeText={(text) => setAutorizacao(text)}
+            />
+            <AreaCapa>
+                <TouchableOpacity style={estilos.imagemCapa}
+                    onPress={() => selecionarCapa()}>
+                    <Image source={imagemCapa ? { uri: imagemCapa } : capabranca}
+                        resizeMode={"cover"}
+                        style={estilos.imagemCapa} />
+                </TouchableOpacity>
+                <Texto>
+                    Foto da rifa
+                </Texto>
+            </AreaCapa>
+            <TextoMensagemCadastro>
+                {mensagemCadastro}
+            </TextoMensagemCadastro>
+            {
+                gravouRifa ?
+                    <Botao onPress={sair}>
+                        <Text>Sair</Text>
+                    </Botao>
+                    :
+                    <Botao onPress={disponibilizarRifa}>
+                        {load ? (
+                            <ActivityIndicator size={20} color='#FFF' />
+                        ) : (
+                            <Text>Disponibilizar Rifa</Text>
+                        )
+                        }
+                    </Botao>
             }
-        </Botao>
-    </SafeAreaView>
-);
+        </SafeAreaView>
+    );
 }
 const styles = StyleSheet.create({
     container: {

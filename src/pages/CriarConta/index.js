@@ -237,7 +237,8 @@ export default function CriarConta({ navigation }) {
                     situacao: 'ativo',
                     dataUltimoLogin: dataLogin,
                     tokenNotificacoes: token,
-                    numeroSorte: numero_sorte
+                    numeroSorte: numero_sorte,
+                    dataSolicitacaoExcluir: ''
                 }
                 await criarUsuario(data);
             })

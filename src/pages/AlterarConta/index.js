@@ -253,7 +253,8 @@ export default function AlterarConta() {
                 situacao: situacao,
                 dataUltimoLogin: dataLogin,
                 tokenNotificacoes: token,
-                numeroSorte: numeroSorte
+                numeroSorte: numeroSorte,
+                dataSolicitacaoExcluir: ''
             }
             try {
                 await setDoc(doc(db, "usuarios", `${uid}`), data)
@@ -288,7 +289,8 @@ export default function AlterarConta() {
                 situacao: situacao,
                 dataUltimoLogin: dataLogin,
                 tokenNotificacoes: token,
-                numeroSorte: numeroSorte
+                numeroSorte: numeroSorte,
+                dataSolicitacaoExcluir: ''
             }
             try {
                 console.log(data)

@@ -4,7 +4,7 @@ import {
   where, orderBy, limit, increment, writeBatch, Timestamp, getCountFromServer, Transaction
 } from "firebase/firestore"
 import { subHours, format } from 'date-fns';
-
+ 
 export async function alteraCepRifasDisponiveis(data) {
   console.log('firestore-alteraCepRifasDisponiveis ' + data.uid)
   const batch = writeBatch(db);
@@ -45,25 +45,26 @@ export async function excluiRifaNaoLiberadaTransacao(idRifa) {
   }
 }
 
-export async function excluiRifaDisponibilizadaTransacao(idRifa) {
-  console.log('firestore-excluiRifaDisponibilizadaTransacao: ' + idRifa)
+export async function marcaRifaDisponibilizadaAExcluirTransacao(id) {
+  console.log('firestore-marcaRifaDisponibilizadaAExcluirTransacao ' + id)
+  const resultDate = subHours(new Date(), 3);
+  const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   const batch = writeBatch(db);
-  const rifaRef = doc(db, "rifasDisponiveis", idRifa);
-  const refNomeColecaoNrsBilhetesRifaDisponivel = 'nrsBilhetesRifaDisponivel-' + `${idRifa}`;
-  const nrsRef = doc(db, refNomeColecaoNrsBilhetesRifaDisponivel);
   try {
-    batch.delete(nrsRef);
-  } catch (error) {
-    console.log('Ops, Algo deu errado em excluiRifaDisponibilizadaTransacao-nrsBilhetesRifaDisponivel ' + error.code);
-    return 'Falha em excluiRifaDisponibilizadaTransacao-nrsBilhetesRifaDisponivel. Tente novamente'
-  }
-  try {
-    batch.delete(rifaRef);
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("id", "==", id));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let docRef = doc.ref;
+      batch.update(docRef, {
+        situacao: 'a excluir',
+        dataSolicitacaoExcluir: dataCadastro
+      })
+    });
     await batch.commit();
-    return 'sucesso';
+    return 'sucesso'
   } catch (error) {
-    console.log('Ops, Algo deu errado em excluiRifaDisponibilizadaTransacao-rifasDisponiveis ' + error.code);
-    return 'Falha em excluiRifaDisponibilizadaTransacao-rifasDisponiveis. Tente novamente'
+    return 'Falha em marcaRifaDisponibilizadaAExcluirTransacao'
   }
 }
 
@@ -99,7 +100,9 @@ export async function gravaRifaLiberadaTransacao(data) {
       qtdNrs: data.qtdNrs,
       autorizacao: data.autorizacao,
       vlrBilhete: data.vlrBilhete,
-      id: idRifa
+      id: idRifa,
+      situacao: 'ativa',
+      dataSolicitacaoExcluir: data.dataSolicitacaoExcluir
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasDisponiveis ' + error.code);
@@ -170,7 +173,8 @@ export async function gravaRifaALiberarTransacao(data) {
       cidadeUf: data.cidade + data.uf,
       qtdNrs: data.qtdNrs,
       autorizacao: data.autorizacao,
-      vlrBilhete: data.vlrBilhete
+      vlrBilhete: data.vlrBilhete,
+      dataSolicitacaoExcluir: data.dataSolicitacaoExcluir
     });
     await batch.commit();
     return 'sucesso'
@@ -207,7 +211,8 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
       cidadeUf: data.cidade + data.uf,
       qtdNrs: data.qtdNrs,
       autorizacao: data.autorizacao,
-      vlrBilhete: data.vlrBilhete
+      vlrBilhete: data.vlrBilhete,
+      dataSolicitacaoExcluir: data.dataSolicitacaoExcluir
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaNaoLiberadaTransacao-RifasNaoLiberadas ' + error.code);
@@ -226,6 +231,8 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
 
 export async function marcaContaAExcluir(uid, id) {
   console.log('firestore-marcaContaAExcluir ' + uid + '-' + id)
+  const resultDate = subHours(new Date(), 3);
+  const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   const batch = writeBatch(db);
   try {
     const q = query(collection(db, "usuarios"),
@@ -234,7 +241,8 @@ export async function marcaContaAExcluir(uid, id) {
     querySnapshot.forEach((doc) => {
       let docRef = doc.ref;
       batch.update(docRef, {
-        situacao: 'a excluir'
+        situacao: 'a excluir',
+        dataSolicitacaoExcluir: dataCadastro
       })
     });
     try {
@@ -375,6 +383,7 @@ export async function obtemRifasDisponiveisCepPaginacao(localidade, uf, qtdLimit
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
+      where("situacao","==", "ativa"),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
@@ -399,6 +408,7 @@ export async function obtemRifasDisponiveisGeneroPaginacao(qtdLimite, cidade, uf
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
       where("genero", "==", genero),
+      where("situacao","==", "ativa"),
       limit(`${qtdLimite}`));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -419,7 +429,9 @@ export async function obtemRifasDisponiveisGeneroPaginacao(qtdLimite, cidade, uf
       const querySnapshotUf = await getDocs(qUf);
       querySnapshotUf.forEach((doc) => {
         let rifaDisponivelUf = { id: doc.id, ...doc.data() }
-        rifasDisponiveisFirestore.push(rifaDisponivelUf)
+        if (doc.data().situacao == 'ativa') {
+          rifasDisponiveisFirestore.push(rifaDisponivelUf)
+        }
       });
       var qtdRifas = rifasDisponiveisFirestore.length
       console.log('firestore-obtemRifasDisponiveisGeneroPaginacao uf qtdRifas : ' + qtdRifas)
@@ -430,6 +442,7 @@ export async function obtemRifasDisponiveisGeneroPaginacao(qtdLimite, cidade, uf
         const qFi = query(collection(db, "rifasDisponiveis"),
           where("genero", "==", genero),
           where("uf", "!=", uf),
+          where("situacao","==", "ativa"),
           limit(`${qtdLimiteFaltaFinal}`));
         const querySnapshotFi = await getDocs(qFi);
         querySnapshotFi.forEach((doc) => {
@@ -512,6 +525,20 @@ export async function obtemQtdNrsBilhetesRifaDisponivel(id) {
   }
 }
 
+export async function obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao(id,uid) {
+  console.log('firestore-obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao: ' + id + ' - ' + uid);
+  const refNomeColecao = 'nrsBilhetesRifaDisponivel-' + `${id}`;
+  try {
+    const coll = collection(db, refNomeColecao);
+    const q = query(coll, where("uidAdquiriu", "==",`${uid}` ));
+    const snapshot = await getCountFromServer(q);
+    return snapshot.data().count;
+  } catch (error) {
+    console.log('erro obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao: ' + error.code)
+    return 999999;
+  }
+}
+
 export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf, argPesquisa) {
   console.log('firestore-obtemRifasDisponiveisTituloPaginacao: ' + qtdLimite + '-' + cidade + '-' + uf + '-' + argPesquisa);
   const cidadeUf = cidade + uf;
@@ -521,6 +548,7 @@ export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
+      where("situacao","==", "ativa"),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
@@ -559,7 +587,9 @@ export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf
     const querySnapshotUf = await getDocs(qUf);
     querySnapshotUf.forEach((doc) => {
       let rifaDisponivelUf = { id: doc.id, ...doc.data() }
-      rifasDisponiveisAntesFiltroUf.push(rifaDisponivelUf)
+      if (doc.data().situacao == 'ativa') {
+        rifasDisponiveisAntesFiltroUf.push(rifaDisponivelUf)
+      }
     });
     var qtdRifasAntesUf = rifasDisponiveisAntesFiltroUf.length
     console.log('firestore-obtemRifasDisponiveisTituloPaginacao Uf qtdRifas antes filtro: ' + qtdRifasAntesUf)
@@ -587,6 +617,7 @@ export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf
     var rifasDisponiveisAposFiltroFi = [];
     const qFi = query(collection(db, "rifasDisponiveis"),
       where("uf", "!=", uf),
+      where("situacao","==", "ativa"),
       limit(`${qtdLimiteFaltaFinal}`));
     const querySnapshotFi = await getDocs(qFi);
     querySnapshotFi.forEach((doc) => {
@@ -621,8 +652,10 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
   const cidadeUf = cidade + uf;
   var rifasDisponiveisFirestore = [];
   try {
+    console.log('firestores-obtemRifasDisponiveisPaginacao-cidadeUf,situacao')
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
+      where("situacao","==", "ativa"),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
@@ -634,7 +667,7 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
     var qtdRifas = rifasDisponiveisFirestore.length
     console.log('firestore-obtemRifasDisponiveisPaginacao qtdRifas : ' + qtdRifas)
     if (qtdRifas < qtdLimite) {
-      console.log('Uf')
+      console.log('firestores-obtemRifasDisponiveisPaginacao-uf,cidadeUf,situacao')
       // uf    
       let qtdLimiteFalta = qtdLimite - qtdRifas
       const qUf = query(collection(db, "rifasDisponiveis"),
@@ -644,16 +677,19 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
       const querySnapshotUf = await getDocs(qUf);
       querySnapshotUf.forEach((doc) => {
         let rifaDisponivelUf = { id: doc.id, ...doc.data() }
-        rifasDisponiveisFirestore.push(rifaDisponivelUf)
+        if (doc.data().situacao == 'ativa') {
+          rifasDisponiveisFirestore.push(rifaDisponivelUf)
+        }
       });
       var qtdRifas = rifasDisponiveisFirestore.length
       console.log('firestore-obtemRifasDisponiveisPaginacao uf qtdRifas : ' + qtdRifas)
       if (qtdRifas < qtdLimite) {
-        console.log('Final')
+        console.log('firestores-obtemRifasDisponiveisPaginacao-uf,situacao')
         // final
         let qtdLimiteFaltaFinal = qtdLimite - qtdRifas
         const qFi = query(collection(db, "rifasDisponiveis"),
           where("uf", "!=", uf),
+          where("situacao","==", "ativa"),
           limit(`${qtdLimiteFaltaFinal}`));
         const querySnapshotFi = await getDocs(qFi);
         querySnapshotFi.forEach((doc) => {
@@ -725,6 +761,7 @@ export async function obtemRifasDisponiveisResponsavelPaginacao(qtdLimite, cidad
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
+      where("situacao","==", "ativa"),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
@@ -763,7 +800,9 @@ export async function obtemRifasDisponiveisResponsavelPaginacao(qtdLimite, cidad
     const querySnapshotUf = await getDocs(qUf);
     querySnapshotUf.forEach((doc) => {
       let rifaDisponivelUf = { id: doc.id, ...doc.data() }
-      rifasDisponiveisAntesFiltroUf.push(rifaDisponivelUf)
+      if (doc.data().situacao == 'ativa') {
+        rifasDisponiveisAntesFiltroUf.push(rifaDisponivelUf)
+      }
     });
     var qtdRifasAntesUf = rifasDisponiveisAntesFiltroUf.length
     console.log('firestore-obtemRifasDisponiveisResponsavelPaginacao Uf qtdRifas antes filtro: ' + qtdRifasAntesUf)
@@ -791,6 +830,7 @@ export async function obtemRifasDisponiveisResponsavelPaginacao(qtdLimite, cidad
     var rifasDisponiveisAposFiltroFi = [];
     const qFi = query(collection(db, "rifasDisponiveis"),
       where("uf", "!=", uf),
+      where("situacao","==", "ativa"),
       limit(`${qtdLimiteFaltaFinal}`));
     const querySnapshotFi = await getDocs(qFi);
     querySnapshotFi.forEach((doc) => {
@@ -957,14 +997,14 @@ export async function gravaPagamentoPreReservaTransacao(data) {
   console.log('firestore-gravaPagamentoPreReservaTransacao ')
   console.log(data)
   const batch = writeBatch(db);
-  const refNomeColecao = 'pagamentoPreReserva-' + `${data.id}`;
+  const refNomeColecao = 'pagamentosPreReserva-' + `${data.id}`;
   const pgtoRef = doc(collection(db, refNomeColecao));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
   const resultDate = subHours(new Date(), 3);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   const idPgto = pgtoRef.id;
-  console.log('pgtoRef.id: ' + pgtoRef.id)
-  console.log('refNomeColecao: ' + refNomeColecao)
+  console.log('firestore-pgtoRef.id: ' + pgtoRef.id)
+  console.log('firestore-refNomeColecao: ' + refNomeColecao)
   try {
     batch.set(pgtoRef, {
       idRifa: data.id,
@@ -981,23 +1021,25 @@ export async function gravaPagamentoPreReservaTransacao(data) {
       anoValidadeCartaoCredito: data.anoValidadeCartaoCredito,
       cvvCartaoCredito: data.cvvCartaoCredito,
       cpfCartaoCredito: data.cpfCartaoCredito, 
-      dataCadastro: dataCadastro,
-      dataCadastroSeq: dataCadastroSeq
+      dataPagamento: dataCadastro,
+      dataPagamentoSeq: dataCadastroSeq
     });
   } catch (error) {
-    console.log('Ops, Algo deu errado em gravaPagamentoPreReservaTransacao-pagamentoPreReserva ' + error.code);
+    console.log('Ops, Algo deu errado em gravaPagamentoPreReservaTransacao-pagamentosPreReserva ' + error.code);
     return 'Falha em gravaPagamentoPreReservaTransacao-pagamentoPreReserva. Tente novamente'
   }
   try {
     const refNomeColecaoB = 'nrsBilhetesRifaDisponivel-' + `${data.id}`;
+    console.log('firestore-refNomeColecaoB: ' + refNomeColecaoB)
     let qtdBilhetesPreReservados = 0;
-    while (qtdBilhetesPreReservados < data.bilhetesPreReservados) {
+    while (qtdBilhetesPreReservados < data.bilhetesPreReservados.length) {
       const nrsBilhetesRef = doc(db, refNomeColecaoB,`${data.bilhetesPreReservados[qtdBilhetesPreReservados]}`);
-      console.log('nrsBilhetesRef: '  + nrsBilhetesRef)
+      console.log('firestore-nrsBilhetesRef: '  + nrsBilhetesRef)
       batch.update(nrsBilhetesRef, {
         idPgto: idPgto,
         dataPgto: dataCadastro,
-        cpfPgto: data.cpfCartaoCredito
+        cpfPgto: data.cpfCartaoCredito,
+        situacao: 'pago'
       });
       qtdBilhetesPreReservados = qtdBilhetesPreReservados + 1;
     }

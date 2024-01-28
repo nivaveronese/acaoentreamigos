@@ -5,7 +5,7 @@ import {
     AreaBotaoExcluir
 } from './styles';
 import { useNavigation } from '@react-navigation/native';
-import { obtemQtdNrsBilhetesRifaDisponivel,excluiRifaDisponibilizadaTransacao } from '../../servicos/firestore';
+import { obtemQtdNrsBilhetesRifaDisponivel, marcaRifaDisponibilizadaAExcluirTransacao } from '../../servicos/firestore';
 import { excluiImagem } from '../../servicos/storage';
 
 export default function RifasDisponibilizadasAExcluirList({ data }) {
@@ -13,7 +13,8 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
     const navigation = useNavigation();
     const [mensagemCadastro, setMensagemCadastro] = useState('');
     const [loading, setLoading] = useState(false);
- 
+    const [exclusaoOk, setExclusaoOk] = useState(false);
+
     const confirmarExclusaoRifa = () => {
         console.log('confirmarExclusaoRifa');
         Alert.alert(
@@ -45,7 +46,7 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
         const qtdNrsBilhetesDisponiveis = await obtemQtdNrsBilhetesRifaDisponivel(data.id);
         console.log('qtdNrsBilhetesDisponiveis: ' + qtdNrsBilhetesDisponiveis)
         console.log('data.qtdNrs: ' + data.qtdNrs)
-        if (qtdNrsBilhetesDisponiveis == data.qtdNrs){
+        if (qtdNrsBilhetesDisponiveis == data.qtdNrs) {
             confirmaExclusaoRifa();
         } else {
             setMensagemCadastro('Rifa nao pode ser excluida, pois tem bilhetes ja adquiridos ou em aquisicao.')
@@ -58,26 +59,28 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
         console.log('confirmaExclusaoRifa');
         setMensagemCadastro('')
         setLoading(true);
-        console.log('data.id: ' + data.id )
-        const resultado = await excluiRifaDisponibilizadaTransacao(data.id);
+        console.log('data.id: ' + data.id)
+        const resultado = await marcaRifaDisponibilizadaAExcluirTransacao(data.id);
         console.log('resultado confirmaExclusaoRifa: ' + resultado);
         if (resultado == 'sucesso') {
-            excluirImagem();
+            setExclusaoOk(true)
+            setMensagemCadastro('Se a rifa nao tiver nenhum bilhete adquirido, ela sera excluida.')
+            setLoading(false);
+            return;
         } else {
             setMensagemCadastro(resultado)
             setLoading(false);
             return;
         }
-    } 
+    }
 
-    async function excluirImagem() {
-        console.log('excluirImagem')
-        const resultadoE = await excluiImagem(data.nomeCapa);
-        console.log('resultado excluirImagem: ' + resultadoE);
-        setMensagemCadastro('')
-        setLoading(false);
-        navigation.navigate('Ok')
-    } 
+    async function sair() {
+        console.log('sair')
+        navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }]
+        })
+    }
 
     if (loading) {
         return (
@@ -106,11 +109,20 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
                         <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
                         <RifaText> Autorizacao: {data.autorizacao} </RifaText>
                     </ListaRifas>
-                    <AreaBotaoExcluir onPress={confirmarExclusaoRifa}>
-                        <SubmitText>
-                            Excluir esta Rifa
-                        </SubmitText>
-                    </AreaBotaoExcluir>
+                    {
+                        exclusaoOk ?
+                            <AreaBotaoExcluir onPress={sair}>
+                                <SubmitText>
+                                    Ok
+                                </SubmitText>
+                            </AreaBotaoExcluir>
+                            :
+                            <AreaBotaoExcluir onPress={confirmarExclusaoRifa}>
+                                <SubmitText>
+                                    Excluir esta Rifa
+                                </SubmitText>
+                            </AreaBotaoExcluir>
+                    }
                     <RifaTextTitulo> {mensagemCadastro} </RifaTextTitulo>
                 </View>
             </SafeAreaView>
