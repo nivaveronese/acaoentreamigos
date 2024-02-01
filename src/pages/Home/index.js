@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { Text, FlatList, StyleSheet } from 'react-native';
 import { obtemUsuario, obtemRifasDisponiveisPaginacao, obtemParametrosApp } from '../../servicos/firestore';
 import RifasDisponiveisList from '../../componentes/RifasDisponiveisList';
 import { Background } from './styles';
-import EntregarReceberBadge from '../../componentes/EntregarReceberBadge';
 import { RifasDisponiveisListShimmerEffect } from '../../componentes/RifasDisponiveisListShimmerEffect';
 import { AuthContext } from '../../contexts/auth';
 //import messaging from '@react-native-firebase/messaging';
@@ -195,7 +194,9 @@ if (loading) {
 } else {
     return (
         <Background>
-            <EntregarReceberBadge />
+                <Text style={styles.texto}>
+                    Rifas disponíveis
+                </Text>
             {temRifaDisponivel ?
                 <FlatList style={styles.lista}
                     data={rifasDisponiveis}
@@ -231,5 +232,12 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
         marginTop: 20,
-    }
+    },
+    texto:{
+        fontSize: 25,
+        color: '#000',
+        fontFamily: 'roboto',
+        marginLeft: 15,
+        fontStyle: 'italic',
+    },
 });

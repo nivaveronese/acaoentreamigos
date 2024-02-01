@@ -102,7 +102,7 @@ export async function gravaRifaLiberadaTransacao(data) {
       vlrBilhete: data.vlrBilhete,
       id: idRifa,
       situacao: 'ativa',
-      dataSolicitacaoExcluir: data.dataSolicitacaoExcluir
+      dataSolicitacaoExcluir: ''
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasDisponiveis ' + error.code);
@@ -173,8 +173,7 @@ export async function gravaRifaALiberarTransacao(data) {
       cidadeUf: data.cidade + data.uf,
       qtdNrs: data.qtdNrs,
       autorizacao: data.autorizacao,
-      vlrBilhete: data.vlrBilhete,
-      dataSolicitacaoExcluir: data.dataSolicitacaoExcluir
+      vlrBilhete: data.vlrBilhete
     });
     await batch.commit();
     return 'sucesso'
@@ -211,8 +210,7 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
       cidadeUf: data.cidade + data.uf,
       qtdNrs: data.qtdNrs,
       autorizacao: data.autorizacao,
-      vlrBilhete: data.vlrBilhete,
-      dataSolicitacaoExcluir: data.dataSolicitacaoExcluir
+      vlrBilhete: data.vlrBilhete
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaNaoLiberadaTransacao-RifasNaoLiberadas ' + error.code);
@@ -260,8 +258,8 @@ export async function marcaContaAExcluir(uid, id) {
     return 'Falha em marcaContaAExcluir'
   }
 }
-
 export async function obtemGeneros() {
+
   console.log('firestore-obtemGeneros: ');
   try {
     const q = query(collection(db, "generos"), orderBy("genero"));
@@ -352,26 +350,6 @@ export async function obtemBilhetesEmAquisicao(idUsuario, idRifa) {
   } catch (error) {
     console.log('firestore-erro obtemBilhetesEmAquisicao: ' + error.code)
     return bilhetesEmAquisicaoFirestore
-  }
-}
-
-export async function obtemBilhetesJaAdquiridos(idUsuario, idRifa) {
-  console.log('firestore-obtemBilhetesJaAdquiridos: ' + idUsuario + '-' + idRifa);
-  var bilhetesJaAdquiridosFirestore = [];
-  try {
-    const q = query(collection(db, "bilhetesJaAdquiridos"),
-      where("idRifa", "==", idRifa),
-      where("idUsuario", "==", idUsuario)
-    );
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      let bilheteJaAdquirido = { id: doc.id, ...doc.data() }
-      bilhetesJaAdquiridosFirestore.push(bilheteJaAdquirido)
-    });
-    return bilhetesJaAdquiridosFirestore
-  } catch (error) {
-    console.log('firestore-erro obtemBilhetesJaAdquiridos: ' + error.code)
-    return bilhetesJaAdquiridosFirestore
   }
 }
 
@@ -495,19 +473,6 @@ export async function obtemRifasNaoLiberadas(uid) {
   } catch (error) {
     console.log('erro obtemRifasNaoLiberadas: ' + error.code)
     return { rifasNaoLiberadasFirestore, qtdRifas }
-  }
-}
-
-export async function obtemQtdRifasNaoLiberadas(uid) {
-  console.log('firestore-obtemQtdRifasNaoLiberadas: ' + uid);
-  try {
-    const coll = collection(db, "rifasNaoLiberadas");
-    const q = query(coll, where("uid", "==", uid));
-    const snapshot = await getCountFromServer(q);
-    return snapshot.data().count;
-  } catch (error) {
-    console.log('erro obtemQtdRifasNaoLiberadas: ' + error.code)
-    return 0;
   }
 }
 
@@ -652,7 +617,7 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
   const cidadeUf = cidade + uf;
   var rifasDisponiveisFirestore = [];
   try {
-    console.log('firestores-obtemRifasDisponiveisPaginacao-cidadeUf,situacao')
+    console.log('firestores-obtemRifasDisponiveisPaginacao-cidadeUf,situacao,orderby dataCadastroSeq')
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
       where("situacao","==", "ativa"),
@@ -687,14 +652,15 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
         console.log('firestores-obtemRifasDisponiveisPaginacao-uf,situacao')
         // final
         let qtdLimiteFaltaFinal = qtdLimite - qtdRifas
-        const qFi = query(collection(db, "rifasDisponiveis"),
+        const qFi = query(collection(db, "rifasDisponiveis"), 
           where("uf", "!=", uf),
-          where("situacao","==", "ativa"),
           limit(`${qtdLimiteFaltaFinal}`));
         const querySnapshotFi = await getDocs(qFi);
         querySnapshotFi.forEach((doc) => {
           let rifaDisponivelFi = { id: doc.id, ...doc.data() }
-          rifasDisponiveisFirestore.push(rifaDisponivelFi)
+          if (doc.data().situacao == 'ativa') {
+            rifasDisponiveisFirestore.push(rifaDisponivelFi)
+          }  
         });
         var qtdRifas = rifasDisponiveisFirestore.length
         console.log('firestore-obtemRifasDisponiveisPaginacao final: ' + qtdRifas)
@@ -997,16 +963,16 @@ export async function gravaPagamentoPreReservaTransacao(data) {
   console.log('firestore-gravaPagamentoPreReservaTransacao ')
   console.log(data)
   const batch = writeBatch(db);
-  const refNomeColecao = 'pagamentosPreReserva-' + `${data.id}`;
-  const pgtoRef = doc(collection(db, refNomeColecao));
+  const refNomeColecaoRifa = 'pagamentosPreReservaRifa-' + `${data.id}`;
+  console.log('firestore-refNomeColecaoRifa: ' + refNomeColecaoRifa)
+  const pgtoRifaRef = doc(collection(db, refNomeColecaoRifa));
+  const idPgto = pgtoRifaRef.id;
+  console.log('firestore-pgtoRifaRef.id: ' + pgtoRifaRef.id)
   const dataCadastroSeq = Timestamp.fromDate(new Date());
   const resultDate = subHours(new Date(), 3);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
-  const idPgto = pgtoRef.id;
-  console.log('firestore-pgtoRef.id: ' + pgtoRef.id)
-  console.log('firestore-refNomeColecao: ' + refNomeColecao)
   try {
-    batch.set(pgtoRef, {
+    batch.set(pgtoRifaRef, {
       idRifa: data.id,
       idPgto: idPgto,
       vlrBilhete: data.vlrBilhete,
@@ -1025,8 +991,19 @@ export async function gravaPagamentoPreReservaTransacao(data) {
       dataPagamentoSeq: dataCadastroSeq
     });
   } catch (error) {
-    console.log('Ops, Algo deu errado em gravaPagamentoPreReservaTransacao-pagamentosPreReserva ' + error.code);
-    return 'Falha em gravaPagamentoPreReservaTransacao-pagamentoPreReserva. Tente novamente'
+    console.log('Ops, Algo deu errado em gravaPagamentoPreReservaTransacao-pagamentosPreReservaRifa ' + error.code);
+    return 'Falha em gravaPagamentoPreReservaTransacao-pagamentoPreReservaRifa. Tente novamente'
+  }
+  try {
+    const refNomeColecaoUsuario = 'pagamentosPreReservaUsuario-' + `${data.usuarioUid}`;
+    console.log('firestore-refNomeColecaoUsuario: ' + refNomeColecaoUsuario)
+    const pgtoUsuarioRef = doc(collection(db, refNomeColecaoUsuario));
+    batch.set(pgtoUsuarioRef, {
+      idRifa: data.id,
+    });
+  } catch (error) {
+    console.log('Ops, Algo deu errado em gravaPagamentoPreReservaTransacao-pagamentosPreReservaUsuario ' + error.code);
+    return 'Falha em gravaPagamentoPreReservaTransacao-pagamentosPreReservaUsuario. Tente novamente'
   }
   try {
     const refNomeColecaoB = 'nrsBilhetesRifaDisponivel-' + `${data.id}`;
@@ -1034,7 +1011,6 @@ export async function gravaPagamentoPreReservaTransacao(data) {
     let qtdBilhetesPreReservados = 0;
     while (qtdBilhetesPreReservados < data.bilhetesPreReservados.length) {
       const nrsBilhetesRef = doc(db, refNomeColecaoB,`${data.bilhetesPreReservados[qtdBilhetesPreReservados]}`);
-      console.log('firestore-nrsBilhetesRef: '  + nrsBilhetesRef)
       batch.update(nrsBilhetesRef, {
         idPgto: idPgto,
         dataPgto: dataCadastro,

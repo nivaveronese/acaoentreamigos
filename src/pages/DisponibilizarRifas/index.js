@@ -74,20 +74,26 @@ export default function DisponibilizarRifas() {
     async function gravarRifa() {
         console.log('gravarRifa')
         setMensagemCadastro('')
-        if (imagemCapa == '') {
-            setMensagemCadastro('Escolha uma foto da Rifa')
-            return
-        }
-        setLoad(true)
-        console.log('inicio salvar imagem')
-        let nomeImagem = titulo.trim() + '-' + uuid.v4();
-        const urlImagemCapa = await salvaImagem(imagemCapa, nomeImagem);
-        if (!urlImagemCapa) {
-            setMensagemCadastro('Ops, foto da rifa não conseguiu ser gravada. Verifique sua conecxão com a internet. Tente novamente')
-            setLoad(false)
-            return
-        }
-        console.log('fim salvar imagem')
+        if (genero == 'Pix') {
+            var nomeImagem = 'pixlogo.jpg';
+            var urlImagemCapa = 'https://firebasestorage.googleapis.com/v0/b/niapp100-6a8d8.appspot.com/o/imagensCapa%2Fpixlogo.jpg?alt=media&token=ffaa2efa-3806-43ee-95dd-0925bf891c30'
+        } else {
+            if (imagemCapa == '') {
+                setMensagemCadastro('Escolha uma foto da Rifa')
+                return
+            } else {
+                setLoad(true)
+                console.log('inicio salvar imagem-imagemCapa: ' + imagemCapa)
+                var nomeImagem = titulo.trim() + '-' + uuid.v4();
+                var urlImagemCapa = await salvaImagem(imagemCapa, nomeImagem);
+                if (!urlImagemCapa) {
+                    setMensagemCadastro('Ops, foto da rifa não conseguiu ser gravada. Verifique sua conecxão com a internet. Tente novamente')
+                    setLoad(false)
+                    return
+                }
+                console.log('fim salvar imagem')
+            } 
+        } 
         let dadosRifa = {
             titulo: titulo,
             descricao: descricao,
@@ -110,6 +116,7 @@ export default function DisponibilizarRifas() {
 
         const resultado = await gravaRifaALiberarTransacao(dadosRifa);
         console.log('resultado gravaRifaALiberarTransacao: ' + resultado);
+        setLoad(false)
         if (resultado == 'sucesso') {
             setTitulo('')
             setImagemCapa('')
@@ -126,7 +133,6 @@ export default function DisponibilizarRifas() {
         }
         else {
             setMensagemCadastro(resultado)
-            setLoad(false)
             return
         }
     }
@@ -202,6 +208,15 @@ export default function DisponibilizarRifas() {
 
     async function sair() {
         console.log('sair')
+        setTitulo('')
+        setImagemCapa('')
+        setdescricao('')
+        setAutorizacao('')
+        setVlrBilhete('')
+        setGenero(' Escolha a categoria')
+        setQtdNrs('')
+        setMensagemCadastro('')
+        setGravouRifa(false);
         navigation.navigate('Ok');
     }
 

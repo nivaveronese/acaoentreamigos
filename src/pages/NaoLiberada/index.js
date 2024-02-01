@@ -40,7 +40,7 @@ export default function NaoLiberada() {
         return (
             <Background>
                 <Text style={styles.texto}>
-                    Rifas não liberados
+                    Rifas não liberadas
                 </Text>
                 <View style={estilos.areaMensagemCadastro}>
                     <Text style={estilos.textoMensagemCadastro}>

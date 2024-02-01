@@ -12,7 +12,6 @@ import { useNavigation } from '@react-navigation/native';
 import { desgravaPreReservaTransacao, gravaPagamentoPreReservaTransacao } from '../../servicos/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { criticallyDampedSpringCalculations } from 'react-native-reanimated/lib/typescript/reanimated2/animation/springUtils';
 
 export default function InformarDadosPagamento() {
     console.log('InformarDadosPagamento')
@@ -30,7 +29,6 @@ export default function InformarDadosPagamento() {
  
     async function validarDadosCartao() {
         console.log('validarDadosCartao');
-        console.log('ano atual: ' + anoAtual)
 
         if (numeroCartaoCredito == '' || isNaN(numeroCartaoCredito) || numeroCartaoCredito.length === 0 || numeroCartaoCredito.length < 13 || numeroCartaoCredito.length > 16) {
             setMensagemCadastro('Digite corretamente o número do cartão de crédito');
@@ -40,7 +38,7 @@ export default function InformarDadosPagamento() {
             setMensagemCadastro('Digite corretamente o mês de validade do cartão de crédito');
             return;
         }
-        if (anoValidadeCartaoCredito == '' || isNaN(anoValidadeCartaoCredito) || !anoValidadeCartaoCredito.length == 4) {
+        if (anoValidadeCartaoCredito == '' || isNaN(anoValidadeCartaoCredito) || anoValidadeCartaoCredito.length < 4 || anoValidadeCartaoCredito.length > 4) {
             setMensagemCadastro('Digite corretamente o ano de validade do cartão de crédito');
             return;
         }
@@ -128,14 +126,15 @@ export default function InformarDadosPagamento() {
             return;
         }
         else {
+            desgravarPreReserva();
             setPgtoRealizado(false)
             setMensagemCadastro('Falha gravacao pagamento pre reserva. Tente novamente.');
             return;
         }
     }
 
-    async function voltar() {
-        console.log('voltar')
+    async function desgravarPreReserva(){
+        console.log('desgravarPreReserva')
         console.log('route.params?.bilhetesPreReservados.length: ' + route.params?.bilhetesPreReservados.length)
         console.log(route.params?.bilhetesPreReservados)
         var qtdBilhetesDesgravados = 0;
@@ -153,10 +152,12 @@ export default function InformarDadosPagamento() {
             qtdBilhetesDesgravados = qtdBilhetesDesgravados + 1;
         }
         setLoading(false)
-        navigation.reset({
-            index: 0,
-            routes: [{ name: "Home" }]
-        })
+    }
+
+    async function voltar() {
+        console.log('voltar')
+        desgravarPreReserva();
+        sair();
     }
 
     async function sair() {
