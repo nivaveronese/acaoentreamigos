@@ -205,7 +205,7 @@ export default function DisponibilizarRifas() {
                 setMensagemCadastro('Ops, erro ao selecionar foto da Rifa')
             });
     }
-
+ 
     async function sair() {
         console.log('sair')
         setTitulo('')
@@ -305,7 +305,7 @@ export default function DisponibilizarRifas() {
             {
                 gravouRifa ?
                     <Botao onPress={sair}>
-                        <Text>Sair</Text>
+                        <Text>Ok</Text>
                     </Botao>
                     :
                     <Botao onPress={disponibilizarRifa}>
@@ -319,7 +319,7 @@ export default function DisponibilizarRifas() {
             }
         </SafeAreaView>
     );
-}
+} 
 const styles = StyleSheet.create({
     container: {
         justifyContent: 'top',

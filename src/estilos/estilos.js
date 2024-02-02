@@ -36,6 +36,11 @@ export default StyleSheet.create({
     marginBottom: 9,
     marginLeft: '40%'
   }, 
+  linkLeft:{
+    marginTop: 20,
+    marginBottom: 5,
+    marginLeft: 10,
+  }, 
   linkText:{
     color: '#008080',
   }, 

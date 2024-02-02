@@ -4,7 +4,7 @@ import {
   where, orderBy, limit, increment, writeBatch, Timestamp, getCountFromServer, Transaction
 } from "firebase/firestore"
 import { subHours, format } from 'date-fns';
- 
+
 export async function alteraCepRifasDisponiveis(data) {
   console.log('firestore-alteraCepRifasDisponiveis ' + data.uid)
   const batch = writeBatch(db);
@@ -361,7 +361,7 @@ export async function obtemRifasDisponiveisCepPaginacao(localidade, uf, qtdLimit
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
-      where("situacao","==", "ativa"),
+      where("situacao", "==", "ativa"),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
@@ -386,7 +386,7 @@ export async function obtemRifasDisponiveisGeneroPaginacao(qtdLimite, cidade, uf
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
       where("genero", "==", genero),
-      where("situacao","==", "ativa"),
+      where("situacao", "==", "ativa"),
       limit(`${qtdLimite}`));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -420,7 +420,7 @@ export async function obtemRifasDisponiveisGeneroPaginacao(qtdLimite, cidade, uf
         const qFi = query(collection(db, "rifasDisponiveis"),
           where("genero", "==", genero),
           where("uf", "!=", uf),
-          where("situacao","==", "ativa"),
+          where("situacao", "==", "ativa"),
           limit(`${qtdLimiteFaltaFinal}`));
         const querySnapshotFi = await getDocs(qFi);
         querySnapshotFi.forEach((doc) => {
@@ -458,21 +458,21 @@ export async function obtemRifasDisponibilizadasAExcluir(uid) {
   }
 }
 
-export async function obtemRifasNaoLiberadas(uid) {
-  console.log('firestore-obtemRifasNaoLiberadas: ' + uid);
+export async function obtemMinhasRifasNaoLiberadas(uid) {
+  console.log('firestore-obtemMinhasRifasNaoLiberadas: ' + uid);
   try {
     const q = query(collection(db, "rifasNaoLiberadas"), where("uid", "==", uid));
-    const rifasNaoLiberadasFirestore = []
+    const minhasRifasNaoLiberadasFirestore = []
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       let rifaNaoLiberada = { id: doc.id, ...doc.data() }
-      rifasNaoLiberadasFirestore.push(rifaNaoLiberada)
+      minhasRifasNaoLiberadasFirestore.push(rifaNaoLiberada)
     });
-    const qtdRifas = rifasNaoLiberadasFirestore.length
-    return { rifasNaoLiberadasFirestore, qtdRifas }
+    const qtdRifas = minhasRifasNaoLiberadasFirestore.length
+    return { minhasRifasNaoLiberadasFirestore, qtdRifas }
   } catch (error) {
-    console.log('erro obtemRifasNaoLiberadas: ' + error.code)
-    return { rifasNaoLiberadasFirestore, qtdRifas }
+    console.log('erro obtemMinhasRifasNaoLiberadas: ' + error.code)
+    return { minhasRifasNaoLiberadasFirestore, qtdRifas }
   }
 }
 
@@ -490,12 +490,12 @@ export async function obtemQtdNrsBilhetesRifaDisponivel(id) {
   }
 }
 
-export async function obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao(id,uid) {
+export async function obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao(id, uid) {
   console.log('firestore-obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao: ' + id + ' - ' + uid);
   const refNomeColecao = 'nrsBilhetesRifaDisponivel-' + `${id}`;
   try {
     const coll = collection(db, refNomeColecao);
-    const q = query(coll, where("uidAdquiriu", "==",`${uid}` ));
+    const q = query(coll, where("uidAdquiriu", "==", `${uid}`));
     const snapshot = await getCountFromServer(q);
     return snapshot.data().count;
   } catch (error) {
@@ -513,7 +513,7 @@ export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
-      where("situacao","==", "ativa"),
+      where("situacao", "==", "ativa"),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
@@ -582,7 +582,7 @@ export async function obtemRifasDisponiveisTituloPaginacao(qtdLimite, cidade, uf
     var rifasDisponiveisAposFiltroFi = [];
     const qFi = query(collection(db, "rifasDisponiveis"),
       where("uf", "!=", uf),
-      where("situacao","==", "ativa"),
+      where("situacao", "==", "ativa"),
       limit(`${qtdLimiteFaltaFinal}`));
     const querySnapshotFi = await getDocs(qFi);
     querySnapshotFi.forEach((doc) => {
@@ -620,7 +620,7 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
     console.log('firestores-obtemRifasDisponiveisPaginacao-cidadeUf,situacao,orderby dataCadastroSeq')
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
-      where("situacao","==", "ativa"),
+      where("situacao", "==", "ativa"),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
@@ -652,7 +652,7 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
         console.log('firestores-obtemRifasDisponiveisPaginacao-uf,situacao')
         // final
         let qtdLimiteFaltaFinal = qtdLimite - qtdRifas
-        const qFi = query(collection(db, "rifasDisponiveis"), 
+        const qFi = query(collection(db, "rifasDisponiveis"),
           where("uf", "!=", uf),
           limit(`${qtdLimiteFaltaFinal}`));
         const querySnapshotFi = await getDocs(qFi);
@@ -660,7 +660,7 @@ export async function obtemRifasDisponiveisPaginacao(qtdLimite, cidade, uf) {
           let rifaDisponivelFi = { id: doc.id, ...doc.data() }
           if (doc.data().situacao == 'ativa') {
             rifasDisponiveisFirestore.push(rifaDisponivelFi)
-          }  
+          }
         });
         var qtdRifas = rifasDisponiveisFirestore.length
         console.log('firestore-obtemRifasDisponiveisPaginacao final: ' + qtdRifas)
@@ -727,7 +727,7 @@ export async function obtemRifasDisponiveisResponsavelPaginacao(qtdLimite, cidad
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("cidadeUf", "==", cidadeUf),
-      where("situacao","==", "ativa"),
+      where("situacao", "==", "ativa"),
       limit(`${qtdLimite}`),
       orderBy("dataCadastroSeq", "desc"));
     const querySnapshot = await getDocs(q);
@@ -796,7 +796,7 @@ export async function obtemRifasDisponiveisResponsavelPaginacao(qtdLimite, cidad
     var rifasDisponiveisAposFiltroFi = [];
     const qFi = query(collection(db, "rifasDisponiveis"),
       where("uf", "!=", uf),
-      where("situacao","==", "ativa"),
+      where("situacao", "==", "ativa"),
       limit(`${qtdLimiteFaltaFinal}`));
     const querySnapshotFi = await getDocs(qFi);
     querySnapshotFi.forEach((doc) => {
@@ -893,7 +893,7 @@ export async function gravaPreReservaTransacao(dadosPreReserva, dadosBilhetePreR
             uidAdquiriu: dadosPreReserva.usuarioUid,
             emailAdquiriu: dadosPreReserva.usuarioEmail,
             dataAdquiriu: dadosPreReserva.dataPreReserva
-          }) 
+          })
           console.log('firestore-bilhete pre-adquirido com sucesso')
           resultado = 'sucesso';
         }
@@ -916,7 +916,7 @@ export async function gravaPreReservaTransacao(dadosPreReserva, dadosBilhetePreR
   return resultado;
 }
 
-export async function desgravaPreReservaTransacao(idRifa,idBilhete) {
+export async function desgravaPreReservaTransacao(idRifa, idBilhete) {
   console.log('firestore-desgravaPreReservaTransacao: ' + idRifa + ' - ' + idBilhete)
   var resultado = 'sucesso';
   const refNomeColecaoNrsBilhetesRifaDisponivel = 'nrsBilhetesRifaDisponivel-' + `${idRifa}`;
@@ -933,9 +933,9 @@ export async function desgravaPreReservaTransacao(idRifa,idBilhete) {
             emailAdquiriu: '',
             dataAdquiriu: ''
           })
-          console.log('firestore-desgravaPreReservaTransacao-bilhete desgravado com sucesso' )
-           resultado = 'sucesso'
-           console.log('firestore-resultado: ' + resultado)
+          console.log('firestore-desgravaPreReservaTransacao-bilhete desgravado com sucesso')
+          resultado = 'sucesso'
+          console.log('firestore-resultado: ' + resultado)
         }
         else {
           console.log('firestore-desgravaPreReservaTransacao-bilhete nao esta na situacao de pre-adquirido')
@@ -945,8 +945,8 @@ export async function desgravaPreReservaTransacao(idRifa,idBilhete) {
       }
       else {
         console.log('firestore-desgravaPreReservaTransacaos-fDoc nao existe ')
-         resultado = 'firestore-desgravaPreReservaTransacao-sfDoc nao existe '
-         console.log('firestore-resultado: ' + resultado)
+        resultado = 'firestore-desgravaPreReservaTransacao-sfDoc nao existe '
+        console.log('firestore-resultado: ' + resultado)
       }
     })
   }
@@ -986,7 +986,7 @@ export async function gravaPagamentoPreReservaTransacao(data) {
       mesValidadeCartaoCredito: data.mesValidadeCartaoCredito,
       anoValidadeCartaoCredito: data.anoValidadeCartaoCredito,
       cvvCartaoCredito: data.cvvCartaoCredito,
-      cpfCartaoCredito: data.cpfCartaoCredito, 
+      cpfCartaoCredito: data.cpfCartaoCredito,
       dataPagamento: dataCadastro,
       dataPagamentoSeq: dataCadastroSeq
     });
@@ -998,9 +998,17 @@ export async function gravaPagamentoPreReservaTransacao(data) {
     const refNomeColecaoUsuario = 'pagamentosPreReservaUsuario-' + `${data.usuarioUid}`;
     console.log('firestore-refNomeColecaoUsuario: ' + refNomeColecaoUsuario)
     const pgtoUsuarioRef = doc(collection(db, refNomeColecaoUsuario));
-    batch.set(pgtoUsuarioRef, {
-      idRifa: data.id,
-    });
+    const coll = collection(db, refNomeColecaoUsuario);
+    const q = query(coll, where("idRifa", "==", data.id));
+    const snapshot = await getCountFromServer(q);
+    console.log('snapshot.data().count: ' + snapshot.data().count);
+    if (snapshot.data().count == 0) {
+      batch.set(pgtoUsuarioRef, {
+        idRifa: data.id,
+        situacao: 'ativa',
+        dataPagamentoSeq: dataCadastroSeq
+      });
+    }
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaPagamentoPreReservaTransacao-pagamentosPreReservaUsuario ' + error.code);
     return 'Falha em gravaPagamentoPreReservaTransacao-pagamentosPreReservaUsuario. Tente novamente'
@@ -1010,7 +1018,7 @@ export async function gravaPagamentoPreReservaTransacao(data) {
     console.log('firestore-refNomeColecaoB: ' + refNomeColecaoB)
     let qtdBilhetesPreReservados = 0;
     while (qtdBilhetesPreReservados < data.bilhetesPreReservados.length) {
-      const nrsBilhetesRef = doc(db, refNomeColecaoB,`${data.bilhetesPreReservados[qtdBilhetesPreReservados]}`);
+      const nrsBilhetesRef = doc(db, refNomeColecaoB, `${data.bilhetesPreReservados[qtdBilhetesPreReservados]}`);
       batch.update(nrsBilhetesRef, {
         idPgto: idPgto,
         dataPgto: dataCadastro,
@@ -1025,5 +1033,32 @@ export async function gravaPagamentoPreReservaTransacao(data) {
   catch (error) {
     console.log('Ops, Algo deu errado em gravaPagamentoPreReservaTransacao-nrsBilhetesRifaDisponivel ' + error.code);
     return 'Falha em gravaPagamentoPreReservaTransacao-nrsBilhetesRifaDisponivel. Tente novamente'
+  }
+}
+
+export async function obtemMinhasRifasAtivas(uid) {
+  console.log('firestore-obtemMinhasRifasAtivas: ' + uid);
+  const minhasRifasAtivasFirestore = []
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("uid", "==", uid),
+      where("situacao", "==", "ativa"));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      const refNomeColecao = 'nrsBilhetesRifaDisponivel-' + `${doc.id}`;
+      console.log('firestore-doc.id: ' + doc.id + ' - ' + refNomeColecao)
+      const coll = collection(db, refNomeColecao);
+      const q = query(coll, where("situacao", "==", "pago"));
+      const snapshot = getCountFromServer(q);
+      console.log('firestore-a')
+      var qtdBilhetesPagos = snapshot.data().count;
+      console.log('firestore-qtdBilhetesPagos: ' + qtdBilhetesPagos)
+      let rifaAtiva = { id: doc.id, qtdBilhetes: qtdBilhetesPagos, ...doc.data() }
+      minhasRifasAtivasFirestore.push(rifaAtiva)
+    });
+    return { minhasRifasAtivasFirestore }
+  } catch (error) {
+    console.log('erro obtemMinhasRifasAtivas: ' + error.code)
+    return { minhasRifasAtivasFirestore }
   }
 }

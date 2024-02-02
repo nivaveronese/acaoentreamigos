@@ -4,6 +4,7 @@ import StackRoutes from '../routes/stack.routes';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DisponibilizarRifas from '../pages/DisponibilizarRifas';
+import MinhasRifasEBilhetes from '../pages/MinhasRifasEBilhetes';
 import Pesquisar from '../pages/Pesquisar';
 import Perfil from '../pages/Perfil';
 
@@ -38,7 +39,7 @@ function AppRoutes() {
         name='DisponibilizarRifas' component={DisponibilizarRifas}
         options={{
           headerShown: false,
-          tabBarLabel: 'DisponibilizarRifas',
+          tabBarLabel: 'Criar Rifas',
           tabBarIcon: ({ color, size }) => {
             return <MaterialCommunityIcons
               name='book-plus-outline' color={color} size={size}
@@ -54,6 +55,18 @@ function AppRoutes() {
           tabBarIcon: ({ color, size }) => {
             return <MaterialCommunityIcons
               name='book-search-outline' color={color} size={size}
+            />
+          }
+        }}
+      />
+      <Tab.Screen
+        name='MinhasRifasEBilhetes' component={MinhasRifasEBilhetes}
+        options={{
+          headerShown: false,
+          tabBarLabel: 'Minhas Rifas',
+          tabBarIcon: ({ color, size }) => {
+            return <MaterialCommunityIcons
+              name='bookmark-check-outline' color={color} size={size}
             />
           }
         }}

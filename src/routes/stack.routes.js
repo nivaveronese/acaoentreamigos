@@ -12,8 +12,9 @@ import ExcluirRifaDisponibilizada from '../pages/ExcluirRifaDisponibilizada';
 import SignIn from '../pages/SignIn';
 import SaidaNet from '../pages/SaidaNet';
 import ValidarAquisicao from '../pages/ValidarAquisicao';
-import NaoLiberada from '../pages/NaoLiberada';
 import InformarDadosPagamento from '../pages/InformarDadosPagamento';
+import MinhasRifasAtivas from '../pages/MinhasRifasAtivas';
+import MinhasRifasNaoLiberadas from '../pages/MinhasRifasNaoLiberadas';
 
 const Stack = createNativeStackNavigator();
 
@@ -132,15 +133,22 @@ export default function StackRoutes() {
                 }}
             />
             <Stack.Screen
-                name='NaoLiberada'
-                component={NaoLiberada}
+                name='InformarDadosPagamento'
+                component={InformarDadosPagamento}
                 options={{
                     headerShown: false
                 }}
             />
             <Stack.Screen
-                name='InformarDadosPagamento'
-                component={InformarDadosPagamento}
+                name='MinhasRifasAtivas'
+                component={MinhasRifasAtivas}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name='MinhasRifasNaoLiberadas'
+                component={MinhasRifasNaoLiberadas}
                 options={{
                     headerShown: false
                 }}

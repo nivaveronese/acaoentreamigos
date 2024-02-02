@@ -1,40 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { ContentText, ListaRifas, RifaTextTitulo, RifaText } from './styles';
-import { SafeAreaView, StyleSheet, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { View, Image } from 'react-native';
-import { excluiRifaNaoLiberadaTransacao } from '../../servicos/firestore';
-import { excluiImagem } from '../../servicos/storage';
+import React, { useState } from 'react';
+import { Image, View, SafeAreaView, StyleSheet } from 'react-native';
+import {
+    RifaText, ListaRifas, RifaTextTitulo, ContentText} from './styles';
 
-export default function RifasNaoLiberadasList({ data }) {
-    console.log('RifasNaoLiberadasList')
+export default function MinhasRifasAtivasList({ data }) {
+    console.log('MinhasRifasAtivasList');
     const [loading, setLoading] = useState(false);
-    const navigation = useNavigation();
-
-    useEffect(() => {
-        return () => {
-            doSomethingOnUnmount();
-        }
-    }, [])
-
-    async function doSomethingOnUnmount() {
-        console.log('doSomethingOnUnmount')
-        setLoading(true);
-        const resultado = await excluiRifaNaoLiberadaTransacao(data.id);
-        console.log('resultado excluiRifaNaoLiberadaTransacao: ' + resultado);
-        if (resultado == 'sucesso') {
-            excluirImagem();
-        }
-        setLoading(false);
-    }
-
-    async function excluirImagem() {
-        console.log('excluirImagem')
-        const resultadoE = await excluiImagem(data.nomeCapa);
-        console.log('resultado excluirImagem: ' + resultadoE);
-        setLoading(false);
-        navigation.navigate('Ok')
-    }
 
     if (loading) {
         return (
@@ -62,14 +33,14 @@ export default function RifasNaoLiberadasList({ data }) {
                         <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
                         <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
                         <RifaText> Autorizacao: {data.autorizacao} </RifaText>
-                        <RifaText> Obs: Rifa nao foi liberada, pois nao atendeu as regras </RifaText>
+                        <RifaText> Qtd bilhetes pagos: {data.qtdBilhetes} </RifaText>
                     </ListaRifas>
                 </View>
             </SafeAreaView>
         )
     }
 }
-
+  
 const styles = StyleSheet.create({
     card: {
         shadowColor: '#000',
@@ -84,6 +55,6 @@ const styles = StyleSheet.create({
     capa: {
         width: '100%',
         height: 400,
-        borderRadius: 5
+        borderRadius: 5,
     }
 })

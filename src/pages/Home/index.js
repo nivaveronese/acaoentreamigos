@@ -8,9 +8,9 @@ import { AuthContext } from '../../contexts/auth';
 //import messaging from '@react-native-firebase/messaging';
 import { db } from '../../config/firebase';
 import { doc, writeBatch, Timestamp } from "firebase/firestore";
-
+ 
 export default function Home() {
-    console.log('pages/home.index.js');
+    console.log('Home');
     const [rifasDisponiveis, setRifasDisponiveis] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(false);
