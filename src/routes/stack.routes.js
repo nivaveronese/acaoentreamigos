@@ -12,6 +12,7 @@ import ExcluirRifaDisponibilizada from '../pages/ExcluirRifaDisponibilizada';
 import SignIn from '../pages/SignIn';
 import SaidaNet from '../pages/SaidaNet';
 import ValidarAquisicao from '../pages/ValidarAquisicao';
+import ValidarDisponibilizacao from '../pages/ValidarDisponibilizacao';
 import InformarDadosPagamento from '../pages/InformarDadosPagamento';
 import MinhasRifasAtivas from '../pages/MinhasRifasAtivas';
 import MinhasRifasNaoLiberadas from '../pages/MinhasRifasNaoLiberadas';
@@ -128,6 +129,13 @@ export default function StackRoutes() {
             <Stack.Screen
                 name='ValidarAquisicao'
                 component={ValidarAquisicao}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name='ValidarDisponibilizacao'
+                component={ValidarDisponibilizacao}
                 options={{
                     headerShown: false
                 }}

@@ -1038,27 +1038,40 @@ export async function gravaPagamentoPreReservaTransacao(data) {
 
 export async function obtemMinhasRifasAtivas(uid) {
   console.log('firestore-obtemMinhasRifasAtivas: ' + uid);
+  const minhasRifasAtivasFirestoreAntes = []
   const minhasRifasAtivasFirestore = []
-  try {
+  try { 
     const q = query(collection(db, "rifasDisponiveis"),
       where("uid", "==", uid),
       where("situacao", "==", "ativa"));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      const refNomeColecao = 'nrsBilhetesRifaDisponivel-' + `${doc.id}`;
-      console.log('firestore-doc.id: ' + doc.id + ' - ' + refNomeColecao)
+      let rifaAtivaAntes = { id: doc.id, ...doc.data() }
+      minhasRifasAtivasFirestoreAntes.push(rifaAtivaAntes)
+    });
+  } catch (error) {
+    console.log('erro obtemMinhasRifasAtivas-rifasDisponiveis: ' + error.code)
+    return { minhasRifasAtivasFirestore }
+  }
+  try {
+    qtdRifasAtivas = 0;
+    while (qtdRifasAtivas < minhasRifasAtivasFirestoreAntes.length){
+      idRifa = minhasRifasAtivasFirestoreAntes[qtdRifasAtivas].id;
+      const refNomeColecao = 'nrsBilhetesRifaDisponivel-' + `${idRifa}`;
+      console.log('firestore-refNomeColecao - ' + refNomeColecao);
       const coll = collection(db, refNomeColecao);
       const q = query(coll, where("situacao", "==", "pago"));
-      const snapshot = getCountFromServer(q);
-      console.log('firestore-a')
+      const snapshot = await getCountFromServer(q);
       var qtdBilhetesPagos = snapshot.data().count;
       console.log('firestore-qtdBilhetesPagos: ' + qtdBilhetesPagos)
-      let rifaAtiva = { id: doc.id, qtdBilhetes: qtdBilhetesPagos, ...doc.data() }
+      let minhaRifaAtiva = minhasRifasAtivasFirestoreAntes[qtdRifasAtivas];
+      let rifaAtiva = { qtdBilhetes: qtdBilhetesPagos, minhaRifaAtiva  }
       minhasRifasAtivasFirestore.push(rifaAtiva)
-    });
+      qtdRifasAtivas = qtdRifasAtivas + 1;
+    }
     return { minhasRifasAtivasFirestore }
   } catch (error) {
-    console.log('erro obtemMinhasRifasAtivas: ' + error.code)
+    console.log('erro obtemMinhasRifasAtivas-nrsBilhetesRifaDisponivel: ' + error.code)
     return { minhasRifasAtivasFirestore }
   }
 }

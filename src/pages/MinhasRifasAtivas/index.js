@@ -24,9 +24,13 @@ export default function MinhasRifasAtivas() {
         setTemRifaAtiva(false)
         setLoading(true)
         const minhasRifasAtivasFirestore = await obtemMinhasRifasAtivas(user.uid)
+        console.log(minhasRifasAtivasFirestore)
+        console.log(minhasRifasAtivasFirestore.minhasRifasAtivasFirestore[0].minhaRifaAtiva.bairro)
+        console.log(minhasRifasAtivasFirestore.minhasRifasAtivasFirestore[0].qtdBilhetes)
         setLoading(false)
-        if (minhasRifasAtivasFirestore.length > 0) {
-            console.log('minhasRifasAtivasFirestore.qtdRifas > 0')
+        console.log(minhasRifasAtivasFirestore.minhasRifasAtivasFirestore.length)
+        if (minhasRifasAtivasFirestore.minhasRifasAtivasFirestore.length > 0) {
+            console.log('minhasRifasAtivasFirestore.minhasRifasAtivasFirestore.length > 0')
             setRifasAtivas(minhasRifasAtivasFirestore.minhasRifasAtivasFirestore)
             setTemRifaAtiva(true)
         } else {

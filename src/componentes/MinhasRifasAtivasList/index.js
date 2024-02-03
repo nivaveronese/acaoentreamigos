@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Image, View, SafeAreaView, StyleSheet } from 'react-native';
 import {
     RifaText, ListaRifas, RifaTextTitulo, ContentText} from './styles';
-
+  
 export default function MinhasRifasAtivasList({ data }) {
     console.log('MinhasRifasAtivasList');
+    console.log(data)
     const [loading, setLoading] = useState(false);
 
     if (loading) {
@@ -16,24 +17,21 @@ export default function MinhasRifasAtivasList({ data }) {
                 />
             </View>
         )
-    } else {
+    } else { 
         return (
             <SafeAreaView>
                 <View style={styles.card}>
-                    <Image source={{ uri: data.imagemCapa }}
+                    <Image source={{ uri: data.minhaRifaAtiva.imagemCapa }}
                         resizeMode={"cover"}
                         style={styles.capa}
                     />
                     <ListaRifas>
-                        <RifaTextTitulo> {data.titulo} </RifaTextTitulo>
+                        <RifaTextTitulo> {data.minhaRifaAtiva.titulo} </RifaTextTitulo>
                         <ContentText numberOfLines={8}>
-                            {data.descricao}
+                            {data.minhaRifaAtiva.descricao}
                         </ContentText>
-                        <RifaText> Responsável: {data.nome} </RifaText>
-                        <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
-                        <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
-                        <RifaText> Autorizacao: {data.autorizacao} </RifaText>
-                        <RifaText> Qtd bilhetes pagos: {data.qtdBilhetes} </RifaText>
+                        <RifaText> Qtd nrs: {data.minhaRifaAtiva.qtdNrs} Vlr bilhete: {data.minhaRifaAtiva.vlrBilhete}</RifaText>
+                        <RifaText> Qtd bilhetes pagos: {data.qtdBilhetes} Vlr total bilhetes pagos: {data.qtdBilhetes * data.minhaRifaAtiva.vlrBilhete} </RifaText>
                     </ListaRifas>
                 </View>
             </SafeAreaView>

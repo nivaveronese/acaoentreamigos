@@ -2,9 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet, Alert, View, Text, ActivityIndicator, Keyboard, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import Botao from '../../componentes/Botao';
 import { AreaCapa, Texto, Input, TextoMensagemCadastro, InputQtd } from './styles';
-import {
-    gravaRifaALiberarTransacao, obtemGeneros
-} from '../../servicos/firestore';
+import { obtemGeneros, obtemParametrosApp} from '../../servicos/firestore';
 import estilos from '../../estilos/estilos';
 import { salvaImagem } from '../../servicos/storage';
 import { AuthContext } from '../../contexts/auth';
@@ -13,7 +11,7 @@ import capabranca from '../../assets/maqfotografica.png';
 import ImagePicker from 'react-native-image-crop-picker';
 import uuid from 'react-native-uuid';
 import { useNavigation } from '@react-navigation/native';
-
+ 
 export default function DisponibilizarRifas() {
     console.log('DisponibilizarRifas');
     const [mensagemCadastro, setMensagemCadastro] = useState('');
@@ -31,9 +29,13 @@ export default function DisponibilizarRifas() {
     const [gravouRifa, setGravouRifa] = useState(false)
     var qtdNrsValidos = [10, 100, 1000, 10000, 100000];
     var regra = /^[0-9]+$/;
+    var qtdLimiteRifasAtivas = 0;
+    var percAdministracao = 0;
+    var percPgtoBilhete = 0;
 
     useEffect(() => {
         carregaGenerosList();
+        obterParametros();
     }, []);
 
     async function carregaGenerosList() {
@@ -47,6 +49,23 @@ export default function DisponibilizarRifas() {
         }
         setDescricaoGenero(descricaoGeneroArray)
         setLoad(false)
+    }
+
+    async function obterParametros() {
+        setLoad(true)
+        const parametrosAppFirestore = await obtemParametrosApp();
+        console.log('parametrosAppFirestore.qtdLimiteRifasAtivas: ' + parametrosAppFirestore.qtdLimiteRifasAtivas)
+        setLoad(false)
+        if (!parametrosAppFirestore) {
+            console.log('parametrosAppFirestore vazio')
+            qtdLimiteRifasAtivas = 5;
+            percAdministracao = 10;
+            percPgtoBilhete = 1;
+        } else {
+            qtdLimiteRifasAtivas = parametrosAppFirestore.qtdLimiteRifasAtivas;
+            percAdministracao = parametrosAppFirestore.percAdministracao;
+            percPgtoBilhete = parametrosAppFirestore.percPgtoBilhete;
+        }    
     }
 
     async function disponibilizarRifa() {
@@ -94,47 +113,7 @@ export default function DisponibilizarRifas() {
                 console.log('fim salvar imagem')
             } 
         } 
-        let dadosRifa = {
-            titulo: titulo,
-            descricao: descricao,
-            imagemCapa: urlImagemCapa,
-            genero: genero,
-            uid: usuario.uid,
-            cep: usuario.cep,
-            cidade: usuario.cidade,
-            uf: usuario.uf,
-            bairro: usuario.bairro,
-            nome: usuario.nome,
-            email: usuario.email,
-            nomeCapa: nomeImagem,
-            post: 'imagemRifa',
-            qtdNrs: parseInt(qtdNrs),
-            autorizacao: autorizacao,
-            vlrBilhete: parseInt(vlrBilhete),
-            dataSolicitacaoExcluir: ''
-        }
 
-        const resultado = await gravaRifaALiberarTransacao(dadosRifa);
-        console.log('resultado gravaRifaALiberarTransacao: ' + resultado);
-        setLoad(false)
-        if (resultado == 'sucesso') {
-            setTitulo('')
-            setImagemCapa('')
-            setdescricao('')
-            setAutorizacao('')
-            setVlrBilhete('')
-            setGenero(' Escolha a categoria')
-            setQtdNrs('')
-            setMensagemCadastro('Os dados da Rifa serao analisados. Estando de acordo com a politica da plataforma, a Rifa sera disponibilizada.')
-            setGravouRifa(true);
-            //            setTimeout(() => {
-            //                navigation.navigate('Ok')
-            //            }, 6000);
-        }
-        else {
-            setMensagemCadastro(resultado)
-            return
-        }
     }
 
     function selecionarCapa() {
