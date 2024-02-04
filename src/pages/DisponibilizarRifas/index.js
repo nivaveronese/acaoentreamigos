@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet, Alert, View, Text, ActivityIndicator, Keyboard, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import Botao from '../../componentes/Botao';
 import { AreaCapa, Texto, Input, TextoMensagemCadastro, InputQtd } from './styles';
-import { obtemGeneros, obtemParametrosApp} from '../../servicos/firestore';
+import { obtemGeneros, obtemParametrosApp, obtemQtdRifasAtivasUsuario,obtemQtdRifasALiberarUsuario} from '../../servicos/firestore';
 import estilos from '../../estilos/estilos';
 import { salvaImagem } from '../../servicos/storage';
 import { AuthContext } from '../../contexts/auth';
@@ -21,17 +21,20 @@ export default function DisponibilizarRifas() {
     const [genero, setGenero] = useState(' Escolha a categoria');
     const [descricaoGenero, setDescricaoGenero] = useState([]);
     const [qtdNrs, setQtdNrs] = useState(0);
-    const [vlrBilhete, setVlrBilhete] = useState(0);
+    const [vlrBilhete, setVlrBilhete] = useState('');
     const [imagemCapa, setImagemCapa] = useState('');
     const [load, setLoad] = useState(false);
     const { user: usuario } = useContext(AuthContext);
     const navigation = useNavigation();
-    const [gravouRifa, setGravouRifa] = useState(false)
+    const [percAdministracao,setPercAdministracao] = useState('');
+    const [percPgtoBilhete,setPercPgtoBilhete] = useState('');
     var qtdNrsValidos = [10, 100, 1000, 10000, 100000];
     var regra = /^[0-9]+$/;
     var qtdLimiteRifasAtivas = 0;
-    var percAdministracao = 0;
-    var percPgtoBilhete = 0;
+    var vlrTotalBilhetes = 0;
+    var vlrTaxaAdministracao = 0;
+    var vlrTaxaBilhetes = 0;
+    var vlrLiquido = 0;
 
     useEffect(() => {
         carregaGenerosList();
@@ -59,13 +62,26 @@ export default function DisponibilizarRifas() {
         if (!parametrosAppFirestore) {
             console.log('parametrosAppFirestore vazio')
             qtdLimiteRifasAtivas = 5;
-            percAdministracao = 10;
-            percPgtoBilhete = 1;
+            setPercAdministracao(10);
+            setPercPgtoBilhete(1);
         } else {
             qtdLimiteRifasAtivas = parametrosAppFirestore.qtdLimiteRifasAtivas;
-            percAdministracao = parametrosAppFirestore.percAdministracao;
-            percPgtoBilhete = parametrosAppFirestore.percPgtoBilhete;
-        }    
+            setPercAdministracao(parametrosAppFirestore.percAdministracao) ;
+            setPercPgtoBilhete(parametrosAppFirestore.percPgtoBilhete) ;
+        }
+        setLoad(true)
+        console.log('usuario.uid: ' + usuario.uid)
+        const qtdRifasAtivasUsuario = await obtemQtdRifasAtivasUsuario(usuario.uid);
+        console.log('obtemQtdRifasAtivasUsuario: ' + qtdRifasAtivasUsuario)
+        const qtdRifasALiberarUsuario = await obtemQtdRifasALiberarUsuario(usuario.uid);
+        console.log('qtdRifasALiberarUsuario: ' + qtdRifasALiberarUsuario)        
+        setLoad(false)
+        let qtdRifasTotalUsuario = qtdRifasAtivasUsuario + qtdRifasALiberarUsuario
+        console.log('qtdRifasTotalUsuario: ' + qtdRifasTotalUsuario)
+        if (qtdRifasTotalUsuario == qtdLimiteRifasAtivas) {
+            setMensagemCadastro('Voce ja atingiu o limite de rifas ativas ' + {qtdLimiteRifasAtivas});
+            return;
+        }
     }
 
     async function disponibilizarRifa() {
@@ -105,15 +121,49 @@ export default function DisponibilizarRifas() {
                 console.log('inicio salvar imagem-imagemCapa: ' + imagemCapa)
                 var nomeImagem = titulo.trim() + '-' + uuid.v4();
                 var urlImagemCapa = await salvaImagem(imagemCapa, nomeImagem);
+                setLoad(false)
                 if (!urlImagemCapa) {
                     setMensagemCadastro('Ops, foto da rifa não conseguiu ser gravada. Verifique sua conecxão com a internet. Tente novamente')
-                    setLoad(false)
                     return
                 }
                 console.log('fim salvar imagem')
             } 
         } 
-
+        console.log('percAdministracao: ' + percAdministracao)
+        console.log('percPgtoBilhete: ' + percPgtoBilhete)
+        vlrTotalBilhetes = qtdNrs * vlrBilhete;
+        console.log('vlrTotalBilhetes: ' + vlrTotalBilhetes)
+        vlrTaxaAdministracao = vlrTotalBilhetes * percAdministracao / 100;
+        console.log('vlrTaxaAdministracao: ' + vlrTaxaAdministracao)
+        vlrTaxaBilhetes = vlrTotalBilhetes * percPgtoBilhete / 100;    
+        console.log('vlrTaxaBilhetes: ' + vlrTaxaBilhetes)
+        vlrLiquido = vlrTotalBilhetes - vlrTaxaAdministracao - vlrTaxaBilhetes;    
+        let dadosRifa = {
+            titulo: titulo,
+            descricao: descricao,
+            imagemCapa: urlImagemCapa,
+            genero: genero,
+            uid: usuario.uid,
+            cep: usuario.cep,
+            cidade: usuario.cidade,
+            uf: usuario.uf,
+            bairro: usuario.bairro,
+            nome: usuario.nome,
+            email: usuario.email,
+            nomeCapa: nomeImagem,
+            post: 'imagemRifa',
+            qtdNrs: parseInt(qtdNrs),
+            autorizacao: autorizacao,
+            vlrBilhete: parseInt(vlrBilhete),
+            percAdministracao: percAdministracao,
+            percPgtoBilhete: percPgtoBilhete,
+            vlrTotalBilhetes: vlrTotalBilhetes,
+            vlrTaxaAdministracao: vlrTaxaAdministracao,
+            vlrTaxaBilhetes: vlrTaxaBilhetes,
+            vlrLiquido: vlrLiquido
+        }
+        console.log('ir para informar validar disponibilizacao')
+        navigation.navigate('ValidarDisponibilizacao', dadosRifa);
     }
 
     function selecionarCapa() {
@@ -183,20 +233,6 @@ export default function DisponibilizarRifas() {
                 console.log(error)
                 setMensagemCadastro('Ops, erro ao selecionar foto da Rifa')
             });
-    }
- 
-    async function sair() {
-        console.log('sair')
-        setTitulo('')
-        setImagemCapa('')
-        setdescricao('')
-        setAutorizacao('')
-        setVlrBilhete('')
-        setGenero(' Escolha a categoria')
-        setQtdNrs('')
-        setMensagemCadastro('')
-        setGravouRifa(false);
-        navigation.navigate('Ok');
     }
 
     const handleOptionSelect = (index, value) => {
@@ -281,12 +317,6 @@ export default function DisponibilizarRifas() {
             <TextoMensagemCadastro>
                 {mensagemCadastro}
             </TextoMensagemCadastro>
-            {
-                gravouRifa ?
-                    <Botao onPress={sair}>
-                        <Text>Ok</Text>
-                    </Botao>
-                    :
                     <Botao onPress={disponibilizarRifa}>
                         {load ? (
                             <ActivityIndicator size={20} color='#FFF' />
@@ -295,7 +325,6 @@ export default function DisponibilizarRifas() {
                         )
                         }
                     </Botao>
-            }
         </SafeAreaView>
     );
 } 

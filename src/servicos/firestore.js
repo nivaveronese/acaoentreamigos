@@ -100,6 +100,11 @@ export async function gravaRifaLiberadaTransacao(data) {
       qtdNrs: data.qtdNrs,
       autorizacao: data.autorizacao,
       vlrBilhete: data.vlrBilhete,
+      percAdministracao: data.percAdministracao,
+      percPgtoBilhete: data.percPgtoBilhete,
+      vlrTotalBilhetes: data.vlrTotalBilhetes,
+      vlrTaxaAdministracao: data.vlrTaxaAdministracao,
+      vlrTaxaBilhetes: data.vlrTaxaBilhetes, 
       id: idRifa,
       situacao: 'ativa',
       dataSolicitacaoExcluir: ''
@@ -173,7 +178,12 @@ export async function gravaRifaALiberarTransacao(data) {
       cidadeUf: data.cidade + data.uf,
       qtdNrs: data.qtdNrs,
       autorizacao: data.autorizacao,
-      vlrBilhete: data.vlrBilhete
+      vlrBilhete: data.vlrBilhete,
+      percAdministracao: data.percAdministracao,
+      percPgtoBilhete: data.percPgtoBilhete,
+      vlrTotalBilhetes: data.vlrTotalBilhetes,
+      vlrTaxaAdministracao: data.vlrTaxaAdministracao,
+      vlrTaxaBilhetes: data.vlrTaxaBilhetes  
     });
     await batch.commit();
     return 'sucesso'
@@ -210,7 +220,12 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
       cidadeUf: data.cidade + data.uf,
       qtdNrs: data.qtdNrs,
       autorizacao: data.autorizacao,
-      vlrBilhete: data.vlrBilhete
+      vlrBilhete: data.vlrBilhete,
+      percAdministracao: data.percAdministracao,
+      percPgtoBilhete: data.percPgtoBilhete,
+      vlrTotalBilhetes: data.vlrTotalBilhetes,
+      vlrTaxaAdministracao: data.vlrTaxaAdministracao,
+      vlrTaxaBilhetes: data.vlrTaxaBilhetes 
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaNaoLiberadaTransacao-RifasNaoLiberadas ' + error.code);
@@ -473,6 +488,34 @@ export async function obtemMinhasRifasNaoLiberadas(uid) {
   } catch (error) {
     console.log('erro obtemMinhasRifasNaoLiberadas: ' + error.code)
     return { minhasRifasNaoLiberadasFirestore, qtdRifas }
+  }
+}
+
+export async function obtemQtdRifasAtivasUsuario(uid) {
+  console.log('firestore-obtemQtdRifasAtivasUsuario: ' + uid);
+  const refNomeColecao = 'rifasDisponiveis';
+  try {
+    const coll = collection(db, refNomeColecao);
+    const q = query(coll, where("uid", "==", `${uid}`));
+    const snapshot = await getCountFromServer(q);
+    return snapshot.data().count;
+  } catch (error) {
+    console.log('erro obtemQtdRifasAtivasUsuario: ' + error.code)
+    return 999999;
+  }
+}
+
+export async function obtemQtdRifasALiberarUsuario(uid) {
+  console.log('firestore-obtemQtdRifasALiberarUsuario: ' + uid);
+  const refNomeColecao = 'rifasALiberar';
+  try {
+    const coll = collection(db, refNomeColecao);
+    const q = query(coll, where("uid", "==", `${uid}`));
+    const snapshot = await getCountFromServer(q);
+    return snapshot.data().count;
+  } catch (error) {
+    console.log('erro obtemQtdRifasALiberarUsuario: ' + error.code)
+    return 999999;
   }
 }
 

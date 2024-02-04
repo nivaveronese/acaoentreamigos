@@ -3,12 +3,12 @@ import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'rea
 import { useRoute } from '@react-navigation/native';
 import {
     RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
-    ContentText
+    ContentText, AreaBotao
 } from './styles';
-import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
 import { gravaRifaALiberarTransacao } from '../../servicos/firestore';
+import { excluiImagem } from '../../servicos/storage';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -16,9 +16,9 @@ export default function ValidarDisponibilizacao() {
     console.log('ValidarDisponibilizacao: ')
     const route = useRoute();
     const navigation = useNavigation();
-    const { user: usuario } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [gravouRifa, setGravouRifa] = useState(false)
+    const [mensagemCadastro, setMensagemCadastro] = useState('');
 
     async function concordar() {
         console.log('concordar');
@@ -60,7 +60,15 @@ export default function ValidarDisponibilizacao() {
         }
     }
 
-    function voltar() {
+    async function voltar() {
+        console.log('voltar')
+        if (!route.params?.genero == 'Pix') {
+            setLoading(true);
+            const resultadoE = await excluiImagem(route.params?.nomeCapa);
+            setLoading(false);
+            console.log('resultado excluirImagem: ' + resultadoE);
+        }
+        setMensagemCadastro('')
         navigation.reset({
             index: 0,
             routes: [{ name: "Home" }]
@@ -82,66 +90,104 @@ export default function ValidarDisponibilizacao() {
                 <ScrollView>
                     <AreaRifa>
                         <RifaTextTitulo> {route.params?.titulo} </RifaTextTitulo>
-                        <ContentText numberOfLines={8}>
-                            {route.params?.descricao}
-                        </ContentText>
-                        <RifaText> Qtd nrs: {route.params?.qtdNrs} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
-                        <RifaText> Vlr total bilhetes: {route.params?.vlrTotalBilhetes}</RifaText>
-                        <RifaText> Vlr taxa administracao: {route.params?.vlrTaxaAdministracao}</RifaText>
-                        <RifaText> Qtd taxa bilhetes: {route.params?.vlrTaxaBilhetes}</RifaText>
+                        <RifaText> </RifaText>
+                        <RifaText> Qtd nrs: {route.params?.qtdNrs} Vlr bilhete R$: {route.params?.vlrBilhete}</RifaText>
+                        <RifaText> Vlr total bilhetes R$: {route.params?.vlrTotalBilhetes}</RifaText>
+                        <RifaText> Vlr taxa administracao R$: {route.params?.vlrTaxaAdministracao}</RifaText>
+                        <RifaText> Vlr taxa bilhetes R$: {route.params?.vlrTaxaBilhetes}</RifaText>
+                        <RifaText> Se todos os bilhetes forem vendidos, voce vai receber R$: {route.params?.vlrLiquido}</RifaText>
                     </AreaRifa>
                     <RifaText> </RifaText>
                     <RifaTextTitulo> Termos para disponibilizacao da rifa </RifaTextTitulo>
                     <RifaText> </RifaText>
                     <RifaText>
-                        - rifa de até 10 bilhetes tem prazo máximo de venda de 3 meses
-                        - rifa de até 100 bilhetes tem prazo máximo de venda de 5 meses
-                        - rifa de 1000 bilhetes tem prazo máximo de venda de 6 meses
-                        - rifa de 10000 bilhetes tem prazo máximo de venda de 9 meses
-                        - rifa de 100000 bilhetes tem prazo máximo de venda de 12 meses
-                        <RifaText> </RifaText>
-                        - se todos os bilhetes da rifa foram adquiridos dentro do prazo final:
-                        - sistema marca a data do sorteio para o primeiro sábado, após 10 dias úteis do dia do encerramento das vendas
-                        <RifaText> </RifaText>
-                        - se nem todos os bilhetes da rifa foram adquiridos dentro do prazo final:
-                        - o criador da lista define se vai sortear o prêmio ou o valor arrecadado em pix.
-                        <RifaText> </RifaText>
-                        - O criador da rifa pode, a qualquer momento, encerrar as vendas dos bilhetes
-                        - neste caso, ele define se vai sortear o prêmio ou o valor arrecadado em pix.
-                        <RifaText> </RifaText>
-                        - Se o criador da rifa, optar pelo sorteio do valor em pix:
-                        - O valor a ser sorteado sera o valor total vendido, menos a taxa de administracao
-                        e menos a taxa da venda dos bilhetes.
-                        Do valor calculado, o criador recebe 50% e o ganhador 50%.
-                        O valor a receber do ganhador nao pode ser menor que o valor pago nos seus bilhetes.
-                        <RifaText> </RifaText>
-                        - Se o sorteio for do premio, o criador vai receber, o valor total da venda dos
-                        bilhetes, menos a taxa de administracao e menos a taxa da venda dos bilhetes.
-                        - O valor sera creditado na conta do criador, em ate 5 dias uteis, contados a
-                        partir da confirmacao do sorteado, de que ele recebeu o premio.
+                        Rifa de até 10 bilhetes tem prazo máximo de venda de 3 meses
                     </RifaText>
-                    {
-                        gravouRifa ?
-                            <SubmitButton onPress={sair}>
-                                <SubmitText>
-                                    Ok
-                                </SubmitText>
-                            </SubmitButton>
-                            :
-                            <SubmitButton onPress={concordar}>
-                                <SubmitText>
-                                    Concordo com os termos
-                                </SubmitText>
-                            </SubmitButton>
-                            <TouchableOpacity style={styles.botao} onPress={() => voltar()}>
-                                <Text style={estilos.linkText}>Voltar</Text>
-                            </TouchableOpacity>
+                    <RifaText>
+                        Rifa de até 100 bilhetes tem prazo máximo de venda de 5 meses
+                    </RifaText>
+                    <RifaText>
+                        Rifa de 1000 bilhetes tem prazo máximo de venda de 6 meses
+                    </RifaText>
+                    <RifaText>
+                        Rifa de 10000 bilhetes tem prazo máximo de venda de 9 meses
+                    </RifaText>
+                    <RifaText>
+                        Rifa de 100000 bilhetes tem prazo máximo de venda de 12 meses
+                    </RifaText>
+                    <RifaText> </RifaText>
+                    <RifaText>
+                        Se todos os bilhetes da rifa forem adquiridos dentro do prazo final,
+                        a plataforma marca a data do sorteio para o primeiro sábado, após
+                        10 dias úteis do encerramento das vendas.
+                    </RifaText>
+                    <RifaText>
+                        O criador vai receber o valor total da venda dos bilhetes, menos a
+                        taxa de administracao e menos a taxa da venda dos bilhetes.
+                    </RifaText>
+                    {route.params?.genero == 'Pix' ?
+                        <View>
+                            <RifaText> </RifaText>
+                            <RifaText>
+                                Se nem todos os bilhetes da rifa forem adquiridos dentro do prazo final,
+                                ou o criador da rifa encerrar as vendas dos bilhetes antecipadamente, o
+                                valor a ser sorteado sera o valor total vendido, menos a taxa de
+                                administracao e menos a taxa da venda dos bilhetes. Do valor restante,
+                                o criador recebe 50% e o ganhador 50%. O valor a receber do ganhador nao
+                                pode ser menor que o valor pago nos seus bilhetes.
+                            </RifaText>
+                        </View>
+                        :
+                        <View>
+                            <RifaText> </RifaText>
+                            <RifaText>
+                                Se nem todos os bilhetes da rifa forem adquiridos dentro do prazo final,
+                                ou o criador da rifa encerrar as vendas dos bilhetes antecipadamente, o
+                                criador da rifa define se vai sortear o prêmio ou o valor arrecadado em pix.
+                                Se o criador da rifa, optar pelo sorteio do valor em pix, o valor a ser
+                                sorteado sera o valor total vendido, menos a taxa de
+                                administracao e menos a taxa da venda dos bilhetes. Do valor restante,
+                                o criador recebe 50% e o ganhador 50%. O valor a receber do ganhador nao pode
+                                ser menor que o valor pago nos seus bilhetes.
+                                Se o criador da rifa, optar pelo sorteio do premio, o criador vai receber, o
+                                valor total da venda dos bilhetes, menos a taxa
+                                de administracao e menos a taxa da venda dos bilhetes.
+                            </RifaText>
+                        </View>
                     }
+                    <View>
+                        <RifaText> </RifaText>
+                        <RifaText>
+                            O valor sera creditado na conta do criador, em ate 5 dias uteis, contados a
+                            partir da confirmacao do sorteado, de que ele recebeu o premio.
+                        </RifaText>
+                    </View>
                     <View style={estilos.areaMensagemCadastro}>
                         <Text style={estilos.textoMensagemCadastro}>
                             {mensagemCadastro}
                         </Text>
                     </View>
+                    {
+                        gravouRifa ?
+                            <AreaBotao>
+                                <SubmitButton onPress={voltar}>
+                                    <SubmitText>
+                                        Ok
+                                    </SubmitText>
+                                </SubmitButton>
+                            </AreaBotao>
+                            :
+                            <AreaBotao>
+                                <SubmitButton onPress={concordar}>
+                                    <SubmitText>
+                                        Concordo
+                                    </SubmitText>
+                                </SubmitButton>
+                                <TouchableOpacity style={styles.botao} onPress={() => voltar()}>
+                                    <Text style={estilos.linkText}>Voltar</Text>
+                                </TouchableOpacity>
+                            </AreaBotao>
+                    }
                 </ScrollView>
             </GestureHandlerRootView>
         )

@@ -15,9 +15,6 @@ export const SubmitText = styled.Text`
     color: #FFFFFF;
     font-family: Roboto;
 `;
-export const ViewTitulo = styled.View`
-    flex-direction: row;
-`;
 export const RifaTextTitulo = styled.Text`
     font-size: 15px;
     font-weight: bold;
@@ -35,19 +32,6 @@ export const AreaRifa = styled.View`
     align-items: flex-start;
     background-color: #FFFFFF;
 `;
-export const AreaBotao = styled.View`
-    justify-content: center;
-    align-items: center;
-    background-color: #FFFFFF;
-`;
-export const AreaInput = styled.View`
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    background-color: #FFFFFF;
-    margin-top: 10px;
-    margin-left: 40px;
-`;
 export const ContentText = styled.Text`
     font-size: 13px;
     margin-left: 15px;
@@ -55,20 +39,10 @@ export const ContentText = styled.Text`
     color: #333;
     font-family: Roboto;
 `;
-export const InputQtd = styled.TextInput`
-    width: 30%;
-    border-width: 1px;
-    border-color: #D3D3D3;    
-    font-size: 15px;
-    padding: 5px;
-    border-radius: 5px;
-    color: #333;
-    font-family: Roboto;
+export const AreaBotao = styled.View`
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    margin-top: 10px;
 `;
-export const TextoQtd= styled.Text`
-        font-size: 12px; 
-        margin-top: 5px;
-        color: #333;
-        font-family: Roboto;
-        font-weight: bold;
-`; 
