@@ -23,15 +23,14 @@ export default function MinhasRifasNaoLiberadas() {
         if (loading) return;
         setLoading(true)
         const minhasRifasNaoLiberadasFirestore = await obtemMinhasRifasNaoLiberadas(usuario.uid)
+        setLoading(false)
         console.log('minhasRifasNaoLiberadasFirestore.qtdRifas: ' + minhasRifasNaoLiberadasFirestore.qtdRifas)
-        if (minhasRifasNaoLiberadasFirestore.qtdRifas == 0) {
+        if (minhasRifasNaoLiberadasFirestore.qtdRifas > 0) {
             setMinhasRifasNaoLiberadas(minhasRifasNaoLiberadasFirestore.minhasRifasNaoLiberadasFirestore)
             setTemRifaNaoLiberada(true)
         } else {
             setTemRifaNaoLiberada(false)
         }
-        setLoading(false)
-        return;
     }
 
     if (loading) {

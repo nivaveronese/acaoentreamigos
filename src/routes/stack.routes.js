@@ -16,6 +16,8 @@ import ValidarDisponibilizacao from '../pages/ValidarDisponibilizacao';
 import InformarDadosPagamento from '../pages/InformarDadosPagamento';
 import MinhasRifasAtivas from '../pages/MinhasRifasAtivas';
 import MinhasRifasNaoLiberadas from '../pages/MinhasRifasNaoLiberadas';
+import MinhasRifasALiberar from '../pages/MinhasRifasALiberar';
+import MeusBilhetesAdquiridos from '../pages/MeusBilhetesAdquiridos';
 
 const Stack = createNativeStackNavigator();
 
@@ -157,6 +159,20 @@ export default function StackRoutes() {
             <Stack.Screen
                 name='MinhasRifasNaoLiberadas'
                 component={MinhasRifasNaoLiberadas}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name='MinhasRifasALiberar'
+                component={MinhasRifasALiberar}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name='MeusBilhetesAdquiridos'
+                component={MeusBilhetesAdquiridos}
                 options={{
                     headerShown: false
                 }}

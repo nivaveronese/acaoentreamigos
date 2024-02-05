@@ -2,6 +2,7 @@ import {storage} from '../config/firebase';
 import {ref, uploadBytes, getDownloadURL, deleteObject} from 'firebase/storage';
 
 export async function salvaImagem(imagem, imagemNome) {
+    console.log('salvaImagem: ' + imagemNome)
     if(!imagem){
         return 'Ops, algo deu errado em salvaImagem imagem'
     } 
@@ -21,7 +22,7 @@ export async function salvaImagem(imagem, imagemNome) {
 } 
 
 export async function excluiImagem(imagemNome) {
-    console.log('excluiImagem' + imagemNome)
+    console.log('excluiImagem: ' + imagemNome)
     if(!imagemNome) {
         return 'Ops, Algo deu errado em excluiImagem imagemNome'
     }
@@ -39,6 +40,7 @@ export async function excluiImagem(imagemNome) {
 }
 
 export async function salvaImagemAvatar(imagem, imagemNome) {
+    console.log('salvaImagemAvatar: ' + imagemNome)
     if(!imagem){
         return 'Ops, algo deu errado em salvaImagemAvatar imagem'
     } 

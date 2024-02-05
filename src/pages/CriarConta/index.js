@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Image, StyleSheet, View, Text, ActivityIndicator, Keyboard, TouchableOpacity, KeyboardAvoidingView, Platform }
     from 'react-native';
@@ -237,8 +236,7 @@ export default function CriarConta({ navigation }) {
                     situacao: 'ativo',
                     dataUltimoLogin: dataLogin,
                     tokenNotificacoes: token,
-                    numeroSorte: numero_sorte,
-                    dataSolicitacaoExcluir: ''
+                    numeroSorte: numero_sorte
                 }
                 await criarUsuario(data);
             })

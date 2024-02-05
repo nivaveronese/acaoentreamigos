@@ -58,10 +58,7 @@ export default function MinhasRifasNaoLiberadasList({ data }) {
                         <ContentText numberOfLines={8}>
                             {data.descricao}
                         </ContentText>
-                        <RifaText> Responsável: {data.nome} </RifaText>
-                        <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
                         <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
-                        <RifaText> Autorizacao: {data.autorizacao} </RifaText>
                         <RifaText> Obs: Rifa nao foi liberada, pois nao atendeu as regras </RifaText>
                     </ListaRifas>
                 </View>

@@ -9,7 +9,7 @@ import {
 } from './styles';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import { desgravaPreReservaTransacao, gravaPagamentoPreReservaTransacao } from '../../servicos/firestore';
+import { obtemSituacaoRifa, desgravaPreReservaTransacao, gravaPagamentoPreReservaTransacao } from '../../servicos/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -60,6 +60,16 @@ export default function InformarDadosPagamento() {
             setMensagemCadastro('Digite o nome impresso no cartão de crédito');
             return;
         }
+
+        setLoading(true)
+        const situacaoRifa = await obtemSituacaoRifa(route.params?.id);
+        setLoading(false)
+        console.log('situacaoRifa: ' + situacaoRifa)
+        if (situacaoRifa != 'ativa'){
+            setMensagemCadastro('Esta rifa nao esta mais disponivel: ' + situacaoRifa)
+            return;
+        }
+
         console.log('vai gravarPagamento')
         gravarPagamento();
     }
@@ -97,17 +107,26 @@ export default function InformarDadosPagamento() {
             return false;
         return true;
     }
-
+ 
     async function gravarPagamento() {
         console.log('gravarPagamento: ')
         var dadosGravarPagamentoPreReserva = {
             id: route.params?.id,
+            imagemCapa: route.params?.imagemCapa,
+            titulo: route.params?.titulo,
+            descricao: route.params?.descricao,
+            nome: route.params?.nome,
+            cep: route.params?.cep,
+            cidade: route.params?.cidade,
+            uf: route.params?.uf,
+            bairro: route.params?.bairro,
             vlrBilhete: route.params?.vlrBilhete,
             vlrTotalBilhetes: route.params?.vlrTotalBilhetes,
             usuarioUid: route.params?.usuarioUid,
             usuarioQtdBilhetes: route.params?.usuarioQtdBilhetes,
             usuarioEmail: route.params?.usuarioEmail,
             bilhetesPreReservados: route.params?.bilhetesPreReservados,
+            nrsBilhetesPreReservados: route.params?.nrsBilhetesPreReservados,
             numeroCartaoCredito: numeroCartaoCredito,
             nomeCartaoCredito: nomeCartaoCredito,
             mesValidadeCartaoCredito: mesValidadeCartaoCredito,

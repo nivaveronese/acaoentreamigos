@@ -14,7 +14,7 @@ export const RifaText = styled.Text`
     font-size: 13px;
     font-family: roboto;
     color: #000;
-`; 
+`;
 export const ContentText = styled.Text`
     font-size: 13px;
     margin-left: 15px;

@@ -32,13 +32,6 @@ export const AreaRifa = styled.View`
     align-items: flex-start;
     background-color: #FFFFFF;
 `;
-export const ContentText = styled.Text`
-    font-size: 13px;
-    margin-left: 15px;
-    font-style: italic;
-    color: #333;
-    font-family: Roboto;
-`;
 export const AreaBotao = styled.View`
     flex-direction: row;
     justify-content: center;

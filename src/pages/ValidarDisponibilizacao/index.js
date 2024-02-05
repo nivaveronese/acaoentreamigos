@@ -3,8 +3,8 @@ import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'rea
 import { useRoute } from '@react-navigation/native';
 import {
     RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
-    ContentText, AreaBotao
-} from './styles';
+    AreaBotao
+} from './styles'; 
 import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
 import { gravaRifaALiberarTransacao } from '../../servicos/firestore';
@@ -39,7 +39,6 @@ export default function ValidarDisponibilizacao() {
             qtdNrs: route.params?.qtdNrs,
             autorizacao: route.params?.autorizacao,
             vlrBilhete: route.params?.vlrBilhete,
-            dataSolicitacaoExcluir: '',
             percAdministracao: route.params?.percAdministracao,
             percPgtoBilhete: route.params?.percPgtoBilhete,
             vlrTotalBilhetes: route.params?.vlrTotalBilhetes,
@@ -61,13 +60,22 @@ export default function ValidarDisponibilizacao() {
     }
 
     async function voltar() {
-        console.log('voltar')
-        if (!route.params?.genero == 'Pix') {
+        console.log('voltar: ' + route.params?.genero + ' - ' + route.params?.nomeCapa)
+        if (route.params?.genero != 'Pix') {
             setLoading(true);
             const resultadoE = await excluiImagem(route.params?.nomeCapa);
             setLoading(false);
             console.log('resultado excluirImagem: ' + resultadoE);
         }
+        setMensagemCadastro('')
+        navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }]
+        })
+    }
+
+    async function sair() {
+        console.log('sair ')
         setMensagemCadastro('')
         navigation.reset({
             index: 0,
@@ -170,7 +178,7 @@ export default function ValidarDisponibilizacao() {
                     {
                         gravouRifa ?
                             <AreaBotao>
-                                <SubmitButton onPress={voltar}>
+                                <SubmitButton onPress={sair}>
                                     <SubmitText>
                                         Ok
                                     </SubmitText>

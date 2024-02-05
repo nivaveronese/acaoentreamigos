@@ -1,39 +1,36 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Text, FlatList, StyleSheet } from 'react-native';
-import { obtemMinhasRifasAtivas } from '../../servicos/firestore';
-import MinhasRifasAtivasList from '../../componentes/MinhasRifasAtivasList';
+import { obtemMinhasRifasALiberar } from '../../servicos/firestore';
+import MinhasRifasALiberarList from '../../componentes/MinhasRifasALiberarList';
 import { Background } from './styles';
 import { RifasDisponiveisListShimmerEffect } from '../../componentes/RifasDisponiveisListShimmerEffect'
 import { AuthContext } from '../../contexts/auth';
  
-export default function MinhasRifasAtivas() {
-    console.log('MinhasRifasAtivas');
-    const [minhasRifasAtivas, setMinhasRifasAtivas] = useState([]);
+export default function MinhasRifasALiberar() {
+    console.log('MinhasRifasALiberar');
+    const [minhasRifasALiberar, setMinhasRifasALiberar] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [temRifaAtiva, setTemRifaAtiva] = useState(false);
+    const [temRifaALiberar, setTemRifaALiberar] = useState(false);
     const { user } = useContext(AuthContext);
 
     useEffect(() => {
-        console.log('MinhasRifasAtivas-useEffect')
-        carregarMinhasRifasAtivas()
+        console.log('MinhasRifasALiberar-useEffect')
+        carregarMinhasRifasALiberar()
     }, [])
 
-    async function carregarMinhasRifasAtivas() {
-        console.log('carregarMinhasRifasAtivas');
-        setMinhasRifasAtivas([])
-        setTemRifaAtiva(false)
+    async function carregarMinhasRifasALiberar() {
+        console.log('carregarMinhasRifasALiberar');
+        setMinhasRifasALiberar([])
+        setTemRifaALiberar(false)
         setLoading(true)
-        const minhasRifasAtivasFirestore = await obtemMinhasRifasAtivas(user.uid)
-        console.log(minhasRifasAtivasFirestore)
+        const minhasRifasALiberarFirestore = await obtemMinhasRifasALiberar(user.uid)
         setLoading(false)
-        console.log(minhasRifasAtivasFirestore.qtdRifas)
-        if (minhasRifasAtivasFirestore.qtdRifas > 0) {
-            console.log('minhasRifasAtivasFirestore.qtdRifas > 0')
-            setMinhasRifasAtivas(minhasRifasAtivasFirestore.minhasRifasAtivasFirestore)
-            setTemRifaAtiva(true)
+        console.log('minhasRifasALiberarFirestore.qtdRifas: ' + minhasRifasALiberarFirestore.qtdRifas)
+        if (minhasRifasALiberarFirestore.qtdRifas > 0) {
+            setMinhasRifasALiberar(minhasRifasALiberarFirestore.minhasRifasALiberarFirestore)
+            setTemRifaALiberar(true)
         } else {
-            setTemRifaAtiva(false)
-            return
+            setTemRifaALiberar(false)
         }
     }
 
@@ -45,14 +42,14 @@ export default function MinhasRifasAtivas() {
         return (
             <Background>
                 <Text style={styles.texto}>
-                    Minhas rifas ativas
+                    Minhas rifas a liberar
                 </Text>
-                {temRifaAtiva ?
+                {temRifaALiberar ?
                     <FlatList style={styles.lista}
                         showsVerticalScrollIndicator={false}
-                        data={minhasRifasAtivas}
+                        data={minhasRifasALiberar}
                         keyExtractor={item => item.key}
-                        renderItem={({ item }) => (<MinhasRifasAtivasList data={item} />)}
+                        renderItem={({ item }) => (<MinhasRifasALiberarList data={item} />)}
                     />
                     :
                     null}

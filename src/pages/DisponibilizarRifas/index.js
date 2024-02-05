@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet, Alert, View, Text, ActivityIndicator, Keyboard, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import Botao from '../../componentes/Botao';
 import { AreaCapa, Texto, Input, TextoMensagemCadastro, InputQtd } from './styles';
-import { obtemGeneros, obtemParametrosApp, obtemQtdRifasAtivasUsuario,obtemQtdRifasALiberarUsuario} from '../../servicos/firestore';
+import { obtemGeneros, obtemParametrosApp, obtemQtdRifasAtivasUsuario, obtemQtdRifasALiberarUsuario } from '../../servicos/firestore';
 import estilos from '../../estilos/estilos';
 import { salvaImagem } from '../../servicos/storage';
 import { AuthContext } from '../../contexts/auth';
@@ -11,7 +11,7 @@ import capabranca from '../../assets/maqfotografica.png';
 import ImagePicker from 'react-native-image-crop-picker';
 import uuid from 'react-native-uuid';
 import { useNavigation } from '@react-navigation/native';
- 
+
 export default function DisponibilizarRifas() {
     console.log('DisponibilizarRifas');
     const [mensagemCadastro, setMensagemCadastro] = useState('');
@@ -20,17 +20,19 @@ export default function DisponibilizarRifas() {
     const [descricao, setdescricao] = useState('');
     const [genero, setGenero] = useState(' Escolha a categoria');
     const [descricaoGenero, setDescricaoGenero] = useState([]);
-    const [qtdNrs, setQtdNrs] = useState(0);
+    const [qtdNrs, setQtdNrs] = useState('');
     const [vlrBilhete, setVlrBilhete] = useState('');
     const [imagemCapa, setImagemCapa] = useState('');
     const [load, setLoad] = useState(false);
     const { user: usuario } = useContext(AuthContext);
     const navigation = useNavigation();
-    const [percAdministracao,setPercAdministracao] = useState('');
-    const [percPgtoBilhete,setPercPgtoBilhete] = useState('');
+    const [percAdministracao, setPercAdministracao] = useState('');
+    const [percPgtoBilhete, setPercPgtoBilhete] = useState('');
+    const [qtdLimiteRifasAtivas, setQtdLimiteRifasAtivas] = useState('')
+    const [qtdRifasAtivasUsuario, setQtdRifasAtivasUsuario] = useState('')
+    const [qtdRifasALiberarUsuario, setQtdRifasALiberarUsuario] = useState('')
     var qtdNrsValidos = [10, 100, 1000, 10000, 100000];
     var regra = /^[0-9]+$/;
-    var qtdLimiteRifasAtivas = 0;
     var vlrTotalBilhetes = 0;
     var vlrTaxaAdministracao = 0;
     var vlrTaxaBilhetes = 0;
@@ -65,23 +67,19 @@ export default function DisponibilizarRifas() {
             setPercAdministracao(10);
             setPercPgtoBilhete(1);
         } else {
-            qtdLimiteRifasAtivas = parametrosAppFirestore.qtdLimiteRifasAtivas;
-            setPercAdministracao(parametrosAppFirestore.percAdministracao) ;
-            setPercPgtoBilhete(parametrosAppFirestore.percPgtoBilhete) ;
+            setQtdLimiteRifasAtivas(parametrosAppFirestore.qtdLimiteRifasAtivas);
+            setPercAdministracao(parametrosAppFirestore.percAdministracao);
+            setPercPgtoBilhete(parametrosAppFirestore.percPgtoBilhete);
         }
         setLoad(true)
         console.log('usuario.uid: ' + usuario.uid)
-        const qtdRifasAtivasUsuario = await obtemQtdRifasAtivasUsuario(usuario.uid);
-        console.log('obtemQtdRifasAtivasUsuario: ' + qtdRifasAtivasUsuario)
-        const qtdRifasALiberarUsuario = await obtemQtdRifasALiberarUsuario(usuario.uid);
-        console.log('qtdRifasALiberarUsuario: ' + qtdRifasALiberarUsuario)        
+        const qtdRifasAtivasUsuarioFirestore = await obtemQtdRifasAtivasUsuario(usuario.uid);
+        console.log('obtemQtdRifasAtivasUsuarioFirestore: ' + qtdRifasAtivasUsuarioFirestore)
+        setQtdRifasAtivasUsuario(qtdRifasAtivasUsuarioFirestore)
+        const qtdRifasALiberarUsuarioFirestore = await obtemQtdRifasALiberarUsuario(usuario.uid);
+        console.log('qtdRifasALiberarUsuarioFirestore: ' + qtdRifasALiberarUsuarioFirestore)
+        setQtdRifasALiberarUsuario(qtdRifasALiberarUsuarioFirestore)
         setLoad(false)
-        let qtdRifasTotalUsuario = qtdRifasAtivasUsuario + qtdRifasALiberarUsuario
-        console.log('qtdRifasTotalUsuario: ' + qtdRifasTotalUsuario)
-        if (qtdRifasTotalUsuario == qtdLimiteRifasAtivas) {
-            setMensagemCadastro('Voce ja atingiu o limite de rifas ativas ' + {qtdLimiteRifasAtivas});
-            return;
-        }
     }
 
     async function disponibilizarRifa() {
@@ -91,19 +89,29 @@ export default function DisponibilizarRifas() {
         if (titulo == '' || titulo.length === 0) {
             console.log('titulo: ' + titulo);
             setMensagemCadastro('Digite o título');
+            return;
         } else if (descricao == '' || descricao.length === 0) {
             console.log('descricao: ' + descricao);
             setMensagemCadastro('Digite a descricao');
+            return;
         } else if (genero === ' Escolha a categoria' || typeof genero === "undefined") {
             console.log('genero: ' + genero);
             setMensagemCadastro('Escolha a categoria')
+            return;
         } else if (typeof qtdNrs === "undefined" || !qtdNrsValidos.includes(parseInt(qtdNrs))) {
             setMensagemCadastro('Informe uma quantidade valida de nrs da rifa (10,100,1000,10000 ou 100000')
+            return;
         } else if (typeof vlrBilhete === "undefined" || isNaN(vlrBilhete) || vlrBilhete == 0 || vlrBilhete < 0 || !vlrBilhete.match(regra)) {
             setMensagemCadastro('Informe valor do bilhete (somente inteiros. Ex: 10, 25, 50')
-        } else {
-            gravarRifa();
+            return;
         }
+        let qtdRifasTotalUsuario = qtdRifasAtivasUsuario + qtdRifasALiberarUsuario
+        console.log('qtdRifasTotalUsuario: ' + qtdRifasTotalUsuario)
+        if (qtdRifasTotalUsuario == qtdLimiteRifasAtivas) {
+            setMensagemCadastro('Voce ja atingiu o limite de rifas ativas ' + qtdLimiteRifasAtivas);
+            return;
+        }
+        gravarRifa();
     }
 
     async function gravarRifa() {
@@ -127,17 +135,17 @@ export default function DisponibilizarRifas() {
                     return
                 }
                 console.log('fim salvar imagem')
-            } 
-        } 
+            }
+        }
         console.log('percAdministracao: ' + percAdministracao)
         console.log('percPgtoBilhete: ' + percPgtoBilhete)
         vlrTotalBilhetes = qtdNrs * vlrBilhete;
         console.log('vlrTotalBilhetes: ' + vlrTotalBilhetes)
         vlrTaxaAdministracao = vlrTotalBilhetes * percAdministracao / 100;
         console.log('vlrTaxaAdministracao: ' + vlrTaxaAdministracao)
-        vlrTaxaBilhetes = vlrTotalBilhetes * percPgtoBilhete / 100;    
+        vlrTaxaBilhetes = vlrTotalBilhetes * percPgtoBilhete / 100;
         console.log('vlrTaxaBilhetes: ' + vlrTaxaBilhetes)
-        vlrLiquido = vlrTotalBilhetes - vlrTaxaAdministracao - vlrTaxaBilhetes;    
+        vlrLiquido = vlrTotalBilhetes - vlrTaxaAdministracao - vlrTaxaBilhetes;
         let dadosRifa = {
             titulo: titulo,
             descricao: descricao,
@@ -317,17 +325,17 @@ export default function DisponibilizarRifas() {
             <TextoMensagemCadastro>
                 {mensagemCadastro}
             </TextoMensagemCadastro>
-                    <Botao onPress={disponibilizarRifa}>
-                        {load ? (
-                            <ActivityIndicator size={20} color='#FFF' />
-                        ) : (
-                            <Text>Disponibilizar Rifa</Text>
-                        )
-                        }
-                    </Botao>
+            <Botao onPress={disponibilizarRifa}>
+                {load ? (
+                    <ActivityIndicator size={20} color='#FFF' />
+                ) : (
+                    <Text>Disponibilizar Rifa</Text>
+                )
+                }
+            </Botao>
         </SafeAreaView>
     );
-} 
+}
 const styles = StyleSheet.create({
     container: {
         justifyContent: 'top',

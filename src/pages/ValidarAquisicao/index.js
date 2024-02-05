@@ -9,7 +9,7 @@ import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
 import {
-    obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao, obtemParametrosApp,
+    obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao, obtemParametrosApp,obtemSituacaoRifa,
     obtemBilhetesDisponiveisParaReserva, gravaPreReservaTransacao, desgravaPreReservaTransacao
 }
     from '../../servicos/firestore';
@@ -74,6 +74,13 @@ export default function ValidarAquisicao() {
             setLoading(false);
             setMensagemCadastro('Voce pode adquirir no maximo:  ' + qtdBilhetesPodeAdquirir + ' bilhetes')
             return;
+        } 
+        const situacaoRifa = await obtemSituacaoRifa(route.params?.id);
+        console.log('situacaoRifa: ' + situacaoRifa)
+        if (situacaoRifa != 'ativa'){
+            setLoading(false)
+            setMensagemCadastro('Esta rifa nao esta mais disponivel: ' + situacaoRifa)
+            return;
         }
 
         let dadosObtemBilhetes = {
@@ -102,6 +109,7 @@ export default function ValidarAquisicao() {
    
         var qtdBilhetesProcessados = 0;
         var bilhetesPreReservados = [];
+        var nrsBilhetesPreReservados = [];
         while (qtdBilhetes > qtdBilhetesProcessados) {
             let dadosBilhetePreReserva = {
                 idBilhete: bilhetesDisponiveisParaReservaFirestore.bilhetesDisponiveisParaReservaFirestore[qtdBilhetesProcessados].idBilhete,
@@ -112,6 +120,7 @@ export default function ValidarAquisicao() {
             if (resultado == 'sucesso') {
                 console.log('bilhete reservado com sucesso: ' + dadosBilhetePreReserva.idBilhete + ' - ' + dadosBilhetePreReserva.nroBilhete)
                 bilhetesPreReservados.push(dadosBilhetePreReserva.idBilhete);
+                nrsBilhetesPreReservados.push(dadosBilhetePreReserva.nroBilhete)
             }
             else {
                 console.log('bilhete nao reservado: ' + dadosBilhetePreReserva.idBilhete + ' - ' + dadosBilhetePreReserva.nroBilhete)
@@ -146,7 +155,7 @@ export default function ValidarAquisicao() {
         if (bilhetesPreReservados.length == qtdBilhetes) {
             console.log('pre-reserva ok')
         }
- 
+
         var dadosRifa = {
             id: route.params?.id,
             cep: route.params?.cep,
@@ -169,7 +178,8 @@ export default function ValidarAquisicao() {
             usuarioQtdBilhetes: qtdBilhetes,
             usuarioNome: usuario.nome,  
             usuarioEmail: usuario.email,
-            bilhetesPreReservados: bilhetesPreReservados 
+            bilhetesPreReservados: bilhetesPreReservados,
+            nrsBilhetesPreReservados: nrsBilhetesPreReservados 
         }       
         console.log('ir para informar dados pagamento')
         setLoading(false)

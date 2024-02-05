@@ -58,7 +58,7 @@ export default function RifasALiberarList({ data }) {
         console.log('naoConfirmaLiberacaoRifa');
         return;
     }
-
+ 
     async function confirmaLiberacaoRifa() {
         console.log('confirmaLiberacaoRifa');
         setMensagemCadastro('')
