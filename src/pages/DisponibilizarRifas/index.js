@@ -28,10 +28,11 @@ export default function DisponibilizarRifas() {
     const navigation = useNavigation();
     const [percAdministracao, setPercAdministracao] = useState('');
     const [percPgtoBilhete, setPercPgtoBilhete] = useState('');
-    const [qtdLimiteRifasAtivas, setQtdLimiteRifasAtivas] = useState('')
     const [qtdRifasAtivasUsuario, setQtdRifasAtivasUsuario] = useState('')
     const [qtdRifasALiberarUsuario, setQtdRifasALiberarUsuario] = useState('')
-    var qtdNrsValidos = [10, 100, 1000, 10000, 100000];
+    const [qtdLimiteRifasAtivas,setQtdLimiteRifasAtivas] = useState('');
+    const [vlrMinimoTotalRifa,setVlrMinimoTotalRifa] = useState('');
+    var qtdNrsValidos = [10, 100, 1000];
     var regra = /^[0-9]+$/;
     var vlrTotalBilhetes = 0;
     var vlrTaxaAdministracao = 0;
@@ -57,19 +58,23 @@ export default function DisponibilizarRifas() {
     }
 
     async function obterParametros() {
+        console.log('obterParametros');
         setLoad(true)
         const parametrosAppFirestore = await obtemParametrosApp();
         console.log('parametrosAppFirestore.qtdLimiteRifasAtivas: ' + parametrosAppFirestore.qtdLimiteRifasAtivas)
+        console.log('parametrosAppFirestore.vlrMinimoTotalRifa: ' + parametrosAppFirestore.vlrMinimoTotalRifa)
         setLoad(false)
         if (!parametrosAppFirestore) {
             console.log('parametrosAppFirestore vazio')
-            qtdLimiteRifasAtivas = 5;
+            setQtdLimiteRifasAtivas(5);
             setPercAdministracao(10);
             setPercPgtoBilhete(1);
+            setVlrMinimoTotalRifa(100);
         } else {
             setQtdLimiteRifasAtivas(parametrosAppFirestore.qtdLimiteRifasAtivas);
             setPercAdministracao(parametrosAppFirestore.percAdministracao);
             setPercPgtoBilhete(parametrosAppFirestore.percPgtoBilhete);
+            setVlrMinimoTotalRifa(parametrosAppFirestore.vlrMinimoTotalRifa);
         }
         setLoad(true)
         console.log('usuario.uid: ' + usuario.uid)
@@ -99,10 +104,16 @@ export default function DisponibilizarRifas() {
             setMensagemCadastro('Escolha a categoria')
             return;
         } else if (typeof qtdNrs === "undefined" || !qtdNrsValidos.includes(parseInt(qtdNrs))) {
-            setMensagemCadastro('Informe uma quantidade valida de nrs da rifa (10,100,1000,10000 ou 100000')
+            setMensagemCadastro('Informe uma quantidade valida de nrs da rifa (10,100 ou 1000')
             return;
         } else if (typeof vlrBilhete === "undefined" || isNaN(vlrBilhete) || vlrBilhete == 0 || vlrBilhete < 0 || !vlrBilhete.match(regra)) {
             setMensagemCadastro('Informe valor do bilhete (somente inteiros. Ex: 10, 25, 50')
+            return;
+        }
+        let vlrTotRifa = (parseInt(qtdNrs) * parseInt(vlrBilhete));
+        console.log('vlrTotRifa - vlrMinimoTotalRifa: ' + vlrTotRifa + ' - ' + vlrMinimoTotalRifa)
+        if (vlrTotRifa < vlrMinimoTotalRifa){
+            setMensagemCadastro('Valor total da rifa: ' + vlrTotRifa + ' , esta menor que o valor minimo aceito: ' + vlrMinimoTotalRifa);
             return;
         }
         let qtdRifasTotalUsuario = qtdRifasAtivasUsuario + qtdRifasALiberarUsuario
@@ -285,7 +296,7 @@ export default function DisponibilizarRifas() {
                 />
             </View>
             <Texto>
-                Qtd de nrs da rifa (10, 100, 1000, 10000 ou 100000)
+                Qtd de nrs da rifa (10, 100 ou 1000)
             </Texto>
             <InputQtd
                 autoCorrect={false}

@@ -9,7 +9,7 @@ import { AuthContext } from '../../contexts/auth';
 import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
 import {
-    obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao, obtemParametrosApp,obtemSituacaoRifa,
+    obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao,obtemSituacaoRifa,
     obtemBilhetesDisponiveisParaReserva, gravaPreReservaTransacao, desgravaPreReservaTransacao
 }
     from '../../servicos/firestore';
@@ -33,15 +33,12 @@ export default function ValidarAquisicao() {
     }, [])
 
     async function carregarParametrosApp() {
-        console.log('carregarParametrosApp')
-        setLoading(true)
-        const parametrosAppFirestore = await obtemParametrosApp();
-        setLoading(false)
-        if (!parametrosAppFirestore) {
-            console.log('nao encontrou parametros')
-            setQtdMaximaBilhetesPorUsuario(5);
-        } else {
-            setQtdMaximaBilhetesPorUsuario(parametrosAppFirestore.qtdMaximaBilhetesParaCompraPorUsuarioPorRifa);
+        if(route.params?.qtdNrs == 10) {
+            setQtdMaximaBilhetesPorUsuario(1)
+        } else if(route.params?.qtdNrs == 100) {
+            setQtdMaximaBilhetesPorUsuario(5)
+        } else if(route.params?.qtdNrs == 1000) {
+            setQtdMaximaBilhetesPorUsuario(10)
         }
         console.log('carregarParametrosApp - qtdMaximaBilhetesPorUsuario: ' + qtdMaximaBilhetesPorUsuario);
     }

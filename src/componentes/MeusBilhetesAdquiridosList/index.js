@@ -36,7 +36,7 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                         <RifaText> Data pagamento: {data.dataPagamento}</RifaText>
                         <RifaText> Qtd bilhetes adquiridos: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
                         <RifaText> Vlr pagamento: {data.vlrTotalBilhetes}</RifaText>
-                        <RifaText> Nrs bilhetes: {data.nrsBilhetesPagos}</RifaText>
+                        <RifaText> Bilhetes: {data.nrsBilhetesPreReservadosFormatados}</RifaText>
                     </ListaRifas>
                 </View>
             </SafeAreaView>

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import {
+import { 
     RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
     AreaBotao
 } from './styles'; 
@@ -109,19 +109,7 @@ export default function ValidarDisponibilizacao() {
                     <RifaTextTitulo> Termos para disponibilizacao da rifa </RifaTextTitulo>
                     <RifaText> </RifaText>
                     <RifaText>
-                        Rifa de até 10 bilhetes tem prazo máximo de venda de 3 meses
-                    </RifaText>
-                    <RifaText>
-                        Rifa de até 100 bilhetes tem prazo máximo de venda de 5 meses
-                    </RifaText>
-                    <RifaText>
-                        Rifa de 1000 bilhetes tem prazo máximo de venda de 6 meses
-                    </RifaText>
-                    <RifaText>
-                        Rifa de 10000 bilhetes tem prazo máximo de venda de 9 meses
-                    </RifaText>
-                    <RifaText>
-                        Rifa de 100000 bilhetes tem prazo máximo de venda de 12 meses
+                        Voce tem o prazo de 6 meses para finalizar a venda dos bilhetes.
                     </RifaText>
                     <RifaText> </RifaText>
                     <RifaText>

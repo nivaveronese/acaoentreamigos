@@ -72,7 +72,8 @@ export default function RifasDisponiveisList({ data, shouldLoad = false }) {
                             {data.descricao}
                         </ContentText>
                         <RifaText> Responsável: {data.nome} </RifaText>
-                        <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
+                        <RifaText> {data.cidade} {data.uf} {data.bairro} </RifaText>
+                        <RifaText> Data final vendas: {data.dataFinalVendas} </RifaText>
                         <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
                         <RifaText> Autorizacao: {data.autorizacao} </RifaText>
                     </ListaRifas>

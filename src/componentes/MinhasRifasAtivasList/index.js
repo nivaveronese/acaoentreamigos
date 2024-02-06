@@ -23,13 +23,15 @@ export default function MinhasRifasAtivasList({ data }) {
                 <View style={styles.card}>
                     <Image source={{ uri: data.minhaRifaAtiva.imagemCapa }}
                         resizeMode={"cover"}
-                        style={styles.capa}
+                        style={styles.capa} 
                     />
                     <ListaRifas>
                         <RifaTextTitulo> {data.minhaRifaAtiva.titulo} </RifaTextTitulo>
                         <ContentText numberOfLines={8}>
                             {data.minhaRifaAtiva.descricao}
                         </ContentText>
+                        <RifaText> Data cadastro: {data.minhaRifaAtiva.dataCadastro}</RifaText>
+                        <RifaText> Data final venda bilhetes: {data.minhaRifaAtiva.dataFinalVendas} </RifaText>
                         <RifaText> Qtd nrs: {data.minhaRifaAtiva.qtdNrs} Vlr bilhete: {data.minhaRifaAtiva.vlrBilhete}</RifaText>
                         <RifaText> Qtd bilhetes pagos: {data.qtdBilhetes} Vlr total bilhetes pagos: {data.qtdBilhetes * data.minhaRifaAtiva.vlrBilhete} </RifaText>
                     </ListaRifas>

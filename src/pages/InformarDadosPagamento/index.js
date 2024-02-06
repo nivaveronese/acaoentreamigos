@@ -110,6 +110,14 @@ export default function InformarDadosPagamento() {
  
     async function gravarPagamento() {
         console.log('gravarPagamento: ')
+        console.log('route.params?.nrsBilhetesPreReservados.length: ' + route.params?.nrsBilhetesPreReservados.length) 
+        let qt = 0;
+        let nrsBilhetesPreReservadosFormatados = '';
+        while (qt < route.params?.nrsBilhetesPreReservados.length){
+           nrsBilhetesPreReservadosFormatados = nrsBilhetesPreReservadosFormatados + (('00000' + route.params?.nrsBilhetesPreReservados[qt]).slice(-5)) + '  ';
+           qt = qt + 1
+        }
+        console.log('nrsBilhetesPreReservadosFormatados: ' + nrsBilhetesPreReservadosFormatados)
         var dadosGravarPagamentoPreReserva = {
             id: route.params?.id,
             imagemCapa: route.params?.imagemCapa,
@@ -127,6 +135,7 @@ export default function InformarDadosPagamento() {
             usuarioEmail: route.params?.usuarioEmail,
             bilhetesPreReservados: route.params?.bilhetesPreReservados,
             nrsBilhetesPreReservados: route.params?.nrsBilhetesPreReservados,
+            nrsBilhetesPreReservadosFormatados: nrsBilhetesPreReservadosFormatados,
             numeroCartaoCredito: numeroCartaoCredito,
             nomeCartaoCredito: nomeCartaoCredito,
             mesValidadeCartaoCredito: mesValidadeCartaoCredito,

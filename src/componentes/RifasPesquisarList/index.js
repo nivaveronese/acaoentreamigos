@@ -28,7 +28,7 @@ export default function RifasPesquisarList({ data }) {
                         {data.descricao}
                     </ContentText>
                     <RifaText> Responsável: {data.nome} </RifaText>
-                    <RifaText> {data.cepusuario} {data.cidade} {data.uf} {data.bairro} </RifaText>
+                    <RifaText> {data.cidade} {data.uf} {data.bairro} </RifaText>
                     <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
                     <RifaText> Autorizacao: {data.autorizacao} </RifaText>
                 </ListaRifas>

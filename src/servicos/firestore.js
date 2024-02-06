@@ -1,9 +1,9 @@
 import { db } from '../config/firebase';
 import {
   collection, getDocs, getDoc, doc, query, runTransaction,
-  where, orderBy, limit, increment, writeBatch, Timestamp, getCountFromServer, Transaction
+  where, orderBy, limit, increment, writeBatch, Timestamp, getCountFromServer
 } from "firebase/firestore"
-import { subHours, format } from 'date-fns';
+import { subHours, format, addDays } from 'date-fns';
 
 export async function alteraCepRifasDisponiveis(data) {
   console.log('firestore-alteraCepRifasDisponiveis ' + data.uid)
@@ -98,7 +98,7 @@ export async function gravaPagamentoPreReservaTransacao(data) {
   var idPgto = pgtoRifaRef.id;
   console.log('firestore-pgtoRifaRef.id: ' + pgtoRifaRef.id)
   const dataCadastroSeq = Timestamp.fromDate(new Date());
-  const resultDate = subHours(new Date(), 3);
+  const resultDate = subHours(new Date(), 0);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   try {
     batch.set(pgtoRifaRef, {
@@ -145,7 +145,7 @@ export async function gravaPagamentoPreReservaTransacao(data) {
       qtdBilhetes: data.usuarioQtdBilhetes,
       vlrBilhete: data.vlrBilhete,
       vlrTotalBilhetes: data.vlrTotalBilhetes,
-      nrsBilhetesPagos: data.nrsBilhetesPreReservados
+      nrsBilhetesPreReservadosFormatados: data.nrsBilhetesPreReservadosFormatados
     })
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaPagamentoPreReservaTransacao-pagamentosPreReservaUsuario ' + error.code);
@@ -221,7 +221,10 @@ export async function gravaRifaLiberadaTransacao(data) {
   const batch = writeBatch(db);
   const rifaRef = doc(collection(db, "rifasDisponiveis"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
-  const resultDate = subHours(new Date(), 3);
+  const dataFinalVendasSeq = Timestamp.fromDate(new Date(Date.now() + 15552000000));
+  const resultDataFinalVendas = addDays(new Date(), 180);
+  const dataFinalVendas = format(resultDataFinalVendas, 'dd/MM/yyyy')
+  const resultDate = subHours(new Date(), 0);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   const idRifa = rifaRef.id;
   console.log('rifaRef.id: ' + rifaRef.id)
@@ -241,6 +244,8 @@ export async function gravaRifaLiberadaTransacao(data) {
       email: data.email,
       dataCadastro: dataCadastro,
       dataCadastroSeq: dataCadastroSeq,
+      dataFinalVendas: dataFinalVendas,
+      dataFinalVendasSeq: dataFinalVendasSeq,
       nomeCapa: data.nomeCapa,
       post: data.post,
       cidadeUf: data.cidade + data.uf,
@@ -254,7 +259,7 @@ export async function gravaRifaLiberadaTransacao(data) {
       vlrTaxaBilhetes: data.vlrTaxaBilhetes,
       id: idRifa,
       situacao: 'ativa'
-    });
+    }); 
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaLiberadaTransacao-RifasDisponiveis ' + error.code);
     return 'Falha em gravaRifaLiberadaTransacao-RifasDisponiveis. Tente novamente'
@@ -266,13 +271,9 @@ export async function gravaRifaLiberadaTransacao(data) {
       const nrsBilhetesRef = doc(collection(db, refNomeColecao));
       const idBilhete = nrsBilhetesRef.id;
       batch.set(nrsBilhetesRef, {
-        idRifa: idRifa,
         idBilhete: idBilhete,
         nroBilhete: nroBilhete,
-        situacao: 'livre',
-        dataCadastro: dataCadastro,
-        dataCadastroSeq: dataCadastroSeq,
-        idPgto: 'nao pago',
+        situacao: 'livre'
       });
       nroBilhete = nroBilhete + 1;
     }
@@ -297,7 +298,7 @@ export async function gravaRifaALiberarTransacao(data) {
   const batch = writeBatch(db);
   const rifaRef = doc(collection(db, "rifasALiberar"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
-  const resultDate = subHours(new Date(), 3);
+  const resultDate = subHours(new Date(), 0);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   try {
     batch.set(rifaRef, {
@@ -339,7 +340,7 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
   const batch = writeBatch(db);
   const rifaRef = doc(collection(db, "rifasNaoLiberadas"));
   const dataCadastroSeq = Timestamp.fromDate(new Date());
-  const resultDate = subHours(new Date(), 3);
+  const resultDate = subHours(new Date(), 0);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   try {
     batch.set(rifaRef, {
@@ -385,7 +386,7 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
 
 export async function marcaRifaDisponibilizadaAExcluirTransacao(id) {
   console.log('firestore-marcaRifaDisponibilizadaAExcluirTransacao ' + id)
-  const resultDate = subHours(new Date(), 3);
+  const resultDate = subHours(new Date(), 0);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   const batch = writeBatch(db);
   try {
@@ -408,7 +409,7 @@ export async function marcaRifaDisponibilizadaAExcluirTransacao(id) {
 
 export async function marcaContaAExcluir(uid, id) {
   console.log('firestore-marcaContaAExcluir ' + uid + '-' + id)
-  const resultDate = subHours(new Date(), 3);
+  const resultDate = subHours(new Date(), 0);
   const dataCadastro = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
   const batch = writeBatch(db);
   try {

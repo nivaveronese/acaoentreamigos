@@ -30,6 +30,7 @@ export default function MinhasRifasALiberarList({ data }) {
                         <ContentText numberOfLines={8}>
                             {data.descricao}
                         </ContentText>
+                        <RifaText> Data cadastro: {data.dataCadastro}</RifaText>
                         <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
                     </ListaRifas>
                 </View>
