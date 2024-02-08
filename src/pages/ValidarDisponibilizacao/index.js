@@ -1,10 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { 
-    RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
+import {
+    RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa, AreaTexto,
     AreaBotao
-} from './styles'; 
+} from './styles';
 import { useNavigation } from '@react-navigation/native';
 import estilos from '../../estilos/estilos';
 import { gravaRifaALiberarTransacao } from '../../servicos/firestore';
@@ -19,6 +19,13 @@ export default function ValidarDisponibilizacao() {
     const [loading, setLoading] = useState(false);
     const [gravouRifa, setGravouRifa] = useState(false)
     const [mensagemCadastro, setMensagemCadastro] = useState('');
+    const [generoPix, setGeneroPix] = useState(false);
+
+    useEffect(() => {
+        if (route.params?.genero == 'Pix') {
+            setGeneroPix(true)
+        }
+    }, []);
 
     async function concordar() {
         console.log('concordar');
@@ -36,20 +43,22 @@ export default function ValidarDisponibilizacao() {
             email: route.params?.email,
             nomeCapa: route.params?.nomeCapa,
             post: route.params?.post,
-            qtdNrs: route.params?.qtdNrs,
+            qtdBilhetes: route.params?.qtdBilhetes,
             autorizacao: route.params?.autorizacao,
+            vlrPremioPix: route.params?.vlrPremioPix,
             vlrBilhete: route.params?.vlrBilhete,
             percAdministracao: route.params?.percAdministracao,
             percPgtoBilhete: route.params?.percPgtoBilhete,
-            vlrTotalBilhetes: route.params?.vlrTotalBilhetes,
-            vlrTaxaAdministracao: route.params?.vlrTaxaAdministracao,
-            vlrTaxaBilhetes: route.params?.vlrTaxaBilhetes
+            vlrTotalBilhetesPrevisto: route.params?.vlrTotalBilhetesPrevisto,
+            vlrTotalTaxaAdministracaoPrevisto: route.params?.vlrTotalTaxaAdministracaoPrevisto,
+            vlrTotalTaxaBilhetesPrevisto: route.params?.vlrTotalTaxaBilhetesPrevisto,
+            vlrLiquidoAReceberResponsavelPrevisto: route.params?.vlrLiquidoAReceberResponsavelPrevisto
         }
         const resultado = await gravaRifaALiberarTransacao(dadosRifa);
         console.log('resultado gravaRifaALiberarTransacao: ' + resultado);
         setLoading(false)
         if (resultado == 'sucesso') {
-            setMensagemCadastro('Os dados da Rifa serao analisados. Estando de acordo com a politica da plataforma, a Rifa sera disponibilizada.')
+            setMensagemCadastro('Os dados da Rifa serao analisados. Estando de acordo com a politica da plataforma, ela sera disponibilizada.')
             setGravouRifa(true);
         }
         else {
@@ -99,65 +108,53 @@ export default function ValidarDisponibilizacao() {
                     <AreaRifa>
                         <RifaTextTitulo> {route.params?.titulo} </RifaTextTitulo>
                         <RifaText> </RifaText>
-                        <RifaText> Qtd nrs: {route.params?.qtdNrs} Vlr bilhete R$: {route.params?.vlrBilhete}</RifaText>
-                        <RifaText> Vlr total bilhetes R$: {route.params?.vlrTotalBilhetes}</RifaText>
-                        <RifaText> Vlr taxa administracao R$: {route.params?.vlrTaxaAdministracao}</RifaText>
-                        <RifaText> Vlr taxa bilhetes R$: {route.params?.vlrTaxaBilhetes}</RifaText>
-                        <RifaText> Se todos os bilhetes forem vendidos, voce vai receber R$: {route.params?.vlrLiquido}</RifaText>
+                        <RifaText> Qtd total bilhetes: {route.params?.qtdBilhetes} Vlr cada bilhete R$: {route.params?.vlrBilhete}</RifaText>
+                        <RifaText> Vlr total bilhetes previsto R$: {route.params?.vlrTotalBilhetesPrevisto}</RifaText>
+                        <RifaText> Vlr total taxa administração previsto R$: {route.params?.vlrTotalTaxaAdministracaoPrevisto}</RifaText>
+                        <RifaText> Vlr total taxa bilhetes previsto R$: {route.params?.vlrTotalTaxaBilhetesPrevisto}</RifaText>
+                        <RifaText> Se todos os bilhetes forem vendidos, você vai receber R$: {route.params?.vlrLiquidoAReceberResponsavelPrevisto}</RifaText>
                     </AreaRifa>
-                    <RifaText> </RifaText>
-                    <RifaTextTitulo> Termos para disponibilizacao da rifa </RifaTextTitulo>
-                    <RifaText> </RifaText>
-                    <RifaText>
-                        Voce tem o prazo de 6 meses para finalizar a venda dos bilhetes.
-                    </RifaText>
-                    <RifaText> </RifaText>
-                    <RifaText>
-                        Se todos os bilhetes da rifa forem adquiridos dentro do prazo final,
-                        a plataforma marca a data do sorteio para o primeiro sábado, após
-                        10 dias úteis do encerramento das vendas.
-                    </RifaText>
-                    <RifaText>
-                        O criador vai receber o valor total da venda dos bilhetes, menos a
-                        taxa de administracao e menos a taxa da venda dos bilhetes.
-                    </RifaText>
-                    {route.params?.genero == 'Pix' ?
-                        <View>
-                            <RifaText> </RifaText>
-                            <RifaText>
-                                Se nem todos os bilhetes da rifa forem adquiridos dentro do prazo final,
-                                ou o criador da rifa encerrar as vendas dos bilhetes antecipadamente, o
-                                valor a ser sorteado sera o valor total vendido, menos a taxa de
-                                administracao e menos a taxa da venda dos bilhetes. Do valor restante,
-                                o criador recebe 50% e o ganhador 50%. O valor a receber do ganhador nao
-                                pode ser menor que o valor pago nos seus bilhetes.
-                            </RifaText>
-                        </View>
-                        :
-                        <View>
-                            <RifaText> </RifaText>
-                            <RifaText>
-                                Se nem todos os bilhetes da rifa forem adquiridos dentro do prazo final,
-                                ou o criador da rifa encerrar as vendas dos bilhetes antecipadamente, o
-                                criador da rifa define se vai sortear o prêmio ou o valor arrecadado em pix.
-                                Se o criador da rifa, optar pelo sorteio do valor em pix, o valor a ser
-                                sorteado sera o valor total vendido, menos a taxa de
-                                administracao e menos a taxa da venda dos bilhetes. Do valor restante,
-                                o criador recebe 50% e o ganhador 50%. O valor a receber do ganhador nao pode
-                                ser menor que o valor pago nos seus bilhetes.
-                                Se o criador da rifa, optar pelo sorteio do premio, o criador vai receber, o
-                                valor total da venda dos bilhetes, menos a taxa
-                                de administracao e menos a taxa da venda dos bilhetes.
-                            </RifaText>
-                        </View>
-                    }
-                    <View>
+                    <AreaTexto>
+                        <RifaText> </RifaText>
+                        <RifaTextTitulo>            Termos para disponibilização da rifa </RifaTextTitulo>
                         <RifaText> </RifaText>
                         <RifaText>
-                            O valor sera creditado na conta do criador, em ate 5 dias uteis, contados a
-                            partir da confirmacao do sorteado, de que ele recebeu o premio.
+                            Você tem o prazo de 6 meses para finalizar a venda dos bilhetes.
                         </RifaText>
-                    </View>
+                        <RifaText> </RifaText>
+                        <RifaText>
+                            Se todos os bilhetes da rifa forem adquiridos dentro do prazo final,
+                            a plataforma marcará a data do sorteio para o primeiro sábado, após
+                            10 dias úteis do encerramento das vendas.
+                        </RifaText>
+                        <RifaText> </RifaText>
+                    </AreaTexto>
+                    {
+                        !generoPix ?
+                            <AreaTexto>
+                                <RifaText>
+                                    Se nem todos os bilhetes da rifa forem vendidos
+                                    até o prazo final, você deverá definir se será sorteado o prêmio mesmo,
+                                    ou o valor arrecadado em PIX.
+                                </RifaText>
+                                <RifaText> </RifaText>
+                                <RifaText>
+                                    O valor líquido a receber por você, será creditado na sua conta
+                                    corrente, em até 5 dias uteis, contados a partir da confirmacao do sorteado, de que ele recebeu
+                                    o premio.
+                                </RifaText>
+                                <RifaText> </RifaText>
+                            </AreaTexto>
+                            :
+                            <AreaTexto>
+                                <RifaText>
+                                    O valor líquido a receber por você, será creditado na sua conta
+                                    corrente, em até 5 dias uteis.
+                                </RifaText>
+                                <RifaText> </RifaText>
+                            </AreaTexto>
+                    }
+
                     <View style={estilos.areaMensagemCadastro}>
                         <Text style={estilos.textoMensagemCadastro}>
                             {mensagemCadastro}

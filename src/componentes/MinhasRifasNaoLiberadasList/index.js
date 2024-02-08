@@ -19,7 +19,7 @@ export default function MinhasRifasNaoLiberadasList({ data }) {
                             {data.descricao}
                         </ContentText>
                         <RifaText> Data cadastro: {data.dataCadastro}</RifaText>
-                        <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
+                        <RifaText> Qtd bilhetes: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
                         <RifaText> Obs: Rifa nao foi liberada, pois nao atendeu as regras </RifaText>
                     </ListaRifas>
                 </View>

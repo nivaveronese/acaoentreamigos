@@ -5,32 +5,6 @@ import {
 } from "firebase/firestore"
 import { subHours, format, addDays } from 'date-fns';
 
-export async function alteraCepRifasDisponiveis(data) {
-  console.log('firestore-alteraCepRifasDisponiveis ' + data.uid)
-  const batch = writeBatch(db);
-  try {
-    const q = query(collection(db, "rifasDisponiveis"),
-      where("uid", "==", data.uid));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      console.log('foreach: ' + doc.id)
-      let docRef = doc.ref;
-      batch.update(docRef, {
-        bairro: data.bairro,
-        cep: data.cep,
-        cidade: data.cidade,
-        cidadeUf: data.cidade + data.uf,
-        uf: data.uf,
-        nome: data.nome
-      })
-    });
-    await batch.commit();
-    return 'sucesso';
-  } catch (error) {
-    return 'Falha em alteraCepRifasDisponiveis'
-  }
-}
-
 export async function desgravaPreReservaTransacao(idRifa, idBilhete) {
   console.log('firestore-desgravaPreReservaTransacao: ' + idRifa + ' - ' + idBilhete)
   var resultado = 'sucesso';
@@ -88,6 +62,31 @@ export async function excluiRifaNaoLiberadaTransacao(idRifa) {
   }
 }
 
+export async function gravaConfirmacaoPremio(id,premio) {
+  console.log('firestore-gravaConfirmacaoPremio ' + id + ' - ' + premio)
+  const resultDate = subHours(new Date(), 0);
+  const dataConfirmacaoPremio = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
+  const batch = writeBatch(db);
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("id", "==", id));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let docRef = doc.ref;
+      batch.update(docRef, {
+        situacao: 'adefinirdatasorteio',
+        dataConfirmacaoPremio: dataConfirmacaoPremio,
+        premioDefinido: premio,
+        quemDefiniuPremio: 'responsavel'
+      })
+    });
+    await batch.commit();
+    return 'sucesso'
+  } catch (error) {
+    return 'Falha em gravaConfirmacaoPremio'
+  }
+}
+
 export async function gravaPagamentoPreReservaTransacao(data) {
   console.log('firestore-gravaPagamentoPreReservaTransacao ')
   console.log(data)
@@ -135,7 +134,6 @@ export async function gravaPagamentoPreReservaTransacao(data) {
       titulo: data.titulo,
       descricao: data.descricao,
       nome: data.nome,
-      cep: data.cep,
       cidade: data.cidade,
       uf: data.uf,
       bairro: data.bairro,
@@ -249,14 +247,16 @@ export async function gravaRifaLiberadaTransacao(data) {
       nomeCapa: data.nomeCapa,
       post: data.post,
       cidadeUf: data.cidade + data.uf,
-      qtdNrs: data.qtdNrs,
+      qtdBilhetes: data.qtdBilhetes,
       autorizacao: data.autorizacao,
+      vlrPremioPix: data.vlrPremioPix,
       vlrBilhete: data.vlrBilhete,
       percAdministracao: data.percAdministracao,
       percPgtoBilhete: data.percPgtoBilhete,
-      vlrTotalBilhetes: data.vlrTotalBilhetes,
-      vlrTaxaAdministracao: data.vlrTaxaAdministracao,
-      vlrTaxaBilhetes: data.vlrTaxaBilhetes,
+      vlrTotalBilhetesPrevisto: data.vlrTotalBilhetesPrevisto,
+      vlrTotalTaxaAdministracaoPrevisto: data.vlrTotalTaxaAdministracaoPrevisto,
+      vlrTotalTaxaBilhetesPrevisto: data.vlrTotalTaxaBilhetesPrevisto,
+      vlrLiquidoAReceberResponsavelPrevisto: data.vlrLiquidoAReceberResponsavelPrevisto,
       id: idRifa,
       situacao: 'ativa'
     }); 
@@ -267,7 +267,7 @@ export async function gravaRifaLiberadaTransacao(data) {
   try {
     const refNomeColecao = 'nrsBilhetesRifaDisponivel-' + `${idRifa}`;
     let nroBilhete = 0;
-    while (nroBilhete < data.qtdNrs) {
+    while (nroBilhete < data.qtdBilhetes) {
       const nrsBilhetesRef = doc(collection(db, refNomeColecao));
       const idBilhete = nrsBilhetesRef.id;
       batch.set(nrsBilhetesRef, {
@@ -318,14 +318,16 @@ export async function gravaRifaALiberarTransacao(data) {
       nomeCapa: data.nomeCapa,
       post: data.post,
       cidadeUf: data.cidade + data.uf,
-      qtdNrs: data.qtdNrs,
+      qtdBilhetes: data.qtdBilhetes,
       autorizacao: data.autorizacao,
+      vlrPremioPix: data.vlrPremioPix,
       vlrBilhete: data.vlrBilhete,
       percAdministracao: data.percAdministracao,
       percPgtoBilhete: data.percPgtoBilhete,
-      vlrTotalBilhetes: data.vlrTotalBilhetes,
-      vlrTaxaAdministracao: data.vlrTaxaAdministracao,
-      vlrTaxaBilhetes: data.vlrTaxaBilhetes
+      vlrTotalBilhetesPrevisto: data.vlrTotalBilhetesPrevisto,
+      vlrTotalTaxaAdministracaoPrevisto: data.vlrTotalTaxaAdministracaoPrevisto,
+      vlrTotalTaxaBilhetesPrevisto: data.vlrTotalTaxaBilhetesPrevisto,
+      vlrLiquidoAReceberResponsavelPrevisto: data.vlrLiquidoAReceberResponsavelPrevisto
     });
     await batch.commit();
     return 'sucesso'
@@ -360,14 +362,16 @@ export async function gravaRifaNaoLiberadaTransacao(data) {
       nomeCapa: data.nomeCapa,
       post: data.post,
       cidadeUf: data.cidade + data.uf,
-      qtdNrs: data.qtdNrs,
+      qtdBilhetes: data.qtdBilhetes,
       autorizacao: data.autorizacao,
+      vlrPremioPix: data.vlrPremioPix,
       vlrBilhete: data.vlrBilhete,
       percAdministracao: data.percAdministracao,
       percPgtoBilhete: data.percPgtoBilhete,
-      vlrTotalBilhetes: data.vlrTotalBilhetes,
-      vlrTaxaAdministracao: data.vlrTaxaAdministracao,
-      vlrTaxaBilhetes: data.vlrTaxaBilhetes
+      vlrTotalBilhetesPrevisto: data.vlrTotalBilhetesPrevisto,
+      vlrTotalTaxaAdministracaoPrevisto: data.vlrTotalTaxaAdministracaoPrevisto,
+      vlrTotalTaxaBilhetesPrevisto: data.vlrTotalTaxaBilhetesPrevisto,
+      vlrLiquidoAReceberResponsavelPrevisto: data.vlrLiquidoAReceberResponsavelPrevisto
     });
   } catch (error) {
     console.log('Ops, Algo deu errado em gravaRifaNaoLiberadaTransacao-RifasNaoLiberadas ' + error.code);
@@ -396,7 +400,7 @@ export async function marcaRifaDisponibilizadaAExcluirTransacao(id) {
     querySnapshot.forEach((doc) => {
       let docRef = doc.ref;
       batch.update(docRef, {
-        situacao: 'a excluir',
+        situacao: 'aexcluir',
         dataSolicitacaoExcluir: dataCadastro
       })
     });
@@ -419,7 +423,7 @@ export async function marcaContaAExcluir(uid, id) {
     querySnapshot.forEach((doc) => {
       let docRef = doc.ref;
       batch.update(docRef, {
-        situacao: 'a excluir',
+        situacao: 'aexcluir',
         dataSolicitacaoExcluir: dataCadastro
       })
     });
@@ -529,6 +533,7 @@ export async function obtemRifasALiberar() {
     return { rifasALiberarFirestore, qtdRifas }
   } catch (error) {
     console.log('erro obtemRifasALiberar: ' + error.code)
+    let qtdRifas = 0;
     return { rifasALiberarFirestore, qtdRifas }
   }
 }
@@ -647,13 +652,16 @@ export async function obtemRifasDisponibilizadasAExcluir(uid) {
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       let rifaAExcluir = { id: doc.id, ...doc.data() }
-      rifasAExcluirFirestore.push(rifaAExcluir)
+      if(doc.data().situacao == 'aexcluir') {
+        rifasAExcluirFirestore.push(rifaAExcluir)
+      }
     });
     const qtdRifas = rifasAExcluirFirestore.length
     console.log('firestore-qtdRifas: ' + qtdRifas)
     return { rifasAExcluirFirestore, qtdRifas }
   } catch (error) {
     console.log('erro obtemRifasDisponibilizadasAExcluir: ' + error.code)
+    let qtdRifas = 0;
     return { rifasAExcluirFirestore, qtdRifas }
   }
 }
@@ -673,10 +681,34 @@ export async function obtemMinhasRifasALiberar(uid) {
     return { minhasRifasALiberarFirestore, qtdRifas }
   } catch (error) {
     console.log('erro obtemMinhasRifasALiberar: ' + error.code)
+    let qtdRifas = 0;
     return { minhasRifasALiberarFirestore, qtdRifas }
   }
 }
 
+export async function obtemMinhasRifasDefinirPremio(uid) {
+  console.log('firestore-obtemMinhasRifasDefinirPremio: ' + uid);
+  try {
+    const q = query(collection(db, "rifasDisponiveis"), 
+    where("uid", "==", uid),
+    where("situacao", "==", "adefinirpremio"));
+    const minhasRifasDefinirPremioFirestore = []
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let rifaDefinirPremio = { id: doc.id, ...doc.data() }
+      if(doc.data().genero != 'PIX'){
+        minhasRifasDefinirPremioFirestore.push(rifaDefinirPremio)
+      }
+    });
+    const qtdRifas = minhasRifasDefinirPremioFirestore.length
+    console.log('firestore-qtdRifas: ' + qtdRifas)
+    return { minhasRifasDefinirPremioFirestore, qtdRifas }
+  } catch (error) {
+    console.log('erro obtemMinhasRifasDefinirPremio: ' + error.code)
+    let qtdRifas = 0;
+    return { minhasRifasDefinirPremioFirestore, qtdRifas }
+  }
+}
 
 export async function obtemMinhasRifasNaoLiberadas(uid) {
   console.log('firestore-obtemMinhasRifasNaoLiberadas: ' + uid);
@@ -692,6 +724,7 @@ export async function obtemMinhasRifasNaoLiberadas(uid) {
     return { minhasRifasNaoLiberadasFirestore, qtdRifas }
   } catch (error) {
     console.log('erro obtemMinhasRifasNaoLiberadas: ' + error.code)
+    let qtdRifas = 0;
     return { minhasRifasNaoLiberadasFirestore, qtdRifas }
   }
 }
@@ -1119,6 +1152,7 @@ export async function obtemBilhetesDisponiveisParaReserva(data) {
   }
   catch (error) {
     console.log('firestore-erro obtemBilhetesDisponiveisParaReserva-nrsBilhetesRifaDisponivel: ' + error.code);
+    let qtdBilhetesDisponiveis = 0;
     return { bilhetesDisponiveisParaReservaFirestore, qtdBilhetesDisponiveis };
   }
 }
@@ -1138,7 +1172,8 @@ export async function obtemMinhasRifasAtivas(uid) {
     });
   } catch (error) {
     console.log('erro obtemMinhasRifasAtivas-rifasDisponiveis: ' + error.code)
-    return { minhasRifasAtivasFirestore }
+    let qtdRifas = 0;
+    return { minhasRifasAtivasFirestore, qtdRifas }
   }
   try {
     qtdRifasAtivas = 0;
@@ -1160,6 +1195,7 @@ export async function obtemMinhasRifasAtivas(uid) {
     return { minhasRifasAtivasFirestore, qtdRifas }
   } catch (error) {
     console.log('erro obtemMinhasRifasAtivas-nrsBilhetesRifaDisponivel: ' + error.code)
+    let qtdRifas = 0;
     return { minhasRifasAtivasFirestore, qtdRifas }
   }
 }

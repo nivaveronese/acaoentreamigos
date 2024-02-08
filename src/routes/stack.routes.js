@@ -4,6 +4,8 @@ import Home from '../pages/Home';
 import Ok from '../pages/Ok';
 import OkL from '../pages/OkL';
 import DisponibilizarRifas from '../pages/DisponibilizarRifas';
+import DisponibilizarRifasPremio from '../pages/DisponibilizarRifasPremio';
+import DisponibilizarRifasPix from '../pages/DisponibilizarRifasPix';
 import LiberarRifas from '../pages/LiberarRifas';
 import Chat from '../pages/Chat';
 import AlterarConta from '../pages/AlterarConta';
@@ -18,6 +20,8 @@ import MinhasRifasAtivas from '../pages/MinhasRifasAtivas';
 import MinhasRifasNaoLiberadas from '../pages/MinhasRifasNaoLiberadas';
 import MinhasRifasALiberar from '../pages/MinhasRifasALiberar';
 import MeusBilhetesAdquiridos from '../pages/MeusBilhetesAdquiridos';
+import MinhasRifasDefinirPremio from '../pages/MinhasRifasDefinirPremio';
+import DefinirPremio from '../pages/DefinirPremio';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +58,20 @@ export default function StackRoutes() {
                     headerShown: false
                 }}
             />
+            <Stack.Screen
+                name='DisponibilizarRifasPremio'
+                component={DisponibilizarRifasPremio}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name='DisponibilizarRifasPix'
+                component={DisponibilizarRifasPix}
+                options={{
+                    headerShown: false
+                }}
+            />                        
             <Stack.Screen
                 name='LiberarRifas'
                 component={LiberarRifas}
@@ -177,6 +195,20 @@ export default function StackRoutes() {
                     headerShown: false
                 }}
             />
+            <Stack.Screen
+                name='MinhasRifasDefinirPremio'
+                component={MinhasRifasDefinirPremio}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name='DefinirPremio'
+                component={DefinirPremio}
+                options={{
+                    headerShown: false
+                }}
+            />            
         </Stack.Navigator>
     )
 }

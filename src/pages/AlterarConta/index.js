@@ -14,7 +14,6 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/auth';
-//import { alteraCepRifasDisponiveis } from '../../servicos/firestore';
 //import messaging from '@react-native-firebase/messaging';
 
 export default function AlterarConta() {
@@ -308,21 +307,6 @@ export default function AlterarConta() {
                 return;
             }
         }
-    }
-
-    async function alterarCepRifasDisponiveis(data) {
-        console.log('alterarCepRifasDisponiveis: ' + data.uid + '-' + data.cep)
-        //const resultado = await alteraCepRifasDisponiveis(data);
-        //if (resultado == 'sucesso') {
-        //    setMensagemCadastro('Ao término da atualização, você será direcionado para o login')
-        //    await delay(3000);
-        //    setLoading(false)
-        //    sair();
-        //} else {
-        //    setMensagemCadastro('Falha alterar usuário-cep rifas disponíveis. Verifique sua conexão de internet');
-        //    setLoading(false)
-        //    return;
-        //}
     }
 
     async function sair() {

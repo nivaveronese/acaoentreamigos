@@ -24,7 +24,7 @@ export default function ValidarAquisicao() {
     const { user: usuario } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [mensagemCadastro, setMensagemCadastro] = useState('');
-    const [qtdBilhetes, setQtdBilhetes] = useState('');
+    const [qtdBilhetesAAdquirir, setQtdBilhetesAAdquirir] = useState('');
     const [qtdMaximaBilhetesPorUsuario, setQtdMaximaBilhetesPorUsuario] = useState('');
 
     useEffect(() => {
@@ -33,12 +33,12 @@ export default function ValidarAquisicao() {
     }, [])
 
     async function carregarParametrosApp() {
-        if(route.params?.qtdNrs == 10) {
+        if(route.params?.qtdBilhetes == 10) {
             setQtdMaximaBilhetesPorUsuario(1)
-        } else if(route.params?.qtdNrs == 100) {
-            setQtdMaximaBilhetesPorUsuario(5)
-        } else if(route.params?.qtdNrs == 1000) {
+        } else if(route.params?.qtdBilhetes == 100) {
             setQtdMaximaBilhetesPorUsuario(10)
+        } else if(route.params?.qtdBilhetes == 1000) {
+            setQtdMaximaBilhetesPorUsuario(50)
         }
         console.log('carregarParametrosApp - qtdMaximaBilhetesPorUsuario: ' + qtdMaximaBilhetesPorUsuario);
     }
@@ -46,7 +46,7 @@ export default function ValidarAquisicao() {
     async function verSePodeAdquirir() {
         console.log('verSePodeAdquirir');
         console.log(usuario.uid + '-' + route.params?.uid);
-        if (!qtdBilhetes || isNaN(qtdBilhetes) || parseInt(qtdBilhetes) == 0) {
+        if (!qtdBilhetesAAdquirir || isNaN(qtdBilhetesAAdquirir) || parseInt(qtdBilhetesAAdquirir) == 0) {
             setMensagemCadastro('Informe a quantidade de bilhetes que deseja adquirir');
             return;
         }
@@ -67,7 +67,7 @@ export default function ValidarAquisicao() {
             setMensagemCadastro('Voce ja adquiriu, ou tem em processo de aquisicao, a quantidade maxima de bilhetes: ' + qtdMaximaBilhetesPorUsuario)
             return;
         }
-        if (qtdBilhetes > qtdBilhetesPodeAdquirir) {
+        if (qtdBilhetesAAdquirir > qtdBilhetesPodeAdquirir) {
             setLoading(false);
             setMensagemCadastro('Voce pode adquirir no maximo:  ' + qtdBilhetesPodeAdquirir + ' bilhetes')
             return;
@@ -82,7 +82,7 @@ export default function ValidarAquisicao() {
 
         let dadosObtemBilhetes = {
             id: route.params?.id,
-            usuarioQtdBilhetes: qtdBilhetes,
+            usuarioQtdBilhetes: qtdBilhetesAAdquirir,
         }
 
         const bilhetesDisponiveisParaReservaFirestore = await obtemBilhetesDisponiveisParaReserva(dadosObtemBilhetes);
@@ -91,7 +91,7 @@ export default function ValidarAquisicao() {
             setMensagemCadastro('No momento, todos os bilhetes ja foram adquiridos ou estao em processo de aquisicao. Tente novamente mais tarde, pois pode ser que alguem desista.(A)')
             return;
         }
-        if (bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis < qtdBilhetes) {
+        if (bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis < qtdBilhetesAAdquirir) {
             setLoading(false);
             setMensagemCadastro('No momento, temos apenas ' + bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis + ' bilhetes disponiveis. Altere a quantidade que deseja adquirir, e tente novamente.(A)')
             return;
@@ -107,7 +107,7 @@ export default function ValidarAquisicao() {
         var qtdBilhetesProcessados = 0;
         var bilhetesPreReservados = [];
         var nrsBilhetesPreReservados = [];
-        while (qtdBilhetes > qtdBilhetesProcessados) {
+        while (qtdBilhetesAAdquirir > qtdBilhetesProcessados) {
             let dadosBilhetePreReserva = {
                 idBilhete: bilhetesDisponiveisParaReservaFirestore.bilhetesDisponiveisParaReservaFirestore[qtdBilhetesProcessados].idBilhete,
                 nroBilhete: bilhetesDisponiveisParaReservaFirestore.bilhetesDisponiveisParaReservaFirestore[qtdBilhetesProcessados].nroBilhete
@@ -131,7 +131,7 @@ export default function ValidarAquisicao() {
             setLoading(false)
             return;
         }
-        if (bilhetesPreReservados.length < qtdBilhetes) {
+        if (bilhetesPreReservados.length < qtdBilhetesAAdquirir) {
             console.log('reservado menos')
             var qtdBilhetesDesgravados = 0;
             while (qtdBilhetesDesgravados < bilhetesPreReservados.length) {
@@ -149,13 +149,12 @@ export default function ValidarAquisicao() {
             setLoading(false)
             return;
         } 
-        if (bilhetesPreReservados.length == qtdBilhetes) {
+        if (bilhetesPreReservados.length == qtdBilhetesAAdquirir) {
             console.log('pre-reserva ok')
         }
 
         var dadosRifa = {
             id: route.params?.id,
-            cep: route.params?.cep,
             cidade: route.params?.cidade,
             uf: route.params?.uf, 
             bairro: route.params?.bairro,
@@ -168,16 +167,16 @@ export default function ValidarAquisicao() {
             nomeCapa: route.params?.nomeCapa,
             post: route.params?.post,
             autorizacao: route.params?.autorizacao,
-            qtdNrs: route.params?.qtdNrs,
+            qtdBilhetes: route.params?.qtdBilhetes,
             vlrBilhete: route.params?.vlrBilhete,
-            vlrTotalBilhetes: (parseInt(qtdBilhetes) * parseInt(route.params?.vlrBilhete)),
+            vlrTotalBilhetes: (parseInt(qtdBilhetesAAdquirir) * parseInt(route.params?.vlrBilhete)),
             usuarioUid: usuario.uid,
-            usuarioQtdBilhetes: qtdBilhetes,
+            usuarioQtdBilhetes: qtdBilhetesAAdquirir,
             usuarioNome: usuario.nome,  
             usuarioEmail: usuario.email,
             bilhetesPreReservados: bilhetesPreReservados,
             nrsBilhetesPreReservados: nrsBilhetesPreReservados 
-        }       
+        }        
         console.log('ir para informar dados pagamento')
         setLoading(false)
         navigation.navigate('InformarDadosPagamento', dadosRifa);
@@ -213,8 +212,8 @@ export default function ValidarAquisicao() {
                                 {route.params?.descricao}
                             </ContentText>
                             <RifaText> Responsável: {route.params?.nome} </RifaText>
-                            <RifaText> {route.params?.cepusuario} {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
-                            <RifaText> Qtd nrs: {route.params?.qtdNrs} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
+                            <RifaText> {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
+                            <RifaText> Qtd bilhetes: {route.params?.qtdBilhetes} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
                             <RifaText> Autorizacao: {route.params?.autorizacao} </RifaText>
                             <RifaText> Permitida a aquisicao maxima de {qtdMaximaBilhetesPorUsuario} bilhetes por usuario </RifaText>
                         </AreaRifa>
@@ -228,8 +227,8 @@ export default function ValidarAquisicao() {
                         <InputQtd
                             autoCorrect={false}
                             keyboardType="numeric"
-                            value={qtdBilhetes}
-                            onChangeText={(text) => setQtdBilhetes(text)}
+                            value={qtdBilhetesAAdquirir}
+                            onChangeText={(text) => setQtdBilhetesAAdquirir(text)}
                         />
                         <SubmitButton onPress={verSePodeAdquirir}>
                             <SubmitText>

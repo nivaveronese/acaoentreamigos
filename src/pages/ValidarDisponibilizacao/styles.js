@@ -31,6 +31,7 @@ export const AreaRifa = styled.View`
     justify-content: center;
     align-items: flex-start;
     background-color: #FFFFFF;
+    margin-left: 5px;
 `;
 export const AreaBotao = styled.View`
     flex-direction: row;
@@ -38,4 +39,11 @@ export const AreaBotao = styled.View`
     align-items: center;
     background-color: #FFFFFF;
     margin-top: 10px;
+`;
+export const AreaTexto = styled.View`
+    margin-top: 10px;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #FFFFFF;
+    margin-left: 5px;
 `;

@@ -45,8 +45,8 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
         setLoading(true)
         const qtdNrsBilhetesDisponiveis = await obtemQtdNrsBilhetesRifaDisponivel(data.id);
         console.log('qtdNrsBilhetesDisponiveis: ' + qtdNrsBilhetesDisponiveis)
-        console.log('data.qtdNrs: ' + data.qtdNrs)
-        if (qtdNrsBilhetesDisponiveis == data.qtdNrs) {
+        console.log('data.qtdBilhetes: ' + data.qtdBilhetes)
+        if (qtdNrsBilhetesDisponiveis == data.qtdBilhetes) {
             confirmaExclusaoRifa();
         } else {
             setMensagemCadastro('Rifa nao pode ser excluida, pois tem bilhetes ja adquiridos ou em aquisicao.')
@@ -106,7 +106,7 @@ export default function RifasDisponibilizadasAExcluirList({ data }) {
                         </ContentText>
                         <RifaText> Responsável: {data.nome} </RifaText>
                         <RifaText> {data.cidade} {data.uf} {data.bairro} </RifaText>
-                        <RifaText> Qtd nrs: {data.qtdNrs} Vlr bilhete: {data.vlrBilhete}</RifaText>
+                        <RifaText> Qtd bilhetes: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
                         <RifaText> Autorizacao: {data.autorizacao} </RifaText>
                     </ListaRifas>
                     {

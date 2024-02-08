@@ -114,7 +114,13 @@ export default function InformarDadosPagamento() {
         let qt = 0;
         let nrsBilhetesPreReservadosFormatados = '';
         while (qt < route.params?.nrsBilhetesPreReservados.length){
-           nrsBilhetesPreReservadosFormatados = nrsBilhetesPreReservadosFormatados + (('00000' + route.params?.nrsBilhetesPreReservados[qt]).slice(-5)) + '  ';
+            if (route.params?.qtdBilhetes == 10) {
+                nrsBilhetesPreReservadosFormatados = nrsBilhetesPreReservadosFormatados + (('0' + route.params?.nrsBilhetesPreReservados[qt]).slice(-1)) + '  ';
+            } else if (route.params?.qtdBilhetes == 100) {
+                nrsBilhetesPreReservadosFormatados = nrsBilhetesPreReservadosFormatados + (('00' + route.params?.nrsBilhetesPreReservados[qt]).slice(-2)) + '  ';
+            } else if (route.params?.qtdBilhetes == 1000) {
+                nrsBilhetesPreReservadosFormatados = nrsBilhetesPreReservadosFormatados + (('000' + route.params?.nrsBilhetesPreReservados[qt]).slice(-3)) + '  ';
+            }
            qt = qt + 1
         }
         console.log('nrsBilhetesPreReservadosFormatados: ' + nrsBilhetesPreReservadosFormatados)
@@ -124,7 +130,6 @@ export default function InformarDadosPagamento() {
             titulo: route.params?.titulo,
             descricao: route.params?.descricao,
             nome: route.params?.nome,
-            cep: route.params?.cep,
             cidade: route.params?.cidade,
             uf: route.params?.uf,
             bairro: route.params?.bairro,
@@ -156,7 +161,7 @@ export default function InformarDadosPagamento() {
         else {
             desgravarPreReserva();
             setPgtoRealizado(false)
-            setMensagemCadastro('Falha gravacao pagamento pre reserva. Tente novamente.');
+            setMensagemCadastro('Falha gravacao pagamento. Tente novamente.');
             return;
         }
     }
@@ -219,8 +224,8 @@ export default function InformarDadosPagamento() {
                                 {route.params?.descricao}
                             </ContentText>
                             <RifaText> Responsável: {route.params?.nome} </RifaText>
-                            <RifaText> {route.params?.cepusuario} {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
-                            <RifaText> Qtd nrs: {route.params?.qtdNrs} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
+                            <RifaText> {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
+                            <RifaText> Qtd bilhetes: {route.params?.qtdBilhetes} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
                             <RifaText> Autorizacao: {route.params?.autorizacao} </RifaText>
                         </AreaRifa>
                     </View>

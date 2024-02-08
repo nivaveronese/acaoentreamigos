@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { Image, View, SafeAreaView, StyleSheet } from 'react-native';
-import {
+import {AreaBotaoReservar, SubmitText,
     RifaText, ListaRifas, RifaTextTitulo, ContentText} from './styles';
   
-export default function MinhasRifasALiberarList({ data }) {
-    console.log('MinhasRifasALiberarList');
+export default function MinhasRifasDefinirPremioList({ data }) {
+    console.log('MinhasRifasDefinirPremioList');
     console.log(data)
     const [loading, setLoading] = useState(false);
+
+    function definirPremio() {
+        console.log('definirPremio')
+        navigation.navigate('DefinirPremio', data);
+    }
 
     if (loading) {
         return (
@@ -23,7 +28,7 @@ export default function MinhasRifasALiberarList({ data }) {
                 <View style={styles.card}>
                     <Image source={{ uri: data.imagemCapa }}
                         resizeMode={"cover"}
-                        style={styles.capa}
+                        style={styles.capa} 
                     />
                     <ListaRifas>
                         <RifaTextTitulo> {data.titulo} </RifaTextTitulo>
@@ -31,8 +36,15 @@ export default function MinhasRifasALiberarList({ data }) {
                             {data.descricao}
                         </ContentText>
                         <RifaText> Data cadastro: {data.dataCadastro}</RifaText>
+                        <RifaText> Data final venda bilhetes: {data.dataFinalVendas} </RifaText>
                         <RifaText> Qtd bilhetes: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
+                        <RifaText> Qtd bilhetes pagos: {data.qtdBilhetesPagos} Vlr total bilhetes pagos: {data.vlrTotalBilhetesPagos} </RifaText>
                     </ListaRifas>
+                    <AreaBotaoReservar onPress={definirPremio}>
+                        <SubmitText>
+                            Definir premio a ser sorteado
+                        </SubmitText>
+                    </AreaBotaoReservar>                    
                 </View>
             </SafeAreaView>
         )
