@@ -17,7 +17,7 @@ export default function MinhasRifasAtivas() {
         console.log('MinhasRifasAtivas-useEffect')
         carregarMinhasRifasAtivas()
     }, [])
-
+ 
     async function carregarMinhasRifasAtivas() {
         console.log('carregarMinhasRifasAtivas');
         setMinhasRifasAtivas([])

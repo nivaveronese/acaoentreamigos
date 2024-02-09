@@ -1,6 +1,6 @@
 import React from 'react';
-import { ContentText, ListaRifas, RifaTextTitulo, RifaText } from './styles';
-import { SafeAreaView, StyleSheet, ActivityIndicator } from 'react-native';
+import { ContentText, ListaRifas, RifaTextTitulo, RifaText,RifaTextCor } from './styles';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import { View, Image } from 'react-native';
 
 export default function MinhasRifasNaoLiberadasList({ data }) {
@@ -20,7 +20,7 @@ export default function MinhasRifasNaoLiberadasList({ data }) {
                         </ContentText>
                         <RifaText> Data cadastro: {data.dataCadastro}</RifaText>
                         <RifaText> Qtd bilhetes: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
-                        <RifaText> Obs: Rifa nao foi liberada, pois nao atendeu as regras </RifaText>
+                        <RifaTextCor> Obs: Rifa não foi liberada, pois não atendeu as regras. </RifaTextCor>
                     </ListaRifas>
                 </View>
             </SafeAreaView>

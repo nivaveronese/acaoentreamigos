@@ -15,6 +15,12 @@ export const RifaText = styled.Text`
     font-family: roboto;
     color: #000;
 `;
+export const RifaTextCor = styled.Text`
+    font-size: 13px;
+    font-weight: bold; 
+    font-family: roboto;
+    color: #B22222;
+`;
 export const ContentText = styled.Text`
     font-size: 13px;
     margin-left: 15px;

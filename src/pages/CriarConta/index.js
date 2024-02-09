@@ -107,8 +107,8 @@ export default function CriarConta({ navigation }) {
             setEstado('')
             setDistrito('')
             return;
-        } else if (parseInt(anoNascimento) < parseInt(maiorAnoNascimento) || parseInt(anoNascimento) > parseInt(menorAnoNascimento)) {
-            setMensagemCadastro('Idade deve estar entre 18 e 99');
+        } else if (!anoNascimento || isNaN(anoNascimento) || parseInt(anoNascimento) < parseInt(maiorAnoNascimento) || parseInt(anoNascimento) > parseInt(menorAnoNascimento)) {
+            setMensagemCadastro('Digite corretamente ano nascimento (idade deve estar entre 18 e 99)');
             return;
         } else { criarContaUsuario(); }
     }

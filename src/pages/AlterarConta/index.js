@@ -54,7 +54,6 @@ export default function AlterarConta() {
     var bairro = '';
     var token = '';
 
-
     console.log('AlterarConta:' + user.email);
 
     useEffect(() => {
@@ -130,8 +129,8 @@ export default function AlterarConta() {
             setCidade('')
             setEstado('')
             setDistrito('')
-        } else if (parseInt(anoNascimento) < parseInt(maiorAnoNascimento) || parseInt(anoNascimento) > parseInt(menorAnoNascimento)) {
-            setMensagemCadastro('Idade deve estar entre 18 e 99');
+        } else if (!anoNascimento || isNaN(anoNascimento) || parseInt(anoNascimento) < parseInt(maiorAnoNascimento) || parseInt(anoNascimento) > parseInt(menorAnoNascimento)) {
+            setMensagemCadastro('Digite corretamente o ano nascimento (idade deve estar entre 18 e 99)');
         } else {
             CriarUsuario();
         }

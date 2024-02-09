@@ -21,29 +21,31 @@ export default function MeusBilhetesAdquiridosList({ data }) {
         return (
             <SafeAreaView>
                 <View style={styles.card}>
-                    <Image source={{ uri: data.imagemCapa }}
+                    <Image source={{ uri: data.rifaDisponivel.imagemCapa }}
                         resizeMode={"cover"}
                         style={styles.capa}
                     />
                     <ListaRifas>
-                        <RifaTextTitulo> {data.titulo} </RifaTextTitulo>
+                        <RifaTextTitulo> {data.rifaDisponivel.titulo} </RifaTextTitulo>
                         <ContentText numberOfLines={8}>
-                            {data.descricao}
+                            {data.rifaDisponivel.descricao}
                         </ContentText>
-                        <RifaText> Responsável: {data.nome} </RifaText>
-                        <RifaText> {data.cep} {data.cidade} {data.uf} {data.bairro} </RifaText>
-                        <RifaText> Situacao rifa: {data.situacao}</RifaText>
-                        <RifaText> Data pagamento: {data.dataPagamento}</RifaText>
-                        <RifaText> Qtd bilhetes adquiridos: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
-                        <RifaText> Vlr pagamento: {data.vlrTotalBilhetes}</RifaText>
-                        <RifaText> Bilhetes: {data.nrsBilhetesPreReservadosFormatados}</RifaText>
+                        <RifaText> Responsável: {data.rifaDisponivel.nome} </RifaText>
+                        <RifaText> {data.rifaDisponivel.cidade} {data.rifaDisponivel.uf} {data.rifaDisponivel.bairro} </RifaText>
+                        <RifaText> Situacao rifa: {data.rifaDisponivel.situacao}</RifaText>
+                        <RifaText> Data sorteio: {data.rifaDisponivel.dataSorteio}</RifaText>
+                        <RifaText> </RifaText>
+                        <RifaText> Data pagamento: {data.meuBilheteAdquirido.dataPagamento}</RifaText>
+                        <RifaText> Qtd bilhetes adquiridos: {data.meuBilheteAdquirido.qtdBilhetes} Vlr bilhete: {data.rifaDisponivel.vlrBilhete}</RifaText>
+                        <RifaText> Vlr pagamento: {data.meuBilheteAdquirido.vlrTotalBilhetes}</RifaText>
+                        <RifaText> Bilhete(s): {data.meuBilheteAdquirido.nrsBilhetesPreReservadosFormatados}</RifaText>
                     </ListaRifas>
                 </View>
             </SafeAreaView>
         )
     }
 }
-  
+ 
 const styles = StyleSheet.create({
     card: {
         shadowColor: '#000',

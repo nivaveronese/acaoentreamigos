@@ -25,7 +25,7 @@ export const ContentText = styled.Text`
 export const AreaBotaoReservar = styled.TouchableOpacity`
     width: 100%;
     height: 30px;
-    background-color: #00BFFF;
+    background-color: #000080;
     padding: 5px;
     border-radius: 5px;
     justify-content: center;

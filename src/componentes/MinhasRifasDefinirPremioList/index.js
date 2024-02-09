@@ -38,11 +38,11 @@ export default function MinhasRifasDefinirPremioList({ data }) {
                         <RifaText> Data cadastro: {data.dataCadastro}</RifaText>
                         <RifaText> Data final venda bilhetes: {data.dataFinalVendas} </RifaText>
                         <RifaText> Qtd bilhetes: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
-                        <RifaText> Qtd bilhetes pagos: {data.qtdBilhetesPagos} Vlr total bilhetes pagos: {data.vlrTotalBilhetesPagos} </RifaText>
+                        <RifaText> Qtd bilhetes pagos: {data.qtdTotalBilhetesPagos} Vlr total bilhetes pagos: {data.vlrTotalBilhetesPagos} </RifaText>
                     </ListaRifas>
                     <AreaBotaoReservar onPress={definirPremio}>
                         <SubmitText>
-                            Definir premio a ser sorteado
+                            Definir prêmio a ser sorteado
                         </SubmitText>
                     </AreaBotaoReservar>                    
                 </View>

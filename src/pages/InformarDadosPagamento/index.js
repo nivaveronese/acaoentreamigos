@@ -66,7 +66,7 @@ export default function InformarDadosPagamento() {
         setLoading(false)
         console.log('situacaoRifa: ' + situacaoRifa)
         if (situacaoRifa != 'ativa'){
-            setMensagemCadastro('Esta rifa nao esta mais disponivel: ' + situacaoRifa)
+            setMensagemCadastro('Esta rifa não esta mais disponível: ' + situacaoRifa)
             return;
         }
 
@@ -161,7 +161,7 @@ export default function InformarDadosPagamento() {
         else {
             desgravarPreReserva();
             setPgtoRealizado(false)
-            setMensagemCadastro('Falha gravacao pagamento. Tente novamente.');
+            setMensagemCadastro('Falha gravação pagamento. Tente novamente.');
             return;
         }
     }
@@ -226,14 +226,14 @@ export default function InformarDadosPagamento() {
                             <RifaText> Responsável: {route.params?.nome} </RifaText>
                             <RifaText> {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
                             <RifaText> Qtd bilhetes: {route.params?.qtdBilhetes} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
-                            <RifaText> Autorizacao: {route.params?.autorizacao} </RifaText>
+                            <RifaText> Autorização: {route.params?.autorizacao} </RifaText>
                         </AreaRifa>
                     </View>
                     <Texto>
                         Olá {route.params?.usuarioNome},
                     </Texto>
                     <Texto>
-                        Voce esta adquirindo {route.params?.usuarioQtdBilhetes} bilhetes, a R$ {route.params?.vlrBilhete} cada um, totalizando R$ {route.params?.vlrTotalBilhetes}
+                        Você está adquirindo {route.params?.usuarioQtdBilhetes} bilhetes, a R$ {route.params?.vlrBilhete} cada um, totalizando R$ {route.params?.vlrTotalBilhetes}
                     </Texto>
                     <Texto>
                         Preencha os dados abaixo, para debitar R$ {route.params?.vlrTotalBilhetes} no seu cartão de crédito.

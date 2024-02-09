@@ -64,19 +64,19 @@ export default function ValidarAquisicao() {
         let qtdBilhetesPodeAdquirir = qtdMaximaBilhetesPorUsuario - qtdBilhetesAdquiridoOuEmAquisicaoFirestore;
         if (qtdBilhetesPodeAdquirir == 0) {
             setLoading(false);
-            setMensagemCadastro('Voce ja adquiriu, ou tem em processo de aquisicao, a quantidade maxima de bilhetes: ' + qtdMaximaBilhetesPorUsuario)
+            setMensagemCadastro('Você ja adquiriu, ou tem em processo de aquisicao, a quantidade maxima de bilhetes: ' + qtdMaximaBilhetesPorUsuario)
             return;
         }
         if (qtdBilhetesAAdquirir > qtdBilhetesPodeAdquirir) {
             setLoading(false);
-            setMensagemCadastro('Voce pode adquirir no maximo:  ' + qtdBilhetesPodeAdquirir + ' bilhetes')
+            setMensagemCadastro('Você pode adquirir no maximo:  ' + qtdBilhetesPodeAdquirir + ' bilhete(s)')
             return;
         } 
         const situacaoRifa = await obtemSituacaoRifa(route.params?.id);
         console.log('situacaoRifa: ' + situacaoRifa)
         if (situacaoRifa != 'ativa'){
             setLoading(false)
-            setMensagemCadastro('Esta rifa nao esta mais disponivel: ' + situacaoRifa)
+            setMensagemCadastro('Esta rifa não esta mais disponível: ' + situacaoRifa)
             return;
         }
 
@@ -171,7 +171,7 @@ export default function ValidarAquisicao() {
             vlrBilhete: route.params?.vlrBilhete,
             vlrTotalBilhetes: (parseInt(qtdBilhetesAAdquirir) * parseInt(route.params?.vlrBilhete)),
             usuarioUid: usuario.uid,
-            usuarioQtdBilhetes: qtdBilhetesAAdquirir,
+            usuarioQtdBilhetes: parseInt(qtdBilhetesAAdquirir),
             usuarioNome: usuario.nome,  
             usuarioEmail: usuario.email,
             bilhetesPreReservados: bilhetesPreReservados,

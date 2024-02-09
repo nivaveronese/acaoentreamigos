@@ -45,7 +45,7 @@ export default function MinhasRifasDefinirPremio() {
         return (
             <Background>
                 <Text style={styles.texto}>
-                    Minhas rifas para definir premio
+                    Minhas rifas para definir prêmio
                 </Text>
                 {temRifaDefinirPremio ?
                     <FlatList style={styles.lista}
