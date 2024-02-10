@@ -696,6 +696,50 @@ export async function obtemMinhasRifasDefinirPremio(uid) {
   }
 }
 
+export async function obtemMinhasRifasAguardandoSorteio(uid) {
+  console.log('firestore-obtemMinhasRifasAguardandoSorteio: ' + uid);
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("uid", "==", uid),
+      where("situacao", "==", "aguardandosorteio"));
+    const minhasRifasAguardandoSorteioFirestore = []
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let rifaAguardandoSorteio = { id: doc.id, ...doc.data() }
+      minhasRifasAguardandoSorteioFirestore.push(rifaAguardandoSorteio)
+    });
+    const qtdRifas = minhasRifasAguardandoSorteioFirestore.length
+    console.log('firestore-qtdRifas: ' + qtdRifas)
+    return { minhasRifasAguardandoSorteioFirestore, qtdRifas }
+  } catch (error) {
+    console.log('erro obtemMinhasRifasAguardandoSorteio: ' + error.code)
+    let qtdRifas = 0;
+    return { minhasRifasAguardandoSorteioFirestore, qtdRifas }
+  }
+}
+
+export async function obtemMinhasRifasSorteadas(uid) {
+  console.log('firestore-obtemMinhasRifasSorteadas: ' + uid);
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("uid", "==", uid),
+      where("situacao", "==", "sorteada"));
+    const minhasRifasSorteadasFirestore = []
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let rifaSorteada = { id: doc.id, ...doc.data() }
+      minhasRifasSorteadasFirestore.push(rifaSorteada)
+    });
+    const qtdRifas = minhasRifasSorteadasFirestore.length
+    console.log('firestore-qtdRifas: ' + qtdRifas)
+    return { minhasRifasSorteadasFirestore, qtdRifas }
+  } catch (error) {
+    console.log('erro obtemMinhasRifasSorteadas: ' + error.code)
+    let qtdRifas = 0;
+    return { minhasRifasSorteadasFirestore, qtdRifas }
+  }
+}
+
 export async function obtemMinhasRifasNaoLiberadas(uid) {
   console.log('firestore-obtemMinhasRifasNaoLiberadas: ' + uid);
   try {

@@ -33,7 +33,8 @@ export default function MinhasRifasAtivasList({ data }) {
                         <RifaText> Data cadastro: {data.minhaRifaAtiva.dataCadastro}</RifaText>
                         <RifaText> Data final venda bilhetes: {data.minhaRifaAtiva.dataFinalVendas} </RifaText>
                         <RifaText> Qtd bilhetes: {data.minhaRifaAtiva.qtdBilhetes} Vlr bilhete: {data.minhaRifaAtiva.vlrBilhete}</RifaText>
-                        <RifaText> Qtd bilhetes pagos: {data.qtdBilhetes} Vlr total bilhetes pagos: {data.qtdBilhetes * data.minhaRifaAtiva.vlrBilhete} </RifaText>
+                        <RifaText> Qtd bilhetes pagos: {data.qtdBilhetes} </RifaText>
+                        <RifaText> Vlr total bilhetes pagos: {data.qtdBilhetes * data.minhaRifaAtiva.vlrBilhete} </RifaText>
                     </ListaRifas>
                 </View>
             </SafeAreaView>

@@ -1,18 +1,36 @@
 import React, { useState } from 'react';
 import { Image, View, SafeAreaView, StyleSheet } from 'react-native';
-import {AreaBotaoReservar, SubmitText,
+import {
     RifaText, ListaRifas, RifaTextTitulo, ContentText} from './styles';
-    import { useNavigation } from '@react-navigation/native';
   
-export default function MinhasRifasDefinirPremioList({ data }) {
-    console.log('MinhasRifasDefinirPremioList');
+export default function MinhasRifasAguardandoSorteioList({ data }) {
+    console.log('MinhasRifasAguardandoSorteioList');
     console.log(data)
-    const [loading, setLoading] = useState(false);    
-    const navigation = useNavigation();
+    const [loading, setLoading] = useState(false);
+ 
+    const Premio = ({gen,pre,tit}) => {
+        console.log('verifica Premio ');
+        if(gen == pre){
+            return null;
+        } else {
+            return <RifaText> Prêmio a ser sorteado: {tit}</RifaText>
+        }
+    }
 
-    function definirPremio() {
-        console.log('definirPremio')
-        navigation.navigate('DefinirPremio', data);
+    const Receber = ({gen,recPixV,recPixG,recPre}) => {
+        console.log('verifica Receber ');
+        if(gen == 'Pix'){
+            let conteudo = ''
+            conteudo = (
+                <View>
+                    <RifaText> Ganhador vai receber R$: {recPixG}</RifaText>
+                    <RifaText> Você vai receber R$: {recPixV}</RifaText>
+                </View>
+            )
+            return conteudo;    
+        } else {
+            return <RifaText> Você vai receber R$: {recPre}</RifaText>
+        }
     }
 
     if (loading) {
@@ -25,12 +43,12 @@ export default function MinhasRifasDefinirPremioList({ data }) {
             </View>
         )
     } else { 
-        return ( 
+        return (
             <SafeAreaView>
                 <View style={styles.card}>
                     <Image source={{ uri: data.imagemCapa }}
                         resizeMode={"cover"}
-                        style={styles.capa} 
+                        style={styles.capa}
                     />
                     <ListaRifas>
                         <RifaTextTitulo> {data.titulo} </RifaTextTitulo>
@@ -38,15 +56,14 @@ export default function MinhasRifasDefinirPremioList({ data }) {
                             {data.descricao}
                         </ContentText>
                         <RifaText> Data cadastro: {data.dataCadastro}</RifaText>
-                        <RifaText> Data final venda bilhetes: {data.dataFinalVendas} </RifaText>
                         <RifaText> Qtd bilhetes: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
-                        <RifaText> Qtd bilhetes pagos: {data.qtdTotalBilhetesPagos} Vlr total bilhetes pagos: {data.vlrTotalBilhetesPagos} </RifaText>
+                        <RifaText> </RifaText>
+                        <RifaText> Data sorteio: {data.dataSorteio}</RifaText>
+                        <RifaText> Qtd bilhetes pagos: {data.qtdTotalBilhetesPagos}</RifaText>
+                        <RifaText> Vlr total bilhetes pagos: {data.vlrTotalBilhetesPagos}</RifaText>
+                        <Premio gen={data.genero} pre={data.premioDefinido} tit={data.titulo}/>
+                        <Receber gen={data.genero} recPixV={data.vlrLiquidoAReceberResponsavelPix} recPixG={data.vlrPremioPixSorteio} recPre={data.vlrLiquidoAReceberResponsavelPremio}/>
                     </ListaRifas>
-                    <AreaBotaoReservar onPress={definirPremio}>
-                        <SubmitText>
-                            Definir prêmio a ser sorteado
-                        </SubmitText>
-                    </AreaBotaoReservar>                    
                 </View>
             </SafeAreaView>
         )

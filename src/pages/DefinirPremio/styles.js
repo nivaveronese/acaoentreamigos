@@ -14,15 +14,30 @@ export const ContentText = styled.Text`
     color: #333;
     font-family: Roboto;
 `;
-export const SubmitButton = styled.TouchableOpacity`
+export const SubmitButtonPremio = styled.TouchableOpacity`
     height: 40px;
-    width: 45%;
+    width: 30%;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFFF00;
+    border-radius: 5px;
+    margin-left: 3px;
+`;  
+export const SubmitButtonPix = styled.TouchableOpacity`
+    height: 40px;
+    width: 30%;
     align-items: center;
     justify-content: center;
     background-color: #008080;
     border-radius: 5px;
-`;  
-export const SubmitText = styled.Text`
+`; 
+export const SubmitTextPremio = styled.Text`
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    font-family: Roboto;
+`;
+export const SubmitTextPix = styled.Text`
     font-size: 15px;
     font-weight: bold;
     color: #FFFFFF;

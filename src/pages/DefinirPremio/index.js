@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Image }
+import { Alert, StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Image }
     from 'react-native';
 import estilos from '../../estilos/estilos';
 import { 
     AreaBotao, Texto,
-    RifaTextTitulo, RifaText, SubmitButton, SubmitText, AreaRifa,
-    ContentText
+    RifaTextTitulo, RifaText, SubmitButtonPremio, SubmitButtonPix, SubmitTextPremio,
+    SubmitTextPix, AreaRifa, ContentText
 } from './styles';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
@@ -68,13 +68,13 @@ export default function DefinirPremio() {
  
     async function confirmaPremio() {
         console.log('confirmaPremio');
-        let premio = 'premio';
+        let premio = route.params?.genero;
         setMensagemCadastro('')
         setLoading(true);
         const resultado = await gravaConfirmacaoPremio(route.params?.id,premio);
         console.log('resultado gravaConfirmacaoPremio-premio: ' + resultado);
         if (resultado == 'sucesso') {
-            setMensagemCadastro('Premio definido com sucesso')
+            setMensagemCadastro('Premio definido com sucesso (' + premio + ')') 
             setLoading(false);
             setPremioDefinido(true)
             return;
@@ -88,7 +88,7 @@ export default function DefinirPremio() {
 
     async function confirmaPix() {
         console.log('confirmaPix');
-        let premio = 'pix';
+        let premio = 'Pix';
         setMensagemCadastro('')
         setLoading(true);
         const resultado = await gravaConfirmacaoPremio(route.params?.id,premio);
@@ -127,83 +127,87 @@ export default function DefinirPremio() {
                     <View style={styles.card}>
                         <Image source={{ uri: route.params?.imagemCapa }}
                             style={styles.capa}
-                        />
+                        /> 
                         <AreaRifa>
                             <RifaTextTitulo> {route.params?.titulo} </RifaTextTitulo>
                             <ContentText numberOfLines={8}>
                                 {route.params?.descricao}
                             </ContentText>
                             <RifaText> Qtd bilhetes: {route.params?.qtdBilhetes} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
-                            <RifaText> Qtd bilhetes pagos: {route.params?.qtdBilhetesPagos} Vlr total bilhetes pagos: {route.params?.vlrTotalBilhetesPagos} </RifaText>
+                            <RifaText> Qtd bilhetes pagos: {route.params?.qtdTotalBilhetesPagos} </RifaText>
                         </AreaRifa>
                     </View>
                     <Texto>
-                        Olá {route.params?.usuarioNome},
-                    </Texto>
-                    <Texto>
                         Como a rifa atingiu a data limite de vendas, voce precisa definir o que sera sorteado.
                     </Texto>
-                    <Texto>
-                        Se voce optar por sortear o premio {route.params?.titulo}, voce vai receber:
+                    <Texto> 
+                        Se voce optar por sortear o premio {route.params?.titulo}:
                     </Texto>
                     <Texto>
                         (+) Vlr total bilhetes pagos R$: {route.params?.vlrTotalBilhetesPagos}
-                        (-) Vlr taxa de administracao R$: {route.params?.vlrTaxaAdministracao}
-                        (-) Vlr taxa bilhetes pagos R$: {route.params?.vlrTaxaBilhetesPagos}
-                        (=) Vlr liquido a receber R$: {route.params?.vlrLiquidoAReceberPremio}
-                    </Texto>                    
+                        </Texto>
+                        <Texto>
+                        (-) Vlr taxa de administracao R$: {route.params?.vlrTaxaAdministracaoPremio}
+                        </Texto>
+                        <Texto>
+                        (-) Vlr taxa bilhetes pagos R$: {route.params?.vlrTaxaBilhetes}
+                        </Texto>
+                        <Texto>
+                        (=) Voce vai receber R$: {route.params?.vlrLiquidoAReceberResponsavelPremio}
+                    </Texto>  
+                    <Texto> </Texto>
                     <Texto>
-
-                    </Texto>
+                        Se voce optar por sortear PIX:
+                    </Texto>                   
                     <Texto>
-                        Se voce optar por sortear PIX, o ganhador vai receber R$ {vlrAReceberGanhadorPix}
-                    </Texto>
+                        (+) Vlr total bilhetes pagos R$: {route.params?.vlrTotalBilhetesPagos}
+                        </Texto>                    
                     <Texto>
-                        E voce vai receber:
-                    </Texto>                    
+                        (-) Vlr taxa de administracao R$: {route.params?.vlrTaxaAdministracaoPix}
+                        </Texto>                    
                     <Texto>
-                        (+) Vlr 50% do vlr total bilhetes pagos R$: {route.params?.vlr50PcTotalBilhetesPagos}
-                        (-) Vlr taxa de administracao R$: {route.params?.vlrTaxaAdministracao}
-                        (-) Vlr taxa bilhetes pagos R$: {route.params?.vlrTaxaBilhetesPagos}
-                        (=) Vlr liquido a receber R$: {route.params?.vlrLiquidoAReceberPremio}
+                        (-) Vlr taxa bilhetes pagos R$: {route.params?.vlrTaxaBilhetes}
+                        </Texto>                    
+                    <Texto>
+                        (-) Ganhador vai receber R$: {route.params?.vlrPremioPixSorteio}
+                    </Texto> 
+                    <Texto>
+                        (=) Voce vai receber R$: {route.params?.vlrLiquidoAReceberResponsavelPix}
                     </Texto>                     
-                    <Texto>
-                       
-                    </Texto>
+                    <Texto> </Texto>
                     <Texto>
                         Atencao: voce tem ate o dia {route.params?.dataFinalDefinirPremio} para definir o premio.
                     </Texto>                    
                     <Texto>
                         Caso voce nao defina, o premio sera automaticamente definido como PIX.
                     </Texto>  
-                    <Texto>
-                        
-                    </Texto>  
+                    <Texto> </Texto>  
                     <View style={estilos.areaMensagemCadastro}>
                         <Text style={estilos.textoMensagemCadastro}>
                             {mensagemCadastro}
-                        </Text>
+                        </Text> 
                     </View>                                        
                    { premioDefinido ?
                             <AreaBotao>
-                                <SubmitButton onPress={sair}>
-                                    <SubmitText>
+                                <SubmitButtonPix onPress={sair}>
+                                    <SubmitTextPix>
                                         Ok
-                                    </SubmitText>
-                                </SubmitButton>
+                                    </SubmitTextPix>
+                                </SubmitButtonPix>
                             </AreaBotao>
                             :
                             <AreaBotao>
-                                <SubmitButton onPress={confirmarPremio}>
-                                    <SubmitText>
-                                        Premio
-                                    </SubmitText>
-                                </SubmitButton>
-                                <SubmitButton onPress={confirmarPix}>
-                                    <SubmitText>
+                                <SubmitButtonPremio onPress={confirmarPremio}>
+                                    <SubmitTextPremio>
+                                        Prêmio
+                                    </SubmitTextPremio>
+                                </SubmitButtonPremio>
+                                <Texto>  </Texto>
+                                <SubmitButtonPix onPress={confirmarPix}>
+                                    <SubmitTextPix>
                                         PIX
-                                    </SubmitText>
-                                </SubmitButton>                                
+                                    </SubmitTextPix>
+                                </SubmitButtonPix>                                
                                 <TouchableOpacity style={styles.botao} onPress={() => sair()}>
                                     <Text style={estilos.linkText}>Voltar</Text>
                                 </TouchableOpacity>

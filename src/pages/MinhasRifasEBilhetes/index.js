@@ -34,6 +34,16 @@ export default function MinhasRifasEBilhetes() {
         navigation.navigate('MinhasRifasDefinirPremio')
     }
 
+    function minhasRifasAguardandoSorteio() {
+        console.log('minhasRifasAguardandoSorteio')
+        navigation.navigate('MinhasRifasAguardandoSorteio')
+    }
+
+    function minhasRifasSorteadas() {
+        console.log('minhasRifasSorteadas')
+        navigation.navigate('MinhasRifasSorteadas')
+    }
+
     return (
         <Container>
             <Texto>Minhas Rifas e Bilhetes Adquiridos</Texto>
@@ -53,6 +63,12 @@ export default function MinhasRifasEBilhetes() {
                 <TouchableOpacity style={estilos.linkLeft} onPress={() => minhasRifasDefinirPremio()}>
                     <Text style={estilos.linkText}>Minhas rifas que atingiram data final venda. Definir premio</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={estilos.linkLeft} onPress={() => minhasRifasAguardandoSorteio()}>
+                    <Text style={estilos.linkText}>Minhas rifas aguardando sorteio</Text>
+                </TouchableOpacity> 
+                <TouchableOpacity style={estilos.linkLeft} onPress={() => minhasRifasSorteadas()}>
+                    <Text style={estilos.linkText}>Minhas rifas sorteadas</Text>
+                </TouchableOpacity>                                
             </View>
         </Container>
     )

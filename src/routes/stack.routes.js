@@ -21,6 +21,8 @@ import MinhasRifasNaoLiberadas from '../pages/MinhasRifasNaoLiberadas';
 import MinhasRifasALiberar from '../pages/MinhasRifasALiberar';
 import MeusBilhetesAdquiridos from '../pages/MeusBilhetesAdquiridos';
 import MinhasRifasDefinirPremio from '../pages/MinhasRifasDefinirPremio';
+import MinhasRifasAguardandoSorteio from '../pages/MinhasRifasAguardandoSorteio';
+import MinhasRifasSorteadas from '../pages/MinhasRifasSorteadas';
 import DefinirPremio from '../pages/DefinirPremio';
 
 const Stack = createNativeStackNavigator();
@@ -202,6 +204,20 @@ export default function StackRoutes() {
                     headerShown: false
                 }}
             />
+            <Stack.Screen
+                name='MinhasRifasAguardandoSorteio'
+                component={MinhasRifasAguardandoSorteio}
+                options={{
+                    headerShown: false
+                }}
+            />  
+            <Stack.Screen
+                name='MinhasRifasSorteadas'
+                component={MinhasRifasSorteadas}
+                options={{
+                    headerShown: false
+                }}
+            />                        
             <Stack.Screen
                 name='DefinirPremio'
                 component={DefinirPremio}
