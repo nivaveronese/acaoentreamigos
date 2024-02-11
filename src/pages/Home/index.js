@@ -5,7 +5,7 @@ import RifasDisponiveisList from '../../componentes/RifasDisponiveisList';
 import { Background } from './styles';
 import { RifasDisponiveisListShimmerEffect } from '../../componentes/RifasDisponiveisListShimmerEffect';
 import { AuthContext } from '../../contexts/auth';
-//import messaging from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 import { db } from '../../config/firebase';
 import { doc, writeBatch, Timestamp } from "firebase/firestore";
  
@@ -39,21 +39,21 @@ export default function Home() {
                 sair();
             }
         }
-        //try {
-        //    const authStatus = await messaging().requestPermission();
-        //    const enabled =
-        //        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        //        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-        //    if (enabled) {
-        //        messaging().onMessage(async mensagem => {
-        //            console.log('mensagem: ' + mensagem)
-        //            token = await messaging().getToken();
-        //            console.log('novo token notificações: ' + token)
-        //        })
-        //    }
-        //} catch (error) {
-        //    console.log('Ops, Algo deu errado em requerer permissao mensagens/obter token: ' + error.code);
-        //}
+        try {
+            const authStatus = await messaging().requestPermission();
+            const enabled =
+                authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+            if (enabled) {
+                messaging().onMessage(async mensagem => {
+                    console.log('mensagem: ' + mensagem)
+                    token = await messaging().getToken();
+                    console.log('novo token notificações: ' + token)
+                })
+            }
+        } catch (error) {
+            console.log('Ops, Algo deu errado em requerer permissao mensagens/obter token: ' + error.code);
+        }
         const dataRefUltimoLogin = Timestamp.fromDate(new Date(Date.now() - 172800000));
         console.log('datas login: ' + dataRefUltimoLogin + '-' + usuarioFirestore.dataUltimoLogin)
         console.log('token notificações: ' + usuarioFirestore.tokenNotificacoes)

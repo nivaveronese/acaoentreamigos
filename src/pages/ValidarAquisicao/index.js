@@ -215,7 +215,7 @@ export default function ValidarAquisicao() {
                             <RifaText> {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
                             <RifaText> Qtd bilhetes: {route.params?.qtdBilhetes} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
                             <RifaText> Autorizacao: {route.params?.autorizacao} </RifaText>
-                            <RifaText> Permitida a aquisicao maxima de {qtdMaximaBilhetesPorUsuario} bilhetes por usuario </RifaText>
+                            <RifaText> Permitida a aquisicao maxima de {qtdMaximaBilhetesPorUsuario} bilhete(s) por usuario </RifaText>
                         </AreaRifa>
                     </View>
                     <View style={estilos.areaMensagemCadastro}>

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "84255558599",
+    "project_id": "niapp100-6a8d8",
+    "storage_bucket": "niapp100-6a8d8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:84255558599:android:a6bd8960ae9f3634b2a7e2",
+        "android_client_info": {
+          "package_name": "com.niapp100"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "84255558599-0m7k3m6lepe6o899c1dm01l1l74smcav.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAygeOK_P_TVnfWqfzXfdtV_6YntFco9NQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "84255558599-0m7k3m6lepe6o899c1dm01l1l74smcav.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "84255558599-f6kmbml1klu4an44tpks9sgftlip02eo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.niapp100"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

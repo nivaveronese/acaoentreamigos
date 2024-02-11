@@ -233,7 +233,7 @@ export default function InformarDadosPagamento() {
                         Olá {route.params?.usuarioNome},
                     </Texto>
                     <Texto>
-                        Você está adquirindo {route.params?.usuarioQtdBilhetes} bilhetes, a R$ {route.params?.vlrBilhete} cada um, totalizando R$ {route.params?.vlrTotalBilhetes}
+                        Você está adquirindo {route.params?.usuarioQtdBilhetes} bilhete(s), a R$ {route.params?.vlrBilhete} cada um, totalizando R$ {route.params?.vlrTotalBilhetes}
                     </Texto>
                     <Texto>
                         Preencha os dados abaixo, para debitar R$ {route.params?.vlrTotalBilhetes} no seu cartão de crédito.

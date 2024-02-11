@@ -112,6 +112,7 @@ export default function ValidarDisponibilizacao() {
                         <RifaText> Vlr total bilhetes previsto R$: {route.params?.vlrTotalBilhetesPrevisto}</RifaText>
                         <RifaText> Vlr total taxa administração previsto R$: {route.params?.vlrTotalTaxaAdministracaoPrevisto}</RifaText>
                         <RifaText> Vlr total taxa bilhetes previsto R$: {route.params?.vlrTotalTaxaBilhetesPrevisto}</RifaText>
+                        <RifaText> Se todos os bilhetes forem vendidos, o ganhador vai receber R$: {route.params?.vlrPremioPix}</RifaText>
                         <RifaText> Se todos os bilhetes forem vendidos, você vai receber R$: {route.params?.vlrLiquidoAReceberResponsavelPrevisto}</RifaText>
                     </AreaRifa>
                     <AreaTexto>
