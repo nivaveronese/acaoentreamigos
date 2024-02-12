@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Image }
     from 'react-native';
 import estilos from '../../estilos/estilos';
@@ -13,22 +13,18 @@ import { obtemSituacaoRifa, desgravaPreReservaTransacao, gravaPagamentoPreReserv
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-export default function InformarDadosPagamento() {
-    console.log('InformarDadosPagamento')
-    const [numeroCartaoCredito, setNumeroCartaoCredito] = useState('');
-    const [nomeCartaoCredito, setNomeCartaoCredito] = useState('');
-    const [mesValidadeCartaoCredito, setMesValidadeCartaoCredito] = useState('');
-    const [anoValidadeCartaoCredito, setAnoValidadeCartaoCredito] = useState('');
-    const [cvvCartaoCredito, setCvvCartaoCredito] = useState('');
-    const [cpfCartaoCredito, setCpfCartaoCredito] = useState('');
+export default function RecebimentoPremioPix() {
+    console.log('RecebimentoPremioPix')
+    const [tipoChavePix, setTipoChavePix] = useState('');
+    const [chavePix, setChavePix] = useState('');
     const [mensagemCadastro, setMensagemCadastro] = useState('');
     const [loading, setLoading] = useState(false);
-    const [pgtoRealizado, setPgtoRealizado] = useState(false);
+    const [dadosGravados, setDadosGravados] = useState(false);
     const route = useRoute();
     const navigation = useNavigation();
  
-    async function validarDadosCartao() {
-        console.log('validarDadosCartao');
+    async function validarDadosChavePix() {
+        console.log('validarDadosChavePix');
 
         if (numeroCartaoCredito == '' || isNaN(numeroCartaoCredito) || numeroCartaoCredito.length === 0 || numeroCartaoCredito.length < 13 || numeroCartaoCredito.length > 16) {
             setMensagemCadastro('Digite corretamente o número do cartão de crédito');
@@ -153,14 +149,14 @@ export default function InformarDadosPagamento() {
         setLoading(false)
         console.log('resultado: ' + resultado)
         if (resultado == 'sucesso') {
-            setPgtoRealizado(true)
+            setDadosGravados(true)
             console.log('pagamento pre reserva realizado com sucesso ')
             setMensagemCadastro('Pagamento realizado com sucesso.');
             return;
         }
         else {
             desgravarPreReserva();
-            setPgtoRealizado(false)
+            setDadosGravados(false)
             setMensagemCadastro('Falha gravação pagamento. Tente novamente.');
             return;
         }
@@ -223,11 +219,7 @@ export default function InformarDadosPagamento() {
                             <ContentText numberOfLines={8}>
                                 {route.params?.descricao}
                             </ContentText>
-                            <RifaText> Responsável: {route.params?.nome} </RifaText>
-                            <RifaText> {route.params?.cidade} {route.params?.uf} {route.params?.bairro} </RifaText>
-                            <RifaText> Qtd bilhetes: {route.params?.qtdBilhetes} Vlr bilhete: {route.params?.vlrBilhete}</RifaText>
-                            <RifaText> Autorização: {route.params?.autorizacao} </RifaText>
-                        </AreaRifa>
+                       </AreaRifa>
                     </View>
                     <Texto>
                         Olá {route.params?.usuarioNome},
@@ -310,7 +302,7 @@ export default function InformarDadosPagamento() {
                         </Text>
                     </View>
                     {
-                        pgtoRealizado ?
+                        dadosGravados ?
                             <AreaBotao>
                                 <SubmitButton onPress={sair}>
                                     <SubmitText>
@@ -320,7 +312,7 @@ export default function InformarDadosPagamento() {
                             </AreaBotao>
                             :
                             <AreaBotao>
-                                <SubmitButton onPress={validarDadosCartao}>
+                                <SubmitButton onPress={validarDadosChavePix}>
                                     <SubmitText>
                                         Pagar
                                     </SubmitText>

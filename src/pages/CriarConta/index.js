@@ -15,8 +15,7 @@ import { salvaImagemAvatar } from '../../servicos/storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
-//import messaging from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 
 export default function CriarConta({ navigation }) {
     const [nome, setNome] = useState('');
@@ -209,18 +208,18 @@ export default function CriarConta({ navigation }) {
                 console.log('fim salvar imagem')
                 let uid = value.user.uid;
                 console.log('urlImagemAvatar: ' + urlImagemAvatar);
-                //try {
-                //    const authStatus = await messaging().requestPermission();
-                //    const enabled =
-                //        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-                //        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-                //    if (enabled) {
-                //        token = await messaging().getToken();
-                //    }
-                // }
-                //catch (error) {
-                //    console.log('Ops, Algo deu errado em requerer permissao mensagens/obter token ' + error.message);
-                //}
+                try {
+                    const authStatus = await messaging().requestPermission();
+                    const enabled =
+                        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+                    if (enabled) {
+                        token = await messaging().getToken();
+                    }
+                 }
+                catch (error) {
+                    console.log('Ops, Algo deu errado em requerer permissao mensagens/obter token ' + error.message);
+                }
                 let numero_sorte = Math.floor(Math.random() * (99999 - 0 + 1)) + 0;
                 let data = {
                     uid: uid,

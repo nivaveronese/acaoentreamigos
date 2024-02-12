@@ -1,12 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Image, View, SafeAreaView, StyleSheet } from 'react-native';
 import {
-    RifaText, ListaRifas, RifaTextTitulo, ContentText} from './styles';
-  
+    RifaTextGanhador, AreaBotao, SubmitText,
+    RifaText, ListaRifas, RifaTextTitulo, ContentText
+} from './styles';
+import { AuthContext } from '../../contexts/auth';
+import { useNavigation } from '@react-navigation/native';
+
 export default function MeusBilhetesAdquiridosList({ data }) {
     console.log('MeusBilhetesAdquiridosList');
     console.log(data)
     const [loading, setLoading] = useState(false);
+    const { user } = useContext(AuthContext);
+    const navigation = useNavigation();
+    const [souGanhador, setSouGanhador] = useState(false);
+
+    const Sorteio = ({ dados }) => {
+        console.log('verifica sorteio ');
+        if (dados.situacao == 'aguardandosorteio') {
+            return <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
+        }
+        if (dados.situacao == 'sorteada') {
+            let conteudo = '';
+            if (dados.genero == 'Pix') {
+                conteudo = (
+                    <View>
+                        <RifaText> </RifaText>
+                        <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
+                        <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
+                        <RifaText> Final bilhete primeiro premio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
+                        <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
+                        <RifaText> Iniciais nome ganhador: {dados.iniciaisNomeGanhador} </RifaText>
+                        <RifaText> Cidade/uf ganhador: {dados.cidadeUfGanhador} </RifaText>
+                    </View>
+                )
+                return conteudo;
+            } else {
+                conteudo = (
+                    <View>
+                        <RifaText> </RifaText>
+                        <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
+                        <RifaText> Prêmio sorteado: {dados.premioDefinido}</RifaText>
+                        <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
+                        <RifaText> Final bilhete primeiro prêmio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
+                        <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
+                        <RifaText> Iniciais nome ganhador: {dados.iniciaisNomeGanhador} </RifaText>
+                        <RifaText> Cidade/uf ganhador: {dados.cidadeUfGanhador} </RifaText>
+                    </View>
+                )
+                return conteudo;
+            }
+        }
+    }
+
+    const Ganhador = ({ dados }) => {
+        if (dados.situacao == 'sorteada') {
+            if (dados.uidGanhador == user.uid) {
+                setSouGanhador(true);
+                return <RifaTextGanhador> Parabéns, você foi o ganhador!!!</RifaTextGanhador>
+            } else {
+                setSouGanhador(false)
+                return <RifaText> Infelizmente, você nao foi o ganhador.</RifaText>
+            }
+        }
+    }
+
+    function recebimentoPremio() {
+        console.log('recebimentoPremio');
+        if (data.genero == 'Pix') {
+            navigation.navigate('RecebimentoPremioPix', data);
+        } else {
+            //navigation.navigate('RecebimentoPremio', data);
+        }
+    }
 
     if (loading) {
         return (
@@ -17,7 +83,7 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                 />
             </View>
         )
-    } else { 
+    } else {
         return (
             <SafeAreaView>
                 <View style={styles.card}>
@@ -32,20 +98,32 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                         </ContentText>
                         <RifaText> Responsável: {data.rifaDisponivel.nome} </RifaText>
                         <RifaText> {data.rifaDisponivel.cidade} {data.rifaDisponivel.uf} {data.rifaDisponivel.bairro} </RifaText>
-                        <RifaText> Situacao rifa: {data.rifaDisponivel.situacao}</RifaText>
-                        <RifaText> Data sorteio: {data.rifaDisponivel.dataSorteio}</RifaText>
+                        <RifaText> Situação rifa: {data.rifaDisponivel.situacao}</RifaText>
+                        <Sorteio dados={data.rifaDisponivel} />
+                        <Ganhador dados={data.rifaDisponivel} />
                         <RifaText> </RifaText>
                         <RifaText> Data pagamento: {data.meuBilheteAdquirido.dataPagamento}</RifaText>
                         <RifaText> Qtd bilhetes adquiridos: {data.meuBilheteAdquirido.qtdBilhetes} Vlr bilhete: {data.rifaDisponivel.vlrBilhete}</RifaText>
                         <RifaText> Vlr pagamento: {data.meuBilheteAdquirido.vlrTotalBilhetes}</RifaText>
                         <RifaText> Bilhete(s): {data.meuBilheteAdquirido.nrsBilhetesPreReservadosFormatados}</RifaText>
                     </ListaRifas>
+                    {souGanhador ?
+                        (
+                            <AreaBotao onPress={recebimentoPremio}>
+                                <SubmitText>
+                                    Recebimento do prêmio
+                                </SubmitText>
+                            </AreaBotao>
+                        )
+                        :
+                        (null)
+                    }
                 </View>
             </SafeAreaView>
         )
     }
 }
- 
+
 const styles = StyleSheet.create({
     card: {
         shadowColor: '#000',

@@ -14,7 +14,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/auth';
-//import messaging from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 
 export default function AlterarConta() {
     console.log('AlterarConta')
@@ -217,17 +217,17 @@ export default function AlterarConta() {
         } else {
             setPerfil ('usu')
         }
-        //try {
-        //    const authStatus = await messaging().requestPermission();
-        //    const enabled =
-        //        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        //        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-        //    if (enabled) {
-        //        token = await messaging().getToken();
-        //    }
-        //} catch (error) {
-        //    console.log('Ops, Algo deu errado em requerer permissao mensagens/obter token ' + error.message);
-        //}
+        try {
+            const authStatus = await messaging().requestPermission();
+            const enabled =
+                authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+            if (enabled) {
+                token = await messaging().getToken();
+            }
+        } catch (error) {
+            console.log('Ops, Algo deu errado em requerer permissao mensagens/obter token ' + error.message);
+        }
         if (imagemNovaAvatar) {
             console.log('nova imagem avatar')
             setLoading(true)

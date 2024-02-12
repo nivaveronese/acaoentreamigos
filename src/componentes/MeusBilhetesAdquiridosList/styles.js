@@ -15,6 +15,12 @@ export const RifaText = styled.Text`
     font-family: roboto;
     color: #000;
 `;
+export const RifaTextGanhador = styled.Text`
+    font-size: 13px;
+    font-family: roboto;
+    color: #000;
+    font-weight: bold; 
+`;
 export const ContentText = styled.Text`
     font-size: 13px;
     margin-left: 15px;
@@ -22,3 +28,18 @@ export const ContentText = styled.Text`
     font-family: roboto;
     color: #000;
 `; 
+export const AreaBotao = styled.TouchableOpacity`
+    width: 100%;
+    height: 30px;
+    background-color: #C71585;
+    padding: 5px;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+`; 
+export const SubmitText = styled.Text`
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+    font-family: Roboto;
+`;

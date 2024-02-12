@@ -24,6 +24,7 @@ import MinhasRifasDefinirPremio from '../pages/MinhasRifasDefinirPremio';
 import MinhasRifasAguardandoSorteio from '../pages/MinhasRifasAguardandoSorteio';
 import MinhasRifasSorteadas from '../pages/MinhasRifasSorteadas';
 import DefinirPremio from '../pages/DefinirPremio';
+import RecebimentoPremioPix from '../pages/RecebimentoPremioPix';
 
 const Stack = createNativeStackNavigator();
 
@@ -224,7 +225,14 @@ export default function StackRoutes() {
                 options={{
                     headerShown: false
                 }}
-            />            
+            />   
+            <Stack.Screen
+                name='RecebimentoPremioPix'
+                component={RecebimentoPremioPix}
+                options={{
+                    headerShown: false
+                }}
+            />                      
         </Stack.Navigator>
     )
 }

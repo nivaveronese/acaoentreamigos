@@ -800,7 +800,7 @@ export async function obtemQtdNrsBilhetesRifaDisponivel(id) {
     return 999999;
   }
 }
-
+ 
 export async function obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao(id, uid) {
   console.log('firestore-obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao: ' + id + ' - ' + uid);
   const refNomeColecao = 'nrsBilhetesRifaDisponivel-' + `${id}`;
@@ -1271,7 +1271,7 @@ export async function obtemMeusBilhetesAdquiridos(uid) {
       let meuBilheteAdquiridoRifa = { rifaDisponivel, meuBilheteAdquirido }
       meusBilhetesAdquiridosFirestore.push(meuBilheteAdquiridoRifa)
       qtdRifasBilhetes = qtdRifasBilhetes + 1;
-    }
+    } 
     let qtdBilhetes = meusBilhetesAdquiridosFirestore.length
     return { meusBilhetesAdquiridosFirestore, qtdBilhetes }
   } catch (error) {

@@ -45,7 +45,7 @@ export default function ValidarAquisicao() {
 
     async function verSePodeAdquirir() {
         console.log('verSePodeAdquirir');
-        console.log(usuario.uid + '-' + route.params?.uid);
+        console.log(usuario.uid + '-' + route.params?.uid);        
         if (!qtdBilhetesAAdquirir || isNaN(qtdBilhetesAAdquirir) || parseInt(qtdBilhetesAAdquirir) == 0) {
             setMensagemCadastro('Informe a quantidade de bilhetes que deseja adquirir');
             return;
@@ -55,36 +55,29 @@ export default function ValidarAquisicao() {
             return
         }
         setLoading(true);
-        const qtdBilhetesAdquiridoOuEmAquisicaoFirestore = await obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao(route.params?.id, usuario.uid)
-        if (qtdBilhetesAdquiridoOuEmAquisicaoFirestore == 999999) {
-            setLoading(false);
-            setMensagemCadastro('Ops, não consegui verificar se pode adquirir bilhetes (adquiridos ou em aquisicao). Tente novamente')
-            return
-        }
-        let qtdBilhetesPodeAdquirir = qtdMaximaBilhetesPorUsuario - qtdBilhetesAdquiridoOuEmAquisicaoFirestore;
-        if (qtdBilhetesPodeAdquirir == 0) {
-            setLoading(false);
-            setMensagemCadastro('Você ja adquiriu, ou tem em processo de aquisicao, a quantidade maxima de bilhetes: ' + qtdMaximaBilhetesPorUsuario)
-            return;
-        }
-        if (qtdBilhetesAAdquirir > qtdBilhetesPodeAdquirir) {
-            setLoading(false);
-            setMensagemCadastro('Você pode adquirir no maximo:  ' + qtdBilhetesPodeAdquirir + ' bilhete(s)')
-            return;
-        } 
         const situacaoRifa = await obtemSituacaoRifa(route.params?.id);
         console.log('situacaoRifa: ' + situacaoRifa)
         if (situacaoRifa != 'ativa'){
             setLoading(false)
             setMensagemCadastro('Esta rifa não esta mais disponível: ' + situacaoRifa)
             return;
+        }        
+        const qtdBilhetesAdquiridoOuEmAquisicaoFirestore = await obtemQtdNrsBilhetesRifaAdquiridoOuEmAquisicao(route.params?.id, usuario.uid)
+        if (qtdBilhetesAdquiridoOuEmAquisicaoFirestore == 999999) {
+            setLoading(false);
+            setMensagemCadastro('Ops, não consegui verificar se pode adquirir bilhetes (adquiridos ou em aquisicao). Tente novamente')
+            return
         }
-
+        console.log('qtdBilhetesAdquiridoOuEmAquisicaoFirestore: ' + qtdBilhetesAdquiridoOuEmAquisicaoFirestore)
+        if (qtdBilhetesAdquiridoOuEmAquisicaoFirestore != 0) {
+            setLoading(false);
+            setMensagemCadastro('Você ja adquiriu, ou tem em processo de aquisicao, bilhetes desta rifa.')
+            return;
+        }
         let dadosObtemBilhetes = {
             id: route.params?.id,
             usuarioQtdBilhetes: qtdBilhetesAAdquirir,
         }
-
         const bilhetesDisponiveisParaReservaFirestore = await obtemBilhetesDisponiveisParaReserva(dadosObtemBilhetes);
         if (bilhetesDisponiveisParaReservaFirestore.qtdBilhetesDisponiveis == 0) {
             setLoading(false);
