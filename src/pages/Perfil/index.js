@@ -75,10 +75,7 @@ export default function Perfil() {
                 </Nome>
                 <Nome>
                     {user && user.cep} {user && user.cidade} {user && user.uf} {user && user.bairro}
-                </Nome>
-                <Nome>
-                    Número da sorte: {user && user.numeroSorte}
-                </Nome>                
+                </Nome>               
             </AreaPerfil>
             <AreaBotao>
                 <SubmitButton onPress={sair}>

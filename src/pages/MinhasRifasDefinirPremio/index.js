@@ -45,7 +45,7 @@ export default function MinhasRifasDefinirPremio() {
         return (
             <Background>
                 <Text style={styles.texto}>
-                    Minhas rifas para definir prêmio
+                    Minhas rifas que atingiram data final de venda. Definir prêmio.
                 </Text>
                 {temRifaDefinirPremio ?
                     <FlatList style={styles.lista}
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         fontSize: 25,
         color: '#000',
         fontFamily: 'roboto',
-        marginLeft: 15,
         fontStyle: 'italic',
+        padding: 5,
     },
 })

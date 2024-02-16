@@ -24,7 +24,9 @@ import MinhasRifasDefinirPremio from '../pages/MinhasRifasDefinirPremio';
 import MinhasRifasAguardandoSorteio from '../pages/MinhasRifasAguardandoSorteio';
 import MinhasRifasSorteadas from '../pages/MinhasRifasSorteadas';
 import DefinirPremio from '../pages/DefinirPremio';
-import RecebimentoPremioPix from '../pages/RecebimentoPremioPix';
+import InformarDadosParaRecebimentoPremioPix from '../pages/InformarDadosParaRecebimentoPremioPix';
+import VisualizarComprovanteDepositoPixGanhador from '../pages/VisualizarComprovanteDepositoPixGanhador';
+import InformarDadosParaRecebimentoPremioProduto from '../pages/InformarDadosParaRecebimentoPremioProduto';
 
 const Stack = createNativeStackNavigator();
 
@@ -227,12 +229,26 @@ export default function StackRoutes() {
                 }}
             />   
             <Stack.Screen
-                name='RecebimentoPremioPix'
-                component={RecebimentoPremioPix}
+                name='InformarDadosParaRecebimentoPremioPix'
+                component={InformarDadosParaRecebimentoPremioPix}
                 options={{
                     headerShown: false
                 }}
-            />                      
+            />    
+            <Stack.Screen
+                name='VisualizarComprovanteDepositoPixGanhador'
+                component={VisualizarComprovanteDepositoPixGanhador}
+                options={{
+                    headerShown: false
+                }}
+            />  
+            <Stack.Screen
+                name='InformarDadosParaRecebimentoPremioProduto'
+                component={InformarDadosParaRecebimentoPremioProduto}
+                options={{
+                    headerShown: false
+                }}
+            />                                          
         </Stack.Navigator>
     )
 }

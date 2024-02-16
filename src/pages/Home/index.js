@@ -39,18 +39,22 @@ export default function Home() {
                 sair();
             }
         }
-        const authStatus = await messaging().requestPermission();
-        const enabled =
-            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-        if (enabled) {
-            console.log('Authorization status: ' + authStatus)
-            messaging().onMessage(async mensagem => {
-                console.log('mensagem: ')
-                console.log(mensagem)
-            })
-        } else {
-            console.log('messaging nao autorizado: ' + authStatus)
+        try {
+            const authStatus = await messaging().requestPermission();
+            const enabled =
+                authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+            if (enabled) {
+                console.log('Authorization status: ' + authStatus)
+                messaging().onMessage(async mensagem => {
+                    console.log('mensagem: ')
+                    console.log(mensagem)
+                })
+            } else {
+                console.log('messaging nao autorizado: ' + authStatus)
+            }
+        } catch (error) {
+            console.log('Ops, Algo deu errado em requerer permissao mensagens: ' + error.code);
         }
         // 2 dias = 172800000 milisegundos
         const dataRefUltimoLogin = Timestamp.fromDate(new Date(Date.now() - 172800000));

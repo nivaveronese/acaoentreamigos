@@ -29,13 +29,14 @@ export const ContentText = styled.Text`
     color: #000;
 `; 
 export const AreaBotao = styled.TouchableOpacity`
-    width: 100%;
+    width: 50%;
     height: 30px;
     background-color: #C71585;
     padding: 5px;
     border-radius: 5px;
     justify-content: center;
     align-items: center;
+    margin-left: 80px;
 `; 
 export const SubmitText = styled.Text`
     font-size: 15px;

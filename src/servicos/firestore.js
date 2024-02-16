@@ -60,6 +60,32 @@ export async function excluiRifaNaoLiberadaTransacao(idRifa) {
     return 'Falha em excluiRifaNaoLiberadaTransacao. Tente novamente'
   }
 }
+ 
+export async function gravaDadosParaRecebimentoPremioPix(dadosParaRecebimentoPremioPix) {
+  console.log('firestore-gravaDadosParaRecebimentoPremioPix: ' + ' - ' + dadosParaRecebimentoPremioPix.idRifa)
+  const resultDate = subHours(new Date(), 0);
+  const dataGravacaoDadosParaRecebimentoPremioPix = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
+  const batch = writeBatch(db);
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("id", "==", dadosParaRecebimentoPremioPix.idRifa));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let docRef = doc.ref;
+      batch.update(docRef, {
+        situacao: 'dados para recebimento prêmio pix gravado',
+        dataGravacaoDadosParaRecebimentoPremioPix: dataGravacaoDadosParaRecebimentoPremioPix,
+        tipoChavePixGanhador: dadosParaRecebimentoPremioPix.tipoChavePixGanhador,
+        chavePixGanhador: dadosParaRecebimentoPremioPix.chavePixGanhador,
+        nomePessoaChavePixGanhador: dadosParaRecebimentoPremioPix.nomePessoaChavePixGanhador
+      })
+    });
+    await batch.commit();
+    return 'sucesso'
+  } catch (error) {
+    return 'Falha em gravaDadosParaRecebimentoPremioPix'
+  }
+}
 
 export async function gravaConfirmacaoPremio(id, premio) {
   console.log('firestore-gravaConfirmacaoPremio ' + id + ' - ' + premio)
@@ -73,7 +99,7 @@ export async function gravaConfirmacaoPremio(id, premio) {
     querySnapshot.forEach((doc) => {
       let docRef = doc.ref;
       batch.update(docRef, {
-        situacao: 'adefinirdatasorteio',
+        situacao: 'a definir data sorteio',
         dataConfirmacaoPremio: dataConfirmacaoPremio,
         premioDefinido: premio,
         quemDefiniuPremio: 'responsavel'
@@ -386,7 +412,7 @@ export async function marcaRifaDisponibilizadaAExcluirTransacao(id) {
     querySnapshot.forEach((doc) => {
       let docRef = doc.ref;
       batch.update(docRef, {
-        situacao: 'aexcluir',
+        situacao: 'a excluir',
         dataSolicitacaoExcluir: dataCadastro
       })
     });
@@ -409,7 +435,7 @@ export async function marcaContaAExcluir(uid, id) {
     querySnapshot.forEach((doc) => {
       let docRef = doc.ref;
       batch.update(docRef, {
-        situacao: 'aexcluir',
+        situacao: 'a excluir',
         dataSolicitacaoExcluir: dataCadastro
       })
     });
@@ -428,8 +454,25 @@ export async function marcaContaAExcluir(uid, id) {
     return 'Falha em marcaContaAExcluir'
   }
 }
-export async function obtemGeneros() {
 
+export async function obtemTiposChavePix() {
+  console.log('firestore-obtemTiposChavePix: ');
+  try {
+    const q = query(collection(db, "tiposChavePix"), orderBy("tipo"));
+    let tiposChavePixFirestore = []
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let tipoChavePix = { id: doc.id, ...doc.data() }
+      tiposChavePixFirestore.push(tipoChavePix)
+    });
+    return tiposChavePixFirestore
+  } catch (error) {
+    console.log('erro obtemTiposChavePix: ' + error.code)
+    return []
+  }
+}
+
+export async function obtemGeneros() {
   console.log('firestore-obtemGeneros: ');
   try {
     const q = query(collection(db, "generos"), orderBy("genero"));
@@ -638,7 +681,7 @@ export async function obtemRifasDisponibilizadasAExcluir(uid) {
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       let rifaAExcluir = { id: doc.id, ...doc.data() }
-      if (doc.data().situacao == 'aexcluir') {
+      if (doc.data().situacao == 'a excluir') {
         rifasAExcluirFirestore.push(rifaAExcluir)
       }
     });
@@ -677,7 +720,7 @@ export async function obtemMinhasRifasDefinirPremio(uid) {
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("uid", "==", uid),
-      where("situacao", "==", "adefinirpremio"));
+      where("situacao", "==", "a definir prêmio"));
     const minhasRifasDefinirPremioFirestore = []
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
@@ -701,7 +744,7 @@ export async function obtemMinhasRifasAguardandoSorteio(uid) {
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("uid", "==", uid),
-      where("situacao", "==", "aguardandosorteio"));
+      where("situacao", "==", "aguardando sorteio"));
     const minhasRifasAguardandoSorteioFirestore = []
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {

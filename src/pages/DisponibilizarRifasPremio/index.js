@@ -374,7 +374,4 @@ const styles = StyleSheet.create({
     dropdownDropdownText: {
         fontSize: 15,
     },
-    moeda: {
-
-    },
 });
