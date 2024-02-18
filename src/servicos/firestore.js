@@ -83,7 +83,33 @@ export async function gravaDadosParaRecebimentoPremioPix(dadosParaRecebimentoPre
     await batch.commit();
     return 'sucesso'
   } catch (error) {
+    console.log('Ops, Algo deu errado em gravaDadosParaRecebimentoPremioPix: ' + error.code);
     return 'Falha em gravaDadosParaRecebimentoPremioPix'
+  }
+}
+
+export async function gravaDadosParaRecebimentoPremioProduto(dadosParaRecebimentoPremioProduto) {
+  console.log('firestore-gravaDadosParaRecebimentoPremioProduto: ' + ' - ' + dadosParaRecebimentoPremioProduto.idRifa + ' - ' + dadosParaRecebimentoPremioProduto.celularGanhadorPremioProduto)
+  const resultDate = subHours(new Date(), 0);
+  const dataGravacaoDadosParaRecebimentoPremioProduto = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
+  const batch = writeBatch(db);
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("id", "==", dadosParaRecebimentoPremioProduto.idRifa));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let docRef = doc.ref;
+      batch.update(docRef, {
+        situacao: 'dados para recebimento prêmio produto gravado',
+        dataGravacaoDadosParaRecebimentoPremioProduto: dataGravacaoDadosParaRecebimentoPremioProduto,
+        celularGanhadorPremioProduto: dadosParaRecebimentoPremioProduto.celularGanhadorPremioProduto
+      })
+    });
+    await batch.commit();
+    return 'sucesso'
+  } catch (error) {
+    console.log('Ops, Algo deu errado em gravaDadosParaRecebimentoPremioProduto: ' + error.code);
+    return 'Falha em gravaDadosParaRecebimentoPremioProduto'
   }
 }
 
@@ -108,6 +134,7 @@ export async function gravaConfirmacaoPremio(id, premio) {
     await batch.commit();
     return 'sucesso'
   } catch (error) {
+    console.log('Ops, Algo deu errado em gravaConfirmacaoPremio: ' + error.code);
     return 'Falha em gravaConfirmacaoPremio'
   }
 }
@@ -766,7 +793,10 @@ export async function obtemMinhasRifasSorteadas(uid) {
   try {
     const q = query(collection(db, "rifasDisponiveis"),
       where("uid", "==", uid),
-      where("situacao", "==", "sorteada"));
+      where("situacao", "in", ["sorteada","prêmio produto já entregue",
+      "dados para recebimento prêmio pix gravado",
+      "dados para recebimento prêmio produto gravado","pix depositado para ganhador",
+      "pix depositado para responsável rifa"]));
     const minhasRifasSorteadasFirestore = []
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {

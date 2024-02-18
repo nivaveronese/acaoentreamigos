@@ -65,13 +65,12 @@ export default function RifasALiberarList({ data }) {
         setLoading(true);
         const resultado = await gravaRifaLiberadaTransacao(data);
         console.log('resultado confirmaLiberacaoRifa: ' + resultado);
+        setLoading(false);
         if (resultado == 'sucesso') {
             setMensagemCadastro('')
-            setLoading(false);
             navigation.navigate('OkL')
         } else {
             setMensagemCadastro(resultado)
-            setLoading(false);
             return;
         }
     }

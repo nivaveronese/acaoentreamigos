@@ -19,30 +19,6 @@ export const ContentText = styled.Text`
     color: #333;
     font-family: Roboto;
 `;
-export const Input = styled.TextInput`
-width: 95%;
-border-width: 1px;
-border-color: #D3D3D3;    
-font-size: 15px;
-margin-bottom: 2px;
-margin-left: 5px;
-padding: 5px;
-border-radius: 5px;
-color: #333;
-font-family: Roboto;
-`;
-export const InputAno = styled.TextInput`
-    width: 35%;
-    border-width: 1px;
-    border-color: #D3D3D3;    
-    font-size: 15px;
-    margin-bottom: 2px;
-    margin-left: 5px;
-    padding: 5px;
-    border-radius: 5px;
-    color: #333;
-    font-family: Roboto;
-`;
 export const SubmitButton = styled.TouchableOpacity`
     height: 40px;
     width: 45%;
@@ -65,6 +41,7 @@ export const Texto = styled.Text`
     font-style: italic;
     margin-left: 5px;
     margin-top: 5px;
+    padding: 5px;
 `;
 export const RifaTextTitulo = styled.Text`
 font-size: 15px;

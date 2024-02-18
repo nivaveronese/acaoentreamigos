@@ -1,125 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Image }
     from 'react-native';
 import estilos from '../../estilos/estilos';
 import {
-    AreaBotao, Input, Texto,RifaText,
+    AreaBotao, InputCel, Texto, RifaText,
     RifaTextTitulo, SubmitButton, SubmitText, AreaRifa,
     ContentText
 } from './styles';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import { obtemTiposChavePix, gravaDadosParaRecebimentoPremioPix } from '../../servicos/firestore';
+import { gravaDadosParaRecebimentoPremioProduto } from '../../servicos/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import ModalDropdown from 'react-native-modal-dropdown';
-import CpfValido from '../../componentes/CpfValido';
-import CnpjValido from '../../componentes/CnpjValido';
 import CelularValido from '../../componentes/CelularValido';
-
+import { TextInputMask } from 'react-native-masked-text'
+ 
 export default function InformarDadosParaRecebimentoPremioProduto() {
     console.log('InformarDadosParaRecebimentoPremioProduto')
-    const [tipoChavePix, setTipoChavePix] = useState(' Escolha tipo da chave');
-    const [descricaoTipoChavePix, setDescricaoTipoChavePix] = useState([]);
-    const [chavePix, setChavePix] = useState('')
-    const [nomePessoaChavePix, setNomePessoaChavePix] = useState('')
+    const [celularGanhador, setCelularGanhador] = useState('')
     const [mensagemCadastro, setMensagemCadastro] = useState('');
     const [loading, setLoading] = useState(false);
     const [dadosGravados, setDadosGravados] = useState(false);
     const route = useRoute();
     const navigation = useNavigation();
-    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-
-    useEffect(() => {
-        carregarTiposChavePixList();
-    }, []);
-
-    async function carregarTiposChavePixList() {
-        console.log('carregarTiposChavePixList');
-        setLoading(true)
-        const tiposChavePixFirestore = await obtemTiposChavePix()
-        console.log('tiposChavePixFirestore.length: ' + tiposChavePixFirestore.length)
-        var descricaoTipoChavePixArray = []
-        for (var g = 0; g < tiposChavePixFirestore.length; g++) {
-            const descrTipoChavePix = tiposChavePixFirestore[g].tipo;
-            descricaoTipoChavePixArray.push(descrTipoChavePix);
-        }
-        setDescricaoTipoChavePix(descricaoTipoChavePixArray)
-        setLoading(false)
-    }
-
-    async function validarDadosChavePix() {
-        console.log('validarDadosChavePix');
-
-        if (tipoChavePix === ' Escolha tipo da chave' || typeof tipoChavePix === "undefined") {
-            console.log('tipoChavePix: ' + tipoChavePix);
-            setMensagemCadastro('Escolha o tipo da chave Pix')
+ 
+    async function validarDados() {
+        console.log('validarDados');
+        if (!CelularValido(celularGanhador)) {
+            setMensagemCadastro('Digite celular válido: ddd mais número do celular');
             return;
         }
-
-        if (tipoChavePix === 'Cpf') {
-            if (!CpfValido(chavePix)) {
-                setMensagemCadastro('Digite cpf válido');
-                return;
-            }
-        }
-
-        if (tipoChavePix === 'Cnpj') {
-            if (!CnpjValido(chavePix)) {
-                setMensagemCadastro('Digite cnpj válido');
-                return;
-            }
-        }
-
-        if (tipoChavePix === 'Celular') {
-            if (!CelularValido(chavePix)) {
-                setMensagemCadastro('Digite celular válido: ex: 16999999999 (ddd mais celular: somente os números');
-                return;
-            }
-        }
-
-        if (tipoChavePix === 'Email') {
-            if (!emailRegex.test(chavePix)) {
-                setMensagemCadastro('Digite email válido');
-                return;
-            }
-        }
-
-        if (tipoChavePix === 'Chave aleatória') {
-            if (chavePix.length != 36) {
-                setMensagemCadastro('Digite chave aleatória válida');
-                return;
-            }
-        }
-
-        if (nomePessoaChavePix == '' || nomePessoaChavePix.length === 0 || !isNaN(nomePessoaChavePix)) {
-            setMensagemCadastro('Digite o nome da pessoa da chave pix');
-            return;
-        }
-        gravarDadosParaRecebimentoPremioPix();
+        console.log('celularGanhador: ' + celularGanhador)
+        gravarDadosParaRecebimentoPremioProduto();
     }
 
-    async function gravarDadosParaRecebimentoPremioPix() {
-        console.log('gravarDadosParaRecebimentoPremioPix: ' + route.params?.rifaDisponivel.id)
-        var dadosParaRecebimentoPremioPix = {
+    async function gravarDadosParaRecebimentoPremioProduto() {
+        console.log('gravarDadosParaRecebimentoPremioProduto: ' + route.params?.rifaDisponivel.id)
+        var dadosParaRecebimentoPremioProduto = {
             idRifa: route.params?.rifaDisponivel.id,
-            tipoChavePixGanhador: tipoChavePix,
-            chavePixGanhador: chavePix,
-            nomePessoaChavePixGanhador: nomePessoaChavePix
+            celularGanhadorPremioProduto: celularGanhador
         }
         setLoading(true)
-        const resultado = await gravaDadosParaRecebimentoPremioPix(dadosParaRecebimentoPremioPix);
+        const resultado = await gravaDadosParaRecebimentoPremioProduto(dadosParaRecebimentoPremioProduto);
         setLoading(false)
         console.log('resultado: ' + resultado)
         if (resultado == 'sucesso') {
             setDadosGravados(true)
-            console.log('Dados para recebimento do Pix gravados com sucesso ')
-            setMensagemCadastro('Dados para recebimento do Pix, gravados com sucesso.');
+            console.log('Dados para recebimento do premio produto gravados com sucesso ')
+            setMensagemCadastro('Dados para recebimento do premio produto, gravados com sucesso.');
             return;
         }
         else {
             setDadosGravados(false)
-            setMensagemCadastro('Falha gravação dados para recebimento do Pix. Tente novamente.');
+            setMensagemCadastro('Falha gravação dados para recebimento do premio produto. Tente novamente.');
             return;
         }
     }
@@ -152,7 +85,7 @@ export default function InformarDadosParaRecebimentoPremioProduto() {
                     <View style={styles.card}>
                         <Image source={{ uri: route.params?.rifaDisponivel.imagemCapa }}
                             style={styles.capa}
-                        /> 
+                        />
                         <AreaRifa>
                             <RifaTextTitulo> {route.params?.rifaDisponivel.titulo} </RifaTextTitulo>
                             <ContentText numberOfLines={8}>
@@ -167,44 +100,28 @@ export default function InformarDadosParaRecebimentoPremioProduto() {
                         Olá {route.params?.rifaDisponivel.nome},
                     </Texto>
                     <Texto>
-                        Você foi o ganhador desta rifa. Para receber o valor de R$ {route.params?.rifaDisponivel.vlrPremioPixSorteio}, preencha os dados abaixo:
+                        Você foi o ganhador desta rifa.
                     </Texto>
-                    <Texto> </Texto>
                     <Texto>
-                        Tipo da sua chave Pix
+                        Informe abaixo, o seu celular, para que o responsável pelo prêmio, entre em contato com você, para a entrega do produto.
                     </Texto>
-                    <View style={styles.container}>
-                        <ModalDropdown
-                            options={descricaoTipoChavePix}
-                            defaultValue={tipoChavePix}
-                            onSelect={handleOptionSelect}
-                            style={styles.dropdown}
-                            textStyle={styles.dropdownText}
-                            dropdownStyle={styles.dropdownDropdown}
-                            dropdownTextStyle={styles.dropdownDropdownText}
-                        />
-                    </View>
                     <Texto>
-                        Chave pix
+                        Quando o responsável ligar para você, informe a ele o código de segurança: {route.params?.rifaDisponivel.codigoSegurancaGanhador}
                     </Texto>
-                    <Input
-                        autoCorrect={false}
-                        autoCaptalize='none'
-                        value={chavePix}
-                        onChangeText={(text) => setChavePix(text)}
+                    <Texto>
+                        Seu número de celular
+                    </Texto>
+                    <TextInputMask
+                        style={styles.input}
+                        type={'cel-phone'}
+                        options={{
+                            maskType: 'BRL',
+                            withDDD: true,
+                            dddMask: '(99)'
+                        }}
+                        value={celularGanhador}
+                        onChangeText={text => setCelularGanhador(text)}
                     />
-                    <Texto>
-                        Nome da pessoa da chave pix
-                    </Texto>
-                    <Input
-                        autoCorrect={false}
-                        autoCaptalize='none'
-                        value={nomePessoaChavePix}
-                        onChangeText={(text) => setNomePessoaChavePix(text)}
-                    />
-                    <Texto>
-                        O valor será depositado em até 5 dias uteis.
-                    </Texto>
                     <View style={estilos.areaMensagemCadastro}>
                         <Text style={estilos.textoMensagemCadastro}>
                             {mensagemCadastro}
@@ -221,7 +138,7 @@ export default function InformarDadosParaRecebimentoPremioProduto() {
                             </AreaBotao>
                             :
                             <AreaBotao>
-                                <SubmitButton onPress={validarDadosChavePix}>
+                                <SubmitButton onPress={validarDados}>
                                     <SubmitText>
                                         Gravar
                                     </SubmitText>
@@ -256,32 +173,15 @@ const styles = StyleSheet.create({
         marginTop: 15,
         marginLeft: 10,
     },
-    container: {
-        justifyContent: 'top',
-        alignItems: 'center',
-        height: 40,
-    },
-    dropdown: {
-        width: 300,
-        height: 40,
-        borderWidth: 1,
+    input: {
+        width: '50%',
+        borderRadius: 5,
         borderColor: '#D3D3D3',
-        padding: 10,
-        borderRadius: 5,
-        marginLeft: 8,
-    },
-    dropdownText: {
-        fontSize: 15,
-    },
-    dropdownDropdown: {
-        width: 300,
-        height: 200,
-        borderColor: 'gray',
         borderWidth: 1,
-        borderRadius: 5,
-        marginLeft: 8,
-    },
-    dropdownDropdownText: {
         fontSize: 15,
+        padding: 5,
+        fontFamily: 'Roboto',
+        color: '#333',
+        marginLeft: 5,
     },
 }) 

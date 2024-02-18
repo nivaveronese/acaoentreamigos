@@ -27,6 +27,7 @@ import DefinirPremio from '../pages/DefinirPremio';
 import InformarDadosParaRecebimentoPremioPix from '../pages/InformarDadosParaRecebimentoPremioPix';
 import VisualizarComprovanteDepositoPixGanhador from '../pages/VisualizarComprovanteDepositoPixGanhador';
 import InformarDadosParaRecebimentoPremioProduto from '../pages/InformarDadosParaRecebimentoPremioProduto';
+import VisualizarCodigoSegurancaGanhador from '../pages/VisualizarCodigoSegurancaGanhador';
 
 const Stack = createNativeStackNavigator();
 
@@ -248,7 +249,14 @@ export default function StackRoutes() {
                 options={{
                     headerShown: false
                 }}
-            />                                          
+            />   
+            <Stack.Screen
+                name='VisualizarCodigoSegurancaGanhador'
+                component={VisualizarCodigoSegurancaGanhador}
+                options={{
+                    headerShown: false
+                }}
+            />                                                    
         </Stack.Navigator>
     )
 }

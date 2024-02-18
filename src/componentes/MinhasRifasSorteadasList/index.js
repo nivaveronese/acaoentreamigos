@@ -7,7 +7,7 @@ export default function MinhasRifasSorteadasList({ data }) {
     console.log('MinhasRifasSorteadasList');
     console.log(data)
     const [loading, setLoading] = useState(false);
- 
+  
     const Premio = ({gen,pre,tit}) => {
         console.log('verifica Premio ');
         if(gen == pre){
@@ -15,7 +15,7 @@ export default function MinhasRifasSorteadasList({ data }) {
         } else {
             return <RifaText> Prêmio sorteado: {tit}</RifaText>
         }
-    }
+    } 
 
     const Receber = ({gen,recPixV,recPixG,recPre}) => {
         console.log('verifica Receber ');
@@ -57,6 +57,7 @@ export default function MinhasRifasSorteadasList({ data }) {
                         </ContentText>
                         <RifaText> Data cadastro: {data.dataCadastro}</RifaText>
                         <RifaText> Qtd bilhetes: {data.qtdBilhetes} Vlr bilhete: {data.vlrBilhete}</RifaText>
+                        <RifaText> Situação rifa: {data.situacao}</RifaText>
                         <RifaText> </RifaText>
                         <RifaText> Data sorteio: {data.dataSorteio}</RifaText>
                         <Premio gen={data.genero} pre={data.premioDefinido} tit={data.titulo}/>
