@@ -28,6 +28,7 @@ import InformarDadosParaRecebimentoPremioPix from '../pages/InformarDadosParaRec
 import VisualizarComprovanteDepositoPixGanhador from '../pages/VisualizarComprovanteDepositoPixGanhador';
 import InformarDadosParaRecebimentoPremioProduto from '../pages/InformarDadosParaRecebimentoPremioProduto';
 import VisualizarCodigoSegurancaGanhador from '../pages/VisualizarCodigoSegurancaGanhador';
+import ConfirmarRecebimentoPremio from '../pages/ConfirmarRecebimentoPremio';
 
 const Stack = createNativeStackNavigator();
 
@@ -256,7 +257,14 @@ export default function StackRoutes() {
                 options={{
                     headerShown: false
                 }}
-            />                                                    
+            />     
+            <Stack.Screen
+                name='ConfirmarRecebimentoPremio'
+                component={ConfirmarRecebimentoPremio}
+                options={{
+                    headerShown: false
+                }}
+            />                                                             
         </Stack.Navigator>
     )
 }

@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Image }
     from 'react-native';
 import estilos from '../../estilos/estilos';
 import {
-    AreaBotao, Input, Texto,RifaText,
+    AreaBotao, Input, Texto, RifaText,
     RifaTextTitulo, SubmitButton, SubmitText, AreaRifa,
     ContentText
 } from './styles';
@@ -152,7 +152,7 @@ export default function InformarDadosParaRecebimentoPremioPix() {
                     <View style={styles.card}>
                         <Image source={{ uri: route.params?.rifaDisponivel.imagemCapa }}
                             style={styles.capa}
-                        /> 
+                        />
                         <AreaRifa>
                             <RifaTextTitulo> {route.params?.rifaDisponivel.titulo} </RifaTextTitulo>
                             <ContentText numberOfLines={8}>
@@ -163,48 +163,51 @@ export default function InformarDadosParaRecebimentoPremioPix() {
                             <RifaText> Situação rifa: {route.params?.rifaDisponivel.situacao}</RifaText>
                         </AreaRifa>
                     </View>
-                    <Texto>
-                        Olá {route.params?.rifaDisponivel.nome},
-                    </Texto>
-                    <Texto>
-                        Você foi o ganhador desta rifa. Para receber o valor de R$ {route.params?.rifaDisponivel.vlrPremioPixSorteio}, preencha os dados abaixo:
-                    </Texto>
-                    <Texto> </Texto>
-                    <Texto>
-                        Tipo da sua chave Pix
-                    </Texto>
-                    <View style={styles.container}>
-                        <ModalDropdown
-                            options={descricaoTipoChavePix}
-                            defaultValue={tipoChavePix}
-                            onSelect={handleOptionSelect}
-                            style={styles.dropdown}
-                            textStyle={styles.dropdownText}
-                            dropdownStyle={styles.dropdownDropdown}
-                            dropdownTextStyle={styles.dropdownDropdownText}
+                    <View style={styles.corpo}>
+                        <Texto>
+                            Olá {route.params?.rifaDisponivel.nome},
+                        </Texto>
+                        <Texto>
+                            Você foi o ganhador desta rifa. Para receber o valor de R$ {route.params?.rifaDisponivel.vlrPremioPixSorteio}, preencha os dados abaixo:
+                        </Texto>
+                        <Texto> </Texto>
+                        <Texto>
+                            Tipo da sua chave Pix
+                        </Texto>
+                        <View style={styles.container}>
+                            <ModalDropdown
+                                options={descricaoTipoChavePix}
+                                defaultValue={tipoChavePix}
+                                onSelect={handleOptionSelect}
+                                style={styles.dropdown}
+                                textStyle={styles.dropdownText}
+                                dropdownStyle={styles.dropdownDropdown}
+                                dropdownTextStyle={styles.dropdownDropdownText}
+                            />
+                        </View>
+                        <Texto>
+                            Chave pix
+                        </Texto>
+                        <Input
+                            autoCorrect={false}
+                            autoCaptalize='none'
+                            value={chavePix}
+                            onChangeText={(text) => setChavePix(text)}
                         />
+                        <Texto>
+                            Nome da pessoa da chave pix
+                        </Texto>
+                        <Input
+                            autoCorrect={false}
+                            autoCaptalize='none'
+                            value={nomePessoaChavePix}
+                            onChangeText={(text) => setNomePessoaChavePix(text)}
+                        />
+                        <Texto>
+                            O valor será depositado em até 5 dias uteis.
+                        </Texto>
+
                     </View>
-                    <Texto>
-                        Chave pix
-                    </Texto>
-                    <Input
-                        autoCorrect={false}
-                        autoCaptalize='none'
-                        value={chavePix}
-                        onChangeText={(text) => setChavePix(text)}
-                    />
-                    <Texto>
-                        Nome da pessoa da chave pix
-                    </Texto>
-                    <Input
-                        autoCorrect={false}
-                        autoCaptalize='none'
-                        value={nomePessoaChavePix}
-                        onChangeText={(text) => setNomePessoaChavePix(text)}
-                    />
-                    <Texto>
-                        O valor será depositado em até 5 dias uteis.
-                    </Texto>
                     <View style={estilos.areaMensagemCadastro}>
                         <Text style={estilos.textoMensagemCadastro}>
                             {mensagemCadastro}
@@ -258,7 +261,7 @@ const styles = StyleSheet.create({
     },
     container: {
         justifyContent: 'top',
-        alignItems: 'center',
+        alignItems: 'left',
         height: 40,
     },
     dropdown: {
@@ -283,5 +286,8 @@ const styles = StyleSheet.create({
     },
     dropdownDropdownText: {
         fontSize: 15,
+    },
+    corpo: {
+        padding: 5,
     },
 }) 

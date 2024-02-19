@@ -61,6 +61,30 @@ export async function excluiRifaNaoLiberadaTransacao(idRifa) {
   }
 }
  
+export async function gravaDadosConfirmacaoRecebimentoPremioProduto(idRifa) {
+  console.log('firestore-gravaDadosConfirmacaoRecebimentoPremioProduto: ' + ' - ' + idRifa)
+  const resultDate = subHours(new Date(), 0);
+  const dataGravacaoDadosConfirmacaoRecebimentoPremioProduto = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
+  const batch = writeBatch(db);
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("id", "==", idRifa));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let docRef = doc.ref;
+      batch.update(docRef, {
+        situacao: 'prêmio produto entregue',
+        dataGravacaoDadosConfirmacaoRecebimentoPremioProduto: dataGravacaoDadosConfirmacaoRecebimentoPremioProduto
+      })
+    });
+    await batch.commit();
+    return 'sucesso'
+  } catch (error) {
+    console.log('Ops, Algo deu errado em gravaDadosConfirmacaoRecebimentoPremioProduto: ' + error.code);
+    return 'Falha em gravaDadosConfirmacaoRecebimentoPremioProduto'
+  }
+}
+
 export async function gravaDadosParaRecebimentoPremioPix(dadosParaRecebimentoPremioPix) {
   console.log('firestore-gravaDadosParaRecebimentoPremioPix: ' + ' - ' + dadosParaRecebimentoPremioPix.idRifa)
   const resultDate = subHours(new Date(), 0);
@@ -161,6 +185,7 @@ export async function gravaPagamentoPreReservaTransacao(data) {
       usuarioQtdBilhetes: data.usuarioQtdBilhetes,
       bilhetesPreReservados: data.bilhetesPreReservados,
       nrsBilhetesPreReservados: data.nrsBilhetesPreReservados,
+      nrsBilhetesPreReservadosFormatados: data.nrsBilhetesPreReservadosFormatados,
       numeroCartaoCredito: data.numeroCartaoCredito,
       nomeCartaoCredito: data.nomeCartaoCredito,
       mesValidadeCartaoCredito: data.mesValidadeCartaoCredito,
@@ -1310,7 +1335,7 @@ export async function obtemMeusBilhetesAdquiridos(uid) {
   const refNomeColecaoUsuario = 'pagamentosPreReservaUsuario-' + `${uid}`;
   try {
     const q = query(collection(db, refNomeColecaoUsuario),
-      orderBy("dataPagamentoSeq", "asc")
+      orderBy("dataPagamentoSeq", "desc")
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {

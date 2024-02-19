@@ -16,10 +16,12 @@ export default function MeusBilhetesAdquiridosList({ data }) {
 
     const Sorteio = ({ dados }) => {
         console.log('verifica sorteio ');
+
         if (dados.situacao == 'aguardando sorteio') {
             return <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
         }
-        if (dados.situacao == 'sorteada') {
+
+        if (dados.situacaoRifaSorteadaGanhador == 'sorteada') {
             let conteudo = '';
             if (dados.genero == 'Pix') {
                 if (dados.uidGanhador == user.uid) {
@@ -27,14 +29,16 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                         <View>
                             <RifaText> </RifaText>
                             <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
+                            <RifaText> Valor do prêmio sorteado: {dados.vlrPremioPixSorteio}</RifaText>
                             <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
                             <RifaText> Final bilhete primeiro premio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
                             <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
+                            <RifaText> </RifaText>
                             <RifaTextGanhador> Parabéns, você foi o ganhador!!!</RifaTextGanhador>
                             <RifaText> </RifaText>
                             <AreaBotao onPress={informarDadosParaRecebimentoPremio}>
                                 <SubmitText>
-                                    Recebimento do prêmio
+                                    Informar dados para recebimento do prêmio
                                 </SubmitText>
                             </AreaBotao>
                         </View>
@@ -45,17 +49,20 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                         <View>
                             <RifaText> </RifaText>
                             <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
+                            <RifaText> Valor do prêmio sorteado: {dados.vlrPremioPixSorteio}</RifaText>
                             <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
                             <RifaText> Final bilhete primeiro premio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
                             <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
                             <RifaText> Iniciais nome ganhador: {dados.iniciaisNomeGanhador} </RifaText>
                             <RifaText> Cidade/uf ganhador: {dados.cidadeUfGanhador} </RifaText>
+                            <RifaText> </RifaText>
                             <RifaTextGanhador> Infelizmente, você nao foi o ganhador.</RifaTextGanhador>
                         </View>
                     )
                     return conteudo;
                 }
             } else {
+                // premio produto
                 if (dados.uidGanhador == user.uid) {
                     if (dados.premioDefinido == 'Pix') {
                         conteudo = (
@@ -63,19 +70,22 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                                 <RifaText> </RifaText>
                                 <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
                                 <RifaText> Prêmio sorteado: {dados.premioDefinido}</RifaText>
+                                <RifaText> Valor do prêmio sorteado: {dados.vlrPremioPixSorteio}</RifaText>
                                 <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
                                 <RifaText> Final bilhete primeiro prêmio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
                                 <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
+                                <RifaText> </RifaText>
                                 <RifaTextGanhador> Parabéns, você foi o ganhador!!!</RifaTextGanhador>
                                 <AreaBotao onPress={informarDadosParaRecebimentoPremio}>
                                     <SubmitText>
-                                        Recebimento do prêmio
+                                        Informar dados para recebimento do prêmio
                                     </SubmitText>
                                 </AreaBotao>
                             </View>
                         )
                         return conteudo;
                     } else {
+                        // premio produto
                         conteudo = (
                             <View>
                                 <RifaText> </RifaText>
@@ -83,10 +93,11 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                                 <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
                                 <RifaText> Final bilhete primeiro prêmio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
                                 <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
+                                <RifaText> </RifaText>
                                 <RifaTextGanhador> Parabéns, você foi o ganhador!!!</RifaTextGanhador>
                                 <AreaBotao onPress={informarDadosParaRecebimentoPremio}>
                                     <SubmitText>
-                                        Recebimento do prêmio
+                                        Informar dados para recebimento do prêmio
                                     </SubmitText>
                                 </AreaBotao>
                             </View>
@@ -100,25 +111,30 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                                 <RifaText> </RifaText>
                                 <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
                                 <RifaText> Prêmio sorteado: {dados.premioDefinido}</RifaText>
+                                <RifaText> Valor do prêmio sorteado: {dados.vlrPremioPixSorteio}</RifaText>
                                 <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
-                                <RifaText> Final bilhete primeiro prêmio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
+                                <RifaText> Final bilhete primeiro premio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
                                 <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
                                 <RifaText> Iniciais nome ganhador: {dados.iniciaisNomeGanhador} </RifaText>
                                 <RifaText> Cidade/uf ganhador: {dados.cidadeUfGanhador} </RifaText>
+                                <RifaText> </RifaText>
                                 <RifaTextGanhador> Infelizmente, você nao foi o ganhador.</RifaTextGanhador>
                             </View>
                         )
                         return conteudo;
-                    } else {
+                    }
+                    else {
+                        // premio produto
                         conteudo = (
                             <View>
                                 <RifaText> </RifaText>
                                 <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
                                 <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
-                                <RifaText> Final bilhete primeiro prêmio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
+                                <RifaText> Final bilhete primeiro premio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
                                 <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
                                 <RifaText> Iniciais nome ganhador: {dados.iniciaisNomeGanhador} </RifaText>
                                 <RifaText> Cidade/uf ganhador: {dados.cidadeUfGanhador} </RifaText>
+                                <RifaText> </RifaText>
                                 <RifaTextGanhador> Infelizmente, você nao foi o ganhador.</RifaTextGanhador>
                             </View>
                         )
@@ -127,56 +143,67 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                 }
             }
         }
-        if (dados.situacao == 'dados para recebimento prêmio pix gravado') {
-            let conteudo = '';
-            conteudo = (
-                <View>
-                    <RifaTextGanhador> Parabéns, você foi o ganhador!!!</RifaTextGanhador>
-                    <RifaText> </RifaText>
-                    <RifaText>Data da informação dos dados para recebimento prêmio: {dados.
-                        dataGravacaoDadosParaRecebimentoPremioPix} </RifaText>
-                    <RifaText>Se após 5 dias úteis da data acima, você nao recebeu o Pix do prêmio em sua conta, envie um email para veronesedigital@gmail.com, informando o codigo da rifa: {dados.id} </RifaText>
-                    <RifaText></RifaText>
-                </View>
-            )
-            return conteudo;
+
+        if (dados.situacaoRifaSorteadaGanhador == 'dados para recebimento prêmio pix gravado') {
+            if (dados.uidGanhador == user.uid) {
+                let conteudo = '';
+                conteudo = (
+                    <View>
+                        <RifaText> </RifaText>
+                        <RifaText>Data da informação dos dados para recebimento prêmio: {dados.
+                            dataGravacaoDadosParaRecebimentoPremioPix} </RifaText>
+                        <RifaText>Se após 5 dias úteis da data acima, você nao recebeu o Pix do prêmio em sua conta, envie um email para veronesedigital@gmail.com, informando o codigo da rifa: {dados.id} </RifaText>
+                        <RifaText></RifaText>
+                    </View>
+                )
+                return conteudo;
+            }
         }
-        if (dados.situacao == 'dados para recebimento prêmio produto gravado') {
-            let conteudo = '';
-            conteudo = (
-                <View>
-                    <RifaTextGanhador> Parabéns, você foi o ganhador!!!</RifaTextGanhador>
-                    <RifaText> </RifaText>
-                    <RifaText>Data da informação dos dados para recebimento prêmio: {dados.
-                        dataGravacaoDadosParaRecebimentoPremioProduto} </RifaText>
-                    <RifaText>Se após 5 dias úteis da data acima, você nao recebeu o prêmio, envie um email para veronesedigital@gmail.com, informando o codigo da rifa: {dados.id} </RifaText>
-                    <RifaText></RifaText>
-                    <AreaBotao onPress={reverCodigoSegurancaGanhador}>
-                        <SubmitText>
-                            Rever código segurança
-                        </SubmitText>
-                    </AreaBotao>
-                </View>
-            )
-            return conteudo;
+
+        if (dados.situacaoRifaSorteadaGanhador == 'pix depositado para ganhador') {
+            if (dados.uidGanhador == user.uid) {
+                let conteudo = '';
+                conteudo = (
+                    <View>
+                        <RifaText> </RifaText>
+                        <RifaText>Data do depósito do pix: {dados.
+                            dataComprovantePixGanhador} </RifaText>
+                        <RifaText></RifaText>
+                        <AreaBotao onPress={visualizarComprovanteDepositoPixGanhador}>
+                            <SubmitText>
+                                Visualizar comprovante depósito Pix
+                            </SubmitText>
+                        </AreaBotao>
+                    </View>
+                )
+                return conteudo;
+            }
         }
-        if (dados.situacao == 'pix depositado para ganhador') {
-            let conteudo = '';
-            conteudo = (
-                <View>
-                    <RifaTextGanhador> Parabéns, você foi o ganhador!!!</RifaTextGanhador>
-                    <RifaText> </RifaText>
-                    <RifaText>Data do depósito do pix: {dados.
-                        dataComprovantePixGanhador} </RifaText>
-                    <RifaText></RifaText>
-                    <AreaBotao onPress={visualizarComprovanteDepositoPix}>
-                        <SubmitText>
-                            Visualizar comprovante depósito Pix
-                        </SubmitText>
-                    </AreaBotao>
-                </View>
-            )
-            return conteudo;
+
+        if (dados.situacaoRifaSorteadaGanhador == 'dados para recebimento prêmio produto gravado') {
+            if (dados.uidGanhador == user.uid) {
+                let conteudo = '';
+                conteudo = (
+                    <View>
+                        <RifaText> </RifaText>
+                        <RifaText>Data da informação dos dados para recebimento prêmio: {dados.
+                            dataGravacaoDadosParaRecebimentoPremioProduto} </RifaText>
+                        <RifaText>Se após 5 dias úteis da data acima, o responsável pelo premio {dados.nome}, ainda nao entrou em contato com voce, envie um email para veronesedigital@gmail.com, informando o codigo da rifa: {dados.id} </RifaText>
+                        <RifaText></RifaText>
+                        <AreaBotao onPress={reverCodigoSegurancaGanhador}>
+                            <SubmitText>
+                                Rever código segurança
+                            </SubmitText>
+                        </AreaBotao>
+                        <AreaBotao onPress={confirmarRecebimentoPremio}>
+                            <SubmitText>
+                                Confirmar recebimento do premio
+                            </SubmitText>
+                        </AreaBotao>
+                    </View>
+                )
+                return conteudo;
+            }
         }
     }
 
@@ -189,14 +216,19 @@ export default function MeusBilhetesAdquiridosList({ data }) {
         }
     }
 
-    function visualizarComprovanteDepositoPix() {
-        console.log('visualizarComprovanteDepositoPix');
+    function visualizarComprovanteDepositoPixGanhador() {
+        console.log('visualizarComprovanteDepositoPixGanhador');
         navigation.navigate('VisualizarComprovanteDepositoPixGanhador', data);
     }
 
     function reverCodigoSegurancaGanhador() {
         console.log('reverCodigoSegurancaGanhador');
         navigation.navigate('VisualizarCodigoSegurancaGanhador', data);
+    }
+
+    function confirmarRecebimentoPremio() {
+        console.log('confirmarRecebimentoPremio');
+        navigation.navigate('ConfirmarRecebimentoPremio', data);
     }
 
     if (loading) {
