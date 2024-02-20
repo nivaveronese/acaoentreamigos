@@ -97,7 +97,7 @@ export async function gravaDadosParaRecebimentoPremioPix(dadosParaRecebimentoPre
     querySnapshot.forEach((doc) => {
       let docRef = doc.ref;
       batch.update(docRef, {
-        situacao: 'dados para recebimento prêmio pix gravado',
+        situacaoRifaSorteadaGanhador: 'dados para recebimento prêmio pix gravado',
         dataGravacaoDadosParaRecebimentoPremioPix: dataGravacaoDadosParaRecebimentoPremioPix,
         tipoChavePixGanhador: dadosParaRecebimentoPremioPix.tipoChavePixGanhador,
         chavePixGanhador: dadosParaRecebimentoPremioPix.chavePixGanhador,
