@@ -22,6 +22,8 @@ export default function MeusBilhetesAdquiridosList({ data }) {
         }
 
         if (dados.situacao == 'sorteada') {
+            console.log('dados.situacao: ' + dados.situacao)
+            let conteudo = [];
             let conteudo1 = '';
             let conteudo2 = '';
             let conteudo3 = '';
@@ -31,12 +33,12 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                 <View>
                     <RifaText> </RifaText>
                     <RifaText> Data sorteio: {dados.dataSorteio}</RifaText>
-                    <RifaText> Valor do prêmio sorteado: {dados.vlrPremioPixSorteio}</RifaText>
                     <RifaText> Bilhete primeiro prêmio loteria federal: {dados.bilhetePrimeiroPremioLoteriaFederal}</RifaText>
-                    <RifaText> Final bilhete primeiro premio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
+                    <RifaText> Final bilhete primeiro prêmio loteria federal: {dados.finalBilhetePrimeiroPremioLoteriaFederal}</RifaText>
                     <RifaText> Bilhete premiado: {dados.bilhetePremiado}</RifaText>
                 </View>
             );
+            conteudo.push(conteudo1)
             if (dados.genero == 'Pix') {
                 conteudo2 = (
                     <View>
@@ -44,15 +46,16 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                     </View>
                 )
             } else {
-                if (dados.premioDefinido == 'Pix') {
+                if (dados.prêmioDefinido == 'Pix') {
                     conteudo2 = (
                         <View>
-                            <RifaText> Prêmio sorteado: {dados.premioDefinido}</RifaText>
+                            <RifaText> Prêmio sorteado: {dados.prêmioDefinido}</RifaText>
                             <RifaText> Valor do prêmio sorteado: {dados.vlrPremioPixSorteio}</RifaText>
                         </View>
                     )
                 }
             }
+            conteudo.push(conteudo2)
             if (dados.uidGanhador == user.uid) {
                 conteudo3 = (
                     <View>
@@ -64,10 +67,11 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                 conteudo3 = (
                     <View>
                         <RifaText> </RifaText>
-                        <RifaTextGanhador> Infelizmente, você nao foi o ganhador.</RifaTextGanhador>
+                        <RifaTextGanhador> Infelizmente, você não foi o ganhador.</RifaTextGanhador>
                     </View>
                 )
             }
+            conteudo.push(conteudo3);
             if (dados.uidGanhador == user.uid) {
                 if (dados.situacaoRifaSorteadaGanhador == 'sorteada') {
                     conteudo4 = (
@@ -80,6 +84,7 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                             </AreaBotao>
                         </View>
                     )
+                    conteudo.push(conteudo4);
                 }
                 if (dados.situacaoRifaSorteadaGanhador == 'dados para recebimento prêmio pix gravado') {
                     conteudo4 = (
@@ -87,9 +92,10 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                             <RifaText> </RifaText>
                             <RifaText>Data da informação dos dados para recebimento prêmio: {dados.
                                 dataGravacaoDadosParaRecebimentoPremioPix} </RifaText>
-                            <RifaText>Se após 5 dias úteis da data acima, você nao recebeu o Pix do prêmio em sua conta, envie um email para veronesedigital@gmail.com, informando o codigo da rifa: {dados.id} </RifaText>
+                            <RifaText>Se após 5 dias úteis da data acima, você não recebeu o Pix do prêmio em sua conta, envie um email para veronesedigital@gmail.com, informando o código da rifa: {dados.id} </RifaText>
                         </View>
                     )
+                    conteudo.push(conteudo4);
                 }
                 if (dados.situacaoRifaSorteadaGanhador == 'dados para recebimento prêmio produto gravado') {
                     conteudo4 = (
@@ -97,7 +103,7 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                             <RifaText> </RifaText>
                             <RifaText>Data da informação dos dados para recebimento prêmio: {dados.
                                 dataGravacaoDadosParaRecebimentoPremioProduto} </RifaText>
-                            <RifaText>Se após 5 dias úteis da data acima, o responsável pelo prêmio {dados.nome}, ainda nao entrou em contato com você, envie um email para veronesedigital@gmail.com, informando o codigo da rifa: {dados.id} </RifaText>
+                            <RifaText>Se após 5 dias úteis da data acima, o responsável pelo prêmio {dados.nome}, ainda não entrou em contato com você, envie um email para veronesedigital@gmail.com, informando o código da rifa: {dados.id} </RifaText>
                             <RifaText></RifaText>
                             <AreaBotao onPress={reverCodigoSegurancaGanhador}>
                                 <SubmitText>
@@ -106,11 +112,12 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                             </AreaBotao>
                             <AreaBotao onPress={confirmarRecebimentoPremio}>
                                 <SubmitText>
-                                    Confirmar recebimento do premio
+                                    Confirmar recebimento do prêmio
                                 </SubmitText>
                             </AreaBotao>
                         </View>
                     )
+                    conteudo.push(conteudo4);
                 }
                 if (dados.situacaoRifaSorteadaGanhador == 'pix depositado para ganhador') {
                     conteudo5 = (
@@ -126,9 +133,9 @@ export default function MeusBilhetesAdquiridosList({ data }) {
                             </AreaBotao>
                         </View>
                     )
+                    conteudo.push(conteudo5);
                 }
             }
-            let conteudo = conteudo1 + conteudo2 + conteudo3 + conteudo4 + conteudo5;
             return conteudo;
         }
     }
@@ -138,7 +145,7 @@ export default function MeusBilhetesAdquiridosList({ data }) {
         if (data.rifaDisponivel.genero == 'Pix') {
             navigation.navigate('InformarDadosParaRecebimentoPremioPix', data);
         } else {
-            if (rifaDisponivel.premioDefinido == 'Pix') {
+            if (rifaDisponivel.prêmioDefinido == 'Pix') {
                 navigation.navigate('InformarDadosParaRecebimentoPremioPix', data);
             } else {
                 navigation.navigate('InformarDadosParaRecebimentoPremioProduto', data);
@@ -198,7 +205,7 @@ export default function MeusBilhetesAdquiridosList({ data }) {
         )
     }
 }
-
+ 
 const styles = StyleSheet.create({
     card: {
         shadowColor: '#000',

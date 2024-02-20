@@ -62,7 +62,7 @@ export default function MinhasRifasAguardandoSorteioList({ data }) {
                         <RifaText> Qtd bilhetes pagos: {data.qtdTotalBilhetesPagos}</RifaText>
                         <RifaText> Vlr total bilhetes pagos: {data.vlrTotalBilhetesPagos}</RifaText>
                         <Premio gen={data.genero} pre={data.premioDefinido} tit={data.titulo}/>
-                        <Receber gen={data.genero} recPixV={data.vlrLiquidoAReceberResponsavelPix} recPixG={data.vlrPremioPixSorteio} recPre={data.vlrLiquidoAReceberResponsavelPremio}/>
+                        <Receber gen={data.genero} recPixV={data.vlrLiquidoAReceberResponsavel} recPixG={data.vlrPremioPixSorteio} recPre={data.vlrLiquidoAReceberResponsavel}/>
                     </ListaRifas>
                 </View>
             </SafeAreaView>

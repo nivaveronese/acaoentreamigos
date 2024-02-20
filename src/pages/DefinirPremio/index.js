@@ -172,7 +172,7 @@ export default function DefinirPremio() {
                         (-) Ganhador vai receber R$: {route.params?.vlrPremioPixSorteio}
                     </Texto> 
                     <Texto>
-                        (=) Voce vai receber R$: {route.params?.vlrLiquidoAReceberResponsavelPix}
+                        (=) Voce vai receber R$: {route.params?.vlrLiquidoAReceberResponsavel}
                     </Texto>                     
                     <Texto> </Texto>
                     <Texto>

@@ -29,6 +29,8 @@ import VisualizarComprovanteDepositoPixGanhador from '../pages/VisualizarComprov
 import InformarDadosParaRecebimentoPremioProduto from '../pages/InformarDadosParaRecebimentoPremioProduto';
 import VisualizarCodigoSegurancaGanhador from '../pages/VisualizarCodigoSegurancaGanhador';
 import ConfirmarRecebimentoPremio from '../pages/ConfirmarRecebimentoPremio';
+import InformarDadosParaRecebimentoValorResponsavel from '../pages/InformarDadosParaRecebimentoValorResponsavel';
+import VisualizarComprovanteDepositoValorResponsavel from '../pages/VisualizarComprovanteDepositoValorResponsavel';
 
 const Stack = createNativeStackNavigator();
 
@@ -264,7 +266,21 @@ export default function StackRoutes() {
                 options={{
                     headerShown: false
                 }}
-            />                                                             
+            />   
+            <Stack.Screen
+                name='InformarDadosParaRecebimentoValorResponsavel'
+                component={InformarDadosParaRecebimentoValorResponsavel}
+                options={{
+                    headerShown: false
+                }}
+            />  
+            <Stack.Screen
+                name='VisualizarComprovanteDepositoValorResponsavel'
+                component={VisualizarComprovanteDepositoValorResponsavel}
+                options={{
+                    headerShown: false
+                }}
+            />                                                                                  
         </Stack.Navigator>
     )
 }

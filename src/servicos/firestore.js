@@ -112,6 +112,33 @@ export async function gravaDadosParaRecebimentoPremioPix(dadosParaRecebimentoPre
   }
 }
 
+export async function gravaDadosParaRecebimentoValorResponsavel(dadosParaRecebimentoValorResponsavel) {
+  console.log('firestore-gravaDadosParaRecebimentoValorResponsavel: ' + ' - ' + dadosParaRecebimentoValorResponsavel.idRifa)
+  const resultDate = subHours(new Date(), 0);
+  const dataGravacaoDadosParaRecebimentoValorResponsavel = format(resultDate, 'dd/MM/yyyy HH:mm:ss')
+  const batch = writeBatch(db);
+  try {
+    const q = query(collection(db, "rifasDisponiveis"),
+      where("id", "==", dadosParaRecebimentoValorResponsavel.idRifa));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      let docRef = doc.ref;
+      batch.update(docRef, {
+        situacaoRifaSorteadaResponsavel: 'dados para recebimento valor responsável gravado',
+        dataGravacaoDadosParaRecebimentoValorResponsavel: dataGravacaoDadosParaRecebimentoValorResponsavel,
+        tipoChavePixResponsavel: dadosParaRecebimentoValorResponsavel.tipoChavePixResponsavel,
+        chavePixResponsavel: dadosParaRecebimentoValorResponsavel.chavePixResponsavel,
+        nomePessoaChavePixResponsavel: dadosParaRecebimentoValorResponsavel.nomePessoaChavePixResponsavel
+      })
+    });
+    await batch.commit();
+    return 'sucesso'
+  } catch (error) {
+    console.log('Ops, Algo deu errado em gravaDadosParaRecebimentoValorResponsavel: ' + error.code);
+    return 'Falha em gravaDadosParaRecebimentoValorResponsavel'
+  }
+}
+
 export async function gravaDadosParaRecebimentoPremioProduto(dadosParaRecebimentoPremioProduto) {
   console.log('firestore-gravaDadosParaRecebimentoPremioProduto: ' + ' - ' + dadosParaRecebimentoPremioProduto.idRifa + ' - ' + dadosParaRecebimentoPremioProduto.celularGanhadorPremioProduto)
   const resultDate = subHours(new Date(), 0);
@@ -124,7 +151,8 @@ export async function gravaDadosParaRecebimentoPremioProduto(dadosParaRecebiment
     querySnapshot.forEach((doc) => {
       let docRef = doc.ref;
       batch.update(docRef, {
-        situacao: 'dados para recebimento prêmio produto gravado',
+        situacaoRifaSorteadaGanhador: 'dados para recebimento prêmio produto gravado',
+        situacaoRifaSorteadaResponsavel: 'ganhador informou dados para receber o prêmio',
         dataGravacaoDadosParaRecebimentoPremioProduto: dataGravacaoDadosParaRecebimentoPremioProduto,
         celularGanhadorPremioProduto: dadosParaRecebimentoPremioProduto.celularGanhadorPremioProduto
       })
